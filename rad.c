@@ -9,9 +9,85 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
- 
+#include "system.h"
 #define NUM_THREADS 5
+#include <stdbool.h>
+struct state_vector       SPHERE_STATE_VECTOR(struct state_vector        next_state, float dt );
+float fovy = 45.0;
+float dNear = 100;
+float dFar = 2000;
+int DONE_WITH_THIS_0 = 0;
+float cameraEye[3] = {0.0, 0.0, 1000.0};
+float lightRotation[16] = {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
+float cameraLookAt[4] = {0.0, 0.0, 0.0, 1.0};
+float cameraUp[4] = {0.0, 1.0, 0.0};
+
+float viewRotation[16] = {1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
+
+float rotationX=0.0;
+float rotationY=0.0;
+struct state_vector sphere_state;
+void key(unsigned char key, int x, int y);
+
+float prevX=0.0;
+float prevY=0.0;
+bool mouseDown=false;
+void mouse(int button, int state, int x, int y){
+    if(button == GLUT_LEFT_BUTTON && state==GLUT_DOWN){
+        mouseDown = true;
+        prevX = x - rotationY;
+        prevY = y - rotationX;
+    }else{
+        mouseDown = false;
+    }
+}
+
+void mouseMotion(int x, int y){
+    if(mouseDown){
+        rotationX = y - prevY;
+        rotationY = x - prevX;
+        glutPostRedisplay();
+    }
+}
+float global_ambient[4] = {0.0, 0.0, 0.0, 0.0};
+struct Light_ {
+        float pos[4];
+        float ambient[3];
+        float difusse[3];
+        float specular[3];
+
+        void (*setPosition_light)(float,float,float);
+	void (*setAmbient_light)(float,float,float);
  
+        void (*setDifusse_light)(float,float,float);
+	void (*setSpecular_light)(float,float,float);
+
+
+};
+void reshape(int w, int h){
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(fovy, (GLdouble)w/(GLdouble)h, dNear, dFar);
+    glViewport(0, 0, w, h);
+} 
+int listplane; 
+int listplane2;
+typedef struct Light_ Light ;
+struct Material_ {
+        float ambient[4];
+        float difusse[4];
+        float specular[4];
+        float shininess;
+
+        void (*setAmbient_material)(float,float,float,float);
+	void (*setDifusse_material)(float,float,float,float);
+ 
+        void (*setSpecular_material)(float,float,float,float);
+	void (*setShininess_material)(float);
+
+
+};
+typedef struct Material_ Material ; 
 /* create thread argument struct for thr_func() */
 typedef struct _thread_data_t {
   int tid;
@@ -28,10 +104,17 @@ typedef struct _thread_data_t {
 #define PERMEABILITY 25000.0 
 #define G 4.818
 
-#define EFIELD 250.0
-#define PERMEABILITY 25000.0  
-#define G 3.1
 
+
+
+#define EFIELD 1200.0
+#define PERMEABILITY 37000.0  
+#define G 9.8
+
+#define EFIELD 300.0
+#define PERMEABILITY 25000.0  
+#define G 15.1
+#define WATTTT 10296.7
 double  position1[1000000];
 double  energy[1000000];
 double time_[1000000];
@@ -52,14 +135,14 @@ double distance_in_material = 0;
 double freq = 60.0;
 double velocity= 894.43;
 double wavelength = 14.9;
-double new_U =250.0;
-double new_W = 7151;
-double WATT =  7151;
+double new_U =EFIELD;
+double new_W = WATTTT;
+double WATT =   WATTTT;
 double RESISTANCE;
 double little_g;
 double DISTANCE_;
 double new_m ;
-double NEWWU= 250.0;
+double NEWWU= EFIELD;
 double DISTANCE__;
 double mega_g;
 double GG = 0;
@@ -69,6 +152,8 @@ int K;
 struct state_vector    state_result_photon;
 void rates_photon ( double *t, double *f, double result[]   )
 {
+if(DONE_WITH_THIS_0 == 1)
+	return;
 /*
   Do some initial setup!
 */
@@ -86,7 +171,8 @@ relativ_permeability = 25000;
 velocity = 1*299792458.0/(sqrt(1*25000.0/2.0*(sqrt(1+pow((10.0/(2*M_PI*60*8.854e-12)),2.0))+1))); 
 
 relativ_permeability = 179751035759958240.0/(pow(velocity,2.0) + sqrt((32310434856777778462720.0 + pow(freq,2.0))/pow(freq,2.0)) * pow(velocity,2.0));
-DISTANCE__ =-(25.0 *log(2.0/new_U))/195728.0;
+//DISTANCE__ =-(25.0 *log(2.0/new_U))/195728.0;
+DISTANCE__ =fabs(0.000817069 + 0.000127728* log(1.0/pow(new_U,2.0)));
 one++;
 }
 else
@@ -128,7 +214,7 @@ position1[work] = 1*fabs(velocity/freq);
 if(result_once == 0)
 {   
  w = 2*M_PI*freq;
-
+DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(relativ_permeability)*1.03e7*freq)) *5;
 energy[work] = 0.5*(pow(w,2)*new_m*pow(f[0],2.0));
 
 double Q = energy[work]/(energy[work-1]-energy[work])*2*M_PI;
@@ -170,7 +256,7 @@ double A_atom = pow(1.4e-10 ,2.0)*M_PI*4;
 ...Then how many photons strikes one atom:
 */
 
-double how_many_photons_on_one_atom =   (((( new_W)/(6.626e-34* 1)) ) *pow(2.48e-10,2.0)/0.374*M_PI  );
+double how_many_photons_on_one_atom =   (((( new_W)/(6.626e-34* freq)) ) *pow(1.26e-10,2.0)/0.374*M_PI  );
  
 /*
 ...Calculate the gravity of single atom:
@@ -178,15 +264,17 @@ double how_many_photons_on_one_atom =   (((( new_W)/(6.626e-34* 1)) ) *pow(2.48e
 
 double amplitude = (0.202642 *powf(velocity,2.0))/(pow(NEWWU,2.0)* powf(freq,2.0)* powf(f[0],2.0));//(0.767495* NEWWU* freq *(velocity/freq))/pow(velocity,2.0);
 double photonarea = M_PI*pow(amplitude,2.0);
-double ironatomarea =  M_PI*pow(2.48e-10,2.0); 
+double ironatomarea =  M_PI*pow(1.26e-10,2.0); 
 double div = photonarea/ironatomarea;
 		 
-atomic_frequency =    (1.02276e7* pow((pow(2.48e-10,2.0)*4*M_PI/0.374),1.0/6.0)* pow(velocity,2.0/3.0)* pow(new_W,1.0/6.0))/(pow(f[0],5.0/6.0)* NEWWU);//(7571.75  *pow(f[3],(2.0/3.0)) *pow(new_W,1.0/6.0))/(pow(f[0],5.0/6.0) *NEWWU);// (2703148515975084336218112 *freq* f[0]* new_W)/pow(velocity,4);
+atomic_frequency =    (1.02276e7* pow((pow(1.26e-10,2.0)*4*M_PI/0.374),1.0/6.0)* pow(velocity,2.0/3.0)* pow(new_W,1.0/6.0))/(pow(f[0],5.0/6.0)* NEWWU);//(7571.75  *pow(f[3],(2.0/3.0)) *pow(new_W,1.0/6.0))/(pow(f[0],5.0/6.0) *NEWWU);// (2703148515975084336218112 *freq* f[0]* new_W)/pow(velocity,4);
 //little_g =1*div*1000000.0*how_many_photons_on_one_atom*(2.23897e-45)/((velocity/freq)*freq* pow(NEWWU,2.0)* pow(amplitude,2.0));
-//little_g =1*div*1* (how_many_photons_on_one_atom)*6.67e-11*(2.0/3.0*powf(2.48e-10,2.0)*9.2732e-26*2*M_PI* (atomic_frequency))/(2*powf(299792458,2.0)*powf(2.48e-10,3.0))*299792458.0/9.78;
+//little_g =1*div*1* (how_many_photons_on_one_atom)*6.67e-11*(2.0/3.0*powf(1.26e-10,2.0)*9.2732e-26*2*M_PI* (atomic_frequency))/(2*powf(299792458,2.0)*powf(1.26e-10,3.0))*299792458.0/9.78;
+//little_g = 36* div *1000000* (how_many_photons_on_one_atom)*6.67e-11*new_m/(pow(amplitude,2.0));
 
-//little_g = 3.3* div *10000000* (how_many_photons_on_one_atom)*6.67e-11*new_m/(pow(amplitude,2.0));
-little_g = div*1000000.0*how_many_photons_on_one_atom*(2.23897e-45)/((velocity/freq)*freq* pow(NEWWU,2.0)* pow(amplitude,2.0));
+little_g =div  *0.0000625* (how_many_photons_on_one_atom)*6.67e-11*(2.0/3.0*powf(1.26e-10,2.0)*9.2732e-26*2*M_PI* (atomic_frequency))/(2*powf(299792458,2.0)*powf(1.26e-10,3.0))*299792458.0/9.78;
+//6.67e-11*(3.35677×10^-35)/(f l U^2)/(h^2)
+//little_g = 1*div*1000000.0*how_many_photons_on_one_atom*(2.23897e-45)/((velocity/freq)*freq* pow(NEWWU,2.0)* pow(amplitude,2.0));
 //printf("little_g = %.100f \n", little_g);  
 GG = GG +little_g;
 //printf("GG = %.100Lf \n", GG);  
@@ -199,7 +287,7 @@ double penetratingdistanceconstant = fabs(5.0/(DISTANCE_));
 */ 
 if(attenuation < 0)
 attenuation = -attenuation;
-	NEWWU   = fabs((exp(-(((distance_in_material ) )*7829.12))*EFIELD ));
+	NEWWU   = fabs((exp(-(((distance_in_material ) )*7195.58))*EFIELD ));
 	new_W = pow(NEWWU ,2.0)*RESISTANCE;
 /*  
 ...Calculate the total gravity summation:
@@ -234,14 +322,17 @@ printf("Velocity of photons  = %.10f m/s^2 \n",velocity);
 printf("Total gravity recording = %.100f m/s^2 \n", mega_g  );
  //sleep(1);
 printf("Distance traveled in medium by a photon = %.40f meter \n",distance_in_material);
-printf("distance/atomic_spacing  = %.10f \n", ( distance_in_material)/( 2.48e-10   ) );
+printf("distance/atomic_spacing  = %.10f \n", ( distance_in_material)/( 1.26e-10   ) );
  
 printf("distance needed  = %.10f \n", DISTANCE__ ); 
 printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n"); 
 
 }
-if( fabs(distance_in_material) > 0.00064 || mega_g > G ||  velocity < 0)
-	for(;;);
+if( fabs(distance_in_material) > DISTANCE__ || mega_g > G ||  velocity < 0 || new_U < (2.0*300.0/EFIELD))
+ {
+	DONE_WITH_THIS_0 = 1;	
+	init_tasks(0,0);
+}
 
 time_[work] = -1.0/(C*w);
 if(result_once == 0)
@@ -295,9 +386,8 @@ struct state_vector  get_photon_state_oscillate_task1(struct state_vector next_s
 	f0[3] =next_state.vel_new_x;
 	f0[4] =next_state.vel_new_y;
 	f0[5] =next_state.vel_new_z;
- 	 rk45(rates_photon, t0, f0,f0_result, tf,z,6, 10000000  );
-printf("_________________________________________________\n");
-//rates_photon();
+ 	 rk45(rates_photon, t0, f0,f0_result, tf,z,6, 1000000  );
+	//rates_photon();
 	state_result_photon.pos_new_x = f0_result[0];
 	state_result_photon.pos_new_y = f0_result[1];
 	state_result_photon.pos_new_z = f0_result[2];
@@ -311,12 +401,13 @@ printf("_________________________________________________\n");
 
 void task1(void )
 {
- 	while(1)
-	{
+ 	//while(1)
+	//{
 		photon_oscillate = get_photon_state_oscillate_task1(photon_oscillate,1,1);
+
 	//	printf("photon_oscillate position = %.10f \n", photon_oscillate.pos_new_x);
 	//	printf("photon_oscillate velocity = %.10f \n", photon_oscillate.vel_new_x);
-	}
+	//}
 }
 
 
@@ -325,14 +416,22 @@ void *thr_func(void *arg) {
 /* if(data->tid == 0)
 	task0();*/
  if(data->tid == 0)
-	task1();
- /*if(data->tid == 2)
-	task2();*/
-/* if(data->tid == 3)
-	init_tasks();*/
-  pthread_exit(NULL);
+	task2();
+ 
+	
+ 
+  //pthread_exit(NULL);
 }
 
+void rates_sphere_g_acc(double *t, double *f, double result[] )
+{
+
+    result[0] =            0;
+    result[1] =            f[4]*1;
+    result[2] =            0;
+
+    result[4] =             (mega_g   -9.78)/10000.0;
+}
 int multitasks( ) {
   pthread_t thr[NUM_THREADS];
   int i, rc;
@@ -353,15 +452,290 @@ int multitasks( ) {
 }
 
 void display  (void){
+sphere_state = SPHERE_STATE_VECTOR(sphere_state,1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+ 
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_COLOR_MATERIAL);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
+    glMultMatrixf(lightRotation);
+ 
+
+    glLoadIdentity();
+    gluLookAt(cameraEye[0]+0, cameraEye[1]+253, cameraEye[2]-423, cameraLookAt[0], cameraLookAt[1], cameraLookAt[2], cameraUp[0], cameraUp[1], cameraUp[2]);
+
+    glMultMatrixf(viewRotation);
+
+    glRotatef(rotationX,1,0,0);
+    glRotatef(rotationY+220,0,1,0);
+
+    glMultMatrixf(lightRotation);
+    glPushMatrix();
+    glScalef( 50, 50, 50); 
+    glCallList(listplane);
+    glPopMatrix();	 
+
+
+
+    glPushMatrix();
+    glScalef( 50, 50, 50); 
+    glCallList(listplane2);
+    glPopMatrix();	 
+    
+
+    glPushMatrix();
+ 
+ 
+ 
+ 
+    glTranslatef(0, sphere_state.pos_new_y/1 +40 ,0);
+
+    double x = 697.0/20.0 - (3485.0 *mega_g)/978.0;//-697.0000/980.0000*(5*(mega_g+mega_g_vert)*1-49);
+
+
+ 	//697/20 - (3485 y)/978 < 0.159*34.85 ||  697/20 - (3485 y)/978 > 0.159*34.85
+    glutPostRedisplay();
+    if(x < 0.159*34.85/**1 < 34.85*0.159 && x*1 > -34.85*0.159*/)
+    {
+
+    }
+    else
+    {
+   
+ 	glutSolidSphere(30,330,100  );
+}
+glutSwapBuffers();
 }
 
 
+Light *dirLight;
+int mass_once_vert = 1;
+Material *material;
+double findMod(double a, double b)
+{
+    // Handling negative values
+    if (a < 0)
+        a = -a;
+    if (b < 0)
+        b = -b;
+ 
+    // Finding mod by repeated subtraction
+    double mod = a;
+    while (mod >= b)
+        mod = mod - b;
+ 
+    // Sign of result typically depends
+    // on sign of a.
+    if (a < 0)
+        return -mod;
+ 
+    return mod;
+}
+ 
+ 
+void  setPosition_light(float x, float y, float z)
+{
+////////////////////////////printf("light1\n");
+    dirLight->pos[0] = x;
+    dirLight->pos[1] = y;
+    dirLight->pos[2] = z;
+    dirLight->pos[3] = 0.0f;
+}
+
+void  setAmbient_light(float x, float y, float z)
+{
+////////////////////////////printf("light2\n");
+    dirLight->ambient[0] = x;
+    dirLight->ambient[1] = y;
+    dirLight->ambient[2] = z;
+}
+
+void  setDifusse_light(float x, float y, float z)
+{
+////////////////////////////printf("light3\n");
+    dirLight->difusse[0] = x;
+    dirLight->difusse[1] = y;
+    dirLight->difusse[2] = z;
+}
+
+void  setSpecular_light(float x, float y, float z)
+{
+ 
+    dirLight->specular[0] = x;
+    dirLight->specular[1] = y;
+    dirLight->specular[2] = z;
+}
+
+ 
+
+void setAmbient_material(float x, float y, float z, float e)
+{
+    material->ambient[0] = x;
+    material->ambient[1] = y;
+    material->ambient[2] = z;
+    material->ambient[3] = e;
+}
+
+void  setDifusse_material(float x, float y, float z, float e)
+{
+    material->difusse[0] = x;
+    material->difusse[1] = y;
+    material->difusse[2] = z;
+    material->difusse[3] = e;
+}
+
+void  setSpecular_material(float x, float y, float z, float e)
+{
+    material->specular[0] = x;
+    material->specular[1] = y;
+    material->specular[2] = z;
+    material->specular[3] = e;
+}
+
+void  setShininess_material(float shine)
+{
+    material->shininess = shine;
+}
+
+void init_tasks(int argc, char **argv)
+{
+   
+    GLint glut_display;
+    glutInitWindowSize (1000,1000);
+    glutCreateWindow ("photon_encounter_teathers");
+
+    int mainMenu;
+    const GLubyte *str;
+    str = glGetString (GL_EXTENSIONS);
+
+    glEnable(GL_NORMALIZE);
+ 
+    glEnable(GL_DEPTH_TEST);
+ 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    glMatrixMode(GL_MODELVIEW);
+    listplane =   loadOBJ("maskin4backup.obj");
+     listplane2 =   loadOBJ("plane.obj");
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    dirLight = (Light*)malloc(sizeof(Light));
+    dirLight->setPosition_light = setPosition_light;
+    dirLight->setAmbient_light = setAmbient_light;
+    dirLight->setDifusse_light = setDifusse_light;
+    dirLight->setSpecular_light = setSpecular_light;
+ 
+    dirLight->setPosition_light(100,100, 800);
+    dirLight->setAmbient_light(0, 0, 0);
+    dirLight->setDifusse_light(1, 1, 1);
+    dirLight->setSpecular_light(0.7f, 0.1f, 0.88f);
+ 
+    material =(Material*)malloc(sizeof(Material));
+    material->setAmbient_material =setAmbient_material;
+    material->setDifusse_material = setDifusse_material;
+    material->setSpecular_material =setSpecular_material;
+    material->setShininess_material = setShininess_material;
+    material->setAmbient_material(0, 0, 1, 1);
+    material->setDifusse_material(0.3f, 0.3f, 0.3f, 1.0f);
+    material->setSpecular_material(0.01f, 0.01f, 0.01f, 1.0f);
+    material->setShininess_material(128);
+    glLightfv(GL_LIGHT0, GL_POSITION, dirLight->pos);
+    glLightfv(GL_LIGHT0, GL_AMBIENT,   dirLight->ambient);
+    glLightfv(GL_LIGHT0, GL_SPECULAR,  dirLight->specular);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,   dirLight->difusse);  
+
+
+ 
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);  
+   glutDisplayFunc (display );
+ 
+    glutReshapeFunc(reshape);
+ 
+    glutMouseFunc(mouse);
+    glutKeyboardFunc(key);
+  
+ 
+    glutMotionFunc(mouseMotion);
+//  multitasks( );
+    glutMainLoop();
+
+}
+ 
+struct state_vector  state_result_sphere;
+struct state_vector       SPHERE_STATE_VECTOR(struct state_vector        next_state, float dt )
+{
+	double f0[6];
+	double f0_result[6];
+
+	double z[6];
+ 	double t0[6] = {0,0,0,0,0,0};
+ 	double tburn = 1.0;
+	double tf[6] = {tburn,tburn,tburn,tburn,tburn,tburn};
+
+	z[0] =  next_state.pos_new_x;
+	z[1] =  next_state.pos_new_y;
+	z[2] = next_state.pos_new_z;
+	z[3] =  next_state.vel_new_x;
+	z[4] =  next_state.vel_new_y;
+	z[5] = next_state.vel_new_z;
+
+	f0[0] = next_state.pos_new_x;
+	f0[1] =next_state.pos_new_y;
+	f0[2] =next_state.pos_new_z;
+	f0[3] =next_state.vel_new_x;
+	f0[4] =next_state.vel_new_y;
+	f0[5] = next_state.vel_new_z;
+ 
+	rk45(rates_sphere_g_acc, t0, f0,f0_result, tf,z,6, 1 );
+
+	state_result_sphere.pos_new_x = f0[0];
+	state_result_sphere.pos_new_y = f0[1];
+	state_result_sphere.pos_new_z = f0[2];
+
+	state_result_sphere.vel_new_x = f0[3];
+	state_result_sphere.vel_new_y = f0[4];
+	state_result_sphere.vel_new_z = f0[5];
+
+	return  state_result_sphere;
+}
+void task2(void )
+{
+printf("TASK  \n");
+	while(1)
+		sphere_state = SPHERE_STATE_VECTOR(sphere_state,1);
+}
+void key(unsigned char key, int x, int y)
+{
+ 
+   if(key == 'x') cameraEye[0]-= 50;
+   if(key == 'X') cameraEye[0]+= 50;
+   if(key == 'y') cameraEye[1]-= 50;
+   if(key == 'Y') cameraEye[1]+= 50;
+   if(key == 'z') cameraEye[2]-= 50;
+   if(key == 'Z') cameraEye[2]+= 50;
+ 
+   if(key == '+')
+   {
+      
+           
+        
+   }
+   if(key == '-')
+   {        
+   }
+
+   glutPostRedisplay();
+}
 int first_run = 1;
 int main (int argc, char **argv)
 { 
-  glutInit(&argc, argv);
-  init_mpgeg( );
  if(first_run == 1)
 {
 	photon_oscillate.pos_new_x =  0;
@@ -372,8 +746,23 @@ int main (int argc, char **argv)
 	photon_oscillate.vel_new_y = 894.43;
 	photon_oscillate.vel_new_z = 894.43;
 
+	sphere_state.pos_new_x =   2;
+	sphere_state.pos_new_y =   2;  
+	sphere_state.pos_new_z =   2; 
+
+	sphere_state.vel_new_x = 0.001;
+	sphere_state.vel_new_y = 0.001;
+	sphere_state.vel_new_z = 0.001;
+
 	first_run = 0;
 }
- 	multitasks(argc,argv);
+  glutInit(&argc, argv);
+  init_mpgeg( );
+task1();
+  
+  //init_tasks(argv,argv);
+
+
+ 	
 
 }
