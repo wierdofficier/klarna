@@ -112,10 +112,10 @@ typedef struct _thread_data_t {
 #define PERMEABILITY 37000.0  
 #define G 9.8
 
-#define EFIELD 300.0
+#define EFIELD 100.0
 #define PERMEABILITY 25000.0  
 #define G 15.1
-#define WATTTT 10296.7
+#define WATTTT 1144.0
 double  position1[1000000];
 double  energy[1000000];
 double time_[1000000];
@@ -150,6 +150,8 @@ double GG = 0;
 double atomic_frequency;
 int K;
 #define HAX 1000
+int count ;
+int megacount;
 struct state_vector    state_result_photon;
 void rates_photon ( double *t, double *f, double result[]   )
 {
@@ -167,7 +169,7 @@ RESISTANCE =  new_W/(pow(EFIELD,2.0));
 
 DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(25000)*1.03e7*freq)) *5; 
 
-relativ_permeability = 25000;
+
 //velocity = 1*299792458.0/(sqrt(1*relativ_permeability/2.0*(sqrt(1+pow((1.03e7/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
 velocity = 1*299792458.0/(sqrt(1*25000.0/2.0*(sqrt(1+pow((10.0/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
 
@@ -180,34 +182,35 @@ one++;
 else
 {
 attenuation = ( 1.00/WATT*(new_W/distance_in_material))/7874.0;
-
-DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(relativ_permeability)*1.03e7*freq)) *5;
+ RESISTANCE =  new_W/(pow(NEWWU,2.0));  
+//DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(relativ_permeability)*1.03e7*freq)) *5;
 /*
    		This executes every loop.
+
 */
 /* 
   Calculate relativ permeability for iron:
   therefore the frequency must vary
 */
-relativ_permeability = 179751035759958240.0/(pow(f[3],2.0) + sqrt((32310434856777778462720.0 + pow(freq,2.0))/pow(freq,2.0)) * pow(f[3],2.0));
 /* 
   Calculate frequency
 */
 freq =     (((1.58882e10)* powf(f[3],2.0) *relativ_permeability)/sqrtf( 252425272283202775718997981659136.0 + 2808609933552555.0*powf(f[3],2.0)* relativ_permeability));
-
+relativ_permeability = 179751035759958240.0/(pow(f[3],2.0) + sqrt((32310434856777778462720.0 + pow(freq,2.0))/pow(freq,2.0)) * pow(f[3],2.0));
 /* 
   Calculate velocity
 */
+f[0] =   sqrt(4*M_PI/(1.03e7*M_PI*relativ_permeability*4e-7*freq));
 velocity =  1*299792458.0/(sqrt(1*relativ_permeability/2.0*(sqrt(1+pow((1.03e7/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
 
 /* 
   Calculate f[0]
 */
-f[0] =   sqrt(4*M_PI/(1.03e7*M_PI*relativ_permeability*4e-7*freq));
+
 /* 
   Calculate mass
 */
-new_m = (3.35677e-35)/(freq* (velocity/freq) *pow(NEWWU,2.0));
+new_m =  ((1.3252e-33* freq)/pow(f[3],2.0));//(3.35677e-35)/(freq* (velocity/freq) *pow(NEWWU,2.0));
 position1[work] = 1*fabs(velocity/freq);
 
 } 
@@ -245,20 +248,25 @@ time_[work] = -time_[work];
 time_[work-1] = -time_[work-1];
 }
 
-if(time_[work] > 1 && time_[work-1] > 1)
+if(fabs(position1[work]) > 0 || fabs(position1[work-1]) > 0)
 {
+ 
 //printf("time_[work] = %.100f \n", time_[work]);  
-distance_in_material =distance_in_material    +  (1*fabs(position1[work-1])-fabs(position1[work]))*1;     
- distance_in_material_2 =distance_in_material_2+ (1*fabs(position1[work-1])-fabs(position1[work]))*1;   
-} 
+distance_in_material =distance_in_material    +  fabs((1*fabs(position1[work])-fabs(position1[work-1]))*1);     
+ distance_in_material_2 =distance_in_material_2+ fabs((1*fabs(position1[work])-fabs(position1[work-1]))*1);      
+ 
+}
 }
 double A_atom = pow(1.4e-10 ,2.0)*M_PI*4;
 
 /*
 ...Then how many photons strikes one atom:
 */
+double how_many_photons_on_one_atom =   (((( new_W)/(6.626e-34* freq)) ) *pow(1.4e-10,2.0)/0.374*M_PI  ) ;
+//printf("megacount = %d :: how_many_photons_on_one_atom = %f\n", megacount,how_many_photons_on_one_atom);
 
-double how_many_photons_on_one_atom =   (((( new_W)/(6.626e-34* freq)) ) *pow(1.4e-10,2.0)/0.374*M_PI  );
+  how_many_photons_on_one_atom = new_W/((6.626e-34*f[3])/(f[0])) *1  ;
+//printf("megacount = %f :: how_many_photons_on_one_atom = %f\n", megacount,fabs(how_many_photons_on_one_atom));
  
 /*
 ...Calculate the gravity of single atom:
@@ -266,20 +274,19 @@ double how_many_photons_on_one_atom =   (((( new_W)/(6.626e-34* freq)) ) *pow(1.
 
 double amplitude = (0.202642 *powf(velocity,2.0))/(pow(NEWWU,2.0)* powf(freq,2.0)* powf(f[0],2.0));//(0.767495* NEWWU* freq *(velocity/freq))/pow(velocity,2.0);
 double photonarea = M_PI*pow(amplitude,2.0);
-double ironatomarea =  M_PI*pow(1.4e-10,2.0); 
+double ironatomarea =  M_PI*pow(2.48e-10,2.0); 
 double div = photonarea/ironatomarea;
 		 
-atomic_frequency =    (1.02276e7* pow((pow(1.4e-10,2.0)*4*M_PI/0.374),1.0/6.0)* pow(velocity,2.0/3.0)* pow(new_W,1.0/6.0))/(pow(f[0],5.0/6.0)* NEWWU);//(7571.75  *pow(f[3],(2.0/3.0)) *pow(new_W,1.0/6.0))/(pow(f[0],5.0/6.0) *NEWWU);// (2703148515975084336218112 *freq* f[0]* new_W)/pow(velocity,4);
-//little_g =1*div*1000000.0*how_many_photons_on_one_atom*(2.23897e-45)/((velocity/freq)*freq* pow(NEWWU,2.0)* pow(amplitude,2.0));
-//little_g =1*div*1* (how_many_photons_on_one_atom)*6.67e-11*(2.0/3.0*powf(1.4e-10,2.0)*9.2732e-26*2*M_PI* (atomic_frequency))/(2*powf(299792458,2.0)*powf(1.4e-10,3.0))*299792458.0/9.78;
-//little_g = 36* div *1000000* (how_many_photons_on_one_atom)*6.67e-11*new_m/(pow(amplitude,2.0));
+atomic_frequency =    (1.02276e7* pow((pow(1.4e-10,2.0)*4*M_PI/0.374),1.0/6.0)* pow(velocity,2.0/3.0)* pow(new_W,1.0/6.0))/(pow(f[0],5.0/6.0)* NEWWU);//(7571.75  *pow(f[3],
+/*
+9.84014×10^-21 y^2 x^5 = 2/3*m*(x)^2*2*pi*f solve x where x is radius
+*/
+double radius__ =  (7.5225e6*pow(freq,1.0/3.0)* pow( (3.35677e-35)/(pow(NEWWU,2.0) *freq* f[0]),(1.0/3.0))/pow(NEWWU,(2.0/3.0)));
 
-little_g =div *1 *0.927805/200000.0* (how_many_photons_on_one_atom)*6.67e-11*(2.0/3.0*powf(1.4e-10,2.0)*9.2732e-26*2*M_PI* (atomic_frequency))/(2*powf(299792458,2.0)*powf(1.4e-10,3.0))*299792458.0/9.78;
-//6.67e-11*(3.35677×10^-35)/(f l U^2)/(h^2)
-//little_g = 1*div*1000000.0*how_many_photons_on_one_atom*(2.23897e-45)/((velocity/freq)*freq* pow(NEWWU,2.0)* pow(amplitude,2.0));
-//printf("little_g = %.100f \n", little_g);  
+ little_g =3.73711 *1e-3* (how_many_photons_on_one_atom)*6.67e-11*(2.0/3.0*powf(radius__,2.0)*9.2732e-26*2*M_PI* (atomic_frequency))/(2*powf(299792458,2.0)*powf(radius__,3.0))*299792458.0/9.78;
+ 
 GG = GG +little_g;
-//printf("GG = %.100Lf \n", GG);  
+ 
  /*
 ...Calculate the penetrating distance constant!
 */ 
@@ -289,23 +296,23 @@ double penetratingdistanceconstant = fabs(5.0/(DISTANCE_));
 */ 
 if(attenuation < 0)
 attenuation = -attenuation;
-	NEWWU   =exp(-8912.160 *distance_in_material) *EFIELD;// fabs((exp(-(((distance_in_material ) )*9506.30412))*EFIELD  ));
-	new_W = pow(NEWWU ,2.0)*RESISTANCE;
+	  NEWWU    =exp(-attenuation *distance_in_material) *EFIELD;// fabs((exp(-(((distance_in_material ) )*9506.30412))*EFIELD  ));
+	  new_W = pow(NEWWU  ,2.0)*RESISTANCE;
 /*  
 ...Calculate the total gravity summation:
 */ 
 if(fabs(distance_in_material_2) > 2.48e-10)  
 {	
-	double count = fabs(distance_in_material_2)/2.48e-10;
+	  count = fabs(distance_in_material_2)/2.48e-10;
 	//printf("count = %f \n", count);
 	
-
+	megacount = megacount + count;
 	mega_g = mega_g + little_g*count;
 	distance_in_material_2= 0;
 }
 
 
-if(K % 1 == 0 )
+if(K % HAX == 0 )
 {
 printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n"); 
 printf("attenuation = %.10f \n", attenuation);
@@ -324,13 +331,14 @@ printf("Velocity of photons  = %.10f m/s^2 \n",velocity);
 printf("Total gravity recording = %.100f m/s^2 \n", mega_g  );
  //sleep(1);
 printf("Distance traveled in medium by a photon = %.40f meter \n",distance_in_material);
-printf("distance/atomic_spacing  = %.10f \n", ( distance_in_material)/( 1.4e-10   ) );
- 
+printf("distance/atomic_spacing  = %.10f \n", ( distance_in_material)/( 2.48e-10   ) );
+ printf("torus mass  = %.10f kg \n", 697.0/20.0 - (2905.0 *mega_g)/978.0 ); 
 printf("distance needed  = %.10f \n", DISTANCE__ ); 
 printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n"); 
-
+if(NEWWU < (pow(0.37,5.0)*EFIELD))
+	for(;;);
 }
-if( fabs(distance_in_material) > DISTANCE__ || mega_g > G ||  velocity < 0 || new_U < (2.0*300.0/EFIELD))
+if( fabs(distance_in_material) > 0.0011835 || mega_g > G ||  velocity < 0 || new_U < (3.0 ))
  {
 	DONE_WITH_THIS_0 = 1;	
 	init_tasks(0,0);
@@ -343,9 +351,9 @@ if(result_once == 0)
     result[1] =             f[4]*1  ;
     result[2] =             f[5]*1  ;
     
-    result[3] = (-(pow(w,2)*new_m)*0 - (C*2*new_m*w)*velocity )/new_m;
-    result[4] = (-(pow(w,2)*new_m)*0 - (C*2*new_m*w)*f[4] )/new_m;
-    result[5] = (-(pow(w,2)*new_m)*0 - (C*2*new_m*w)*f[5] )/new_m;
+    result[3] = (-(pow(w,2)*1)*0 - (C*2*1*w)*velocity )/1;
+    result[4] = (-(pow(w,2)*1)*0 - (C*2*1*w)*f[4] )/1;
+    result[5] = (-(pow(w,2)*1)*0 - (C*2*1*w)*f[5] )/1;
     result_once = 1;
 
 accen = result[3];
@@ -354,9 +362,9 @@ else if(result_once == 1){
     result[0] =             f[3]*1 ;
     result[1] =             f[4]*1  ;
     result[2] =             f[5]*1  ;
-result[3] = (-(pow(w,2)*new_m)*f[0] - (C*2*new_m*w)*f[3] )/new_m;
-result[4] = (-(pow(w,2)*new_m)*f[0] - (C*2*new_m*w)*f[4] )/new_m;
-result[5] = (-(pow(w,2)*new_m)*f[0]  - (C*2*new_m*w)*f[5] )/new_m;
+result[3] = (-(pow(w,2)*1)*f[0] - (C*2*1*w)*f[3] )/1;
+result[4] = (-(pow(w,2)*1)*f[0] - (C*2*1*w)*f[4] )/1;
+result[5] = (-(pow(w,2)*1)*f[0]  - (C*2*1*w)*f[5] )/1;
 
 accen = result[3];
 }
@@ -388,7 +396,7 @@ struct state_vector  get_photon_state_oscillate_task1(struct state_vector next_s
 	f0[3] =next_state.vel_new_x;
 	f0[4] =next_state.vel_new_y;
 	f0[5] =next_state.vel_new_z;
- 	 rk45(rates_photon, t0, f0,f0_result, tf,z,6, 1000000000.0  );
+ 	 rk45(rates_photon, t0, f0,f0_result, tf,z,6, 10000000000.0  );
 	//rates_photon();
 	state_result_photon.pos_new_x = f0_result[0];
 	state_result_photon.pos_new_y = f0_result[1];
