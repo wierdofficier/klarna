@@ -13,7 +13,6 @@
 #define NUM_THREADS 5
 #include <stdbool.h>
 struct state_vector       SPHERE_STATE_VECTOR(struct state_vector        next_state, float dt );
-//2*300/y=y*e^(x*7829.11764) solve x
 float fovy = 45.0;
 float dNear = 100;
 float dFar = 2000;
@@ -89,13 +88,12 @@ struct Material_ {
 
 };
 typedef struct Material_ Material ; 
-/* create thread argument struct for thr_func() */
+
 typedef struct _thread_data_t {
   int tid;
   double stuff;
 } thread_data_t;
 #include "system.h"
-
 
 #define EFIELD 150.0
 #define PERMEABILITY 37000.0  
@@ -104,9 +102,6 @@ typedef struct _thread_data_t {
 #define EFIELD 200.0
 #define PERMEABILITY 25000.0 
 #define G 4.818
-
-
-
 
 #define EFIELD 1200.0
 #define PERMEABILITY 37000.0  
@@ -133,7 +128,7 @@ double dipolewattsystemh;
 int one= 0;
 double distance_in_material_2 = 0;
 double distance_in_material = 0;
-double freq =60.0;
+double freq =60.0 ;
 double velocity= 894.43;
 double wavelength = 14.9;
 double new_U =EFIELD;
@@ -146,6 +141,22 @@ double new_m ;
 double NEWWU= EFIELD;
 double DISTANCE__;
 double mega_g;
+
+
+double aluresistancewire;
+double wirepower;
+double wirevoltage = 0.1;
+double wirefreq = 5e-6;
+void wiregravity()
+{
+
+aluresistancewire = 2.65e-8*3.528/(0.005 * 3e-6);
+wirepower = aluresistancewire*pow(wirevoltage,2.0);
+//atomic_frequency_aluminium =    (1.02276e7* pow((pow(1.4e-10,2.0)*4*M_PI),1.0/6.0)* pow(velocity,2.0/3.0)* pow(new_W,1.0/6.0))/(pow(f[0],5.0/6.0)* NEWWU);
+//little_g =  (how_many_photons_on_one_atom)*6.67e-11*(2.0/3.0*powf(radius__,2.0)*9.2732e-26*2*M_PI* (atomic_frequency))/(2*powf(299792458,2.0)*powf(radius__,3.0))*299792458.0/9.78
+}
+
+
 double GG = 0;
 double atomic_frequency;
 int K;
@@ -169,11 +180,10 @@ RESISTANCE =  new_W/(pow(EFIELD,2.0));
 
 DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(25000)*1.03e7*freq)) *5; 
 
-
 //velocity = 1*299792458.0/(sqrt(1*relativ_permeability/2.0*(sqrt(1+pow((1.03e7/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
 velocity = 1*299792458.0/(sqrt(1*25000.0/2.0*(sqrt(1+pow((10.0/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
 
-relativ_permeability = 179751035759958240.0/(pow(velocity,2.0) + sqrt((32310434856777778462720.0 + pow(freq,2.0))/pow(freq,2.0)) * pow(velocity,2.0));
+relativ_permeability =  179751035759958240.0/(pow(velocity,2.0) + sqrt((32310434856777778462720.0 + pow(freq,2.0))/pow(freq,2.0)) * pow(velocity,2.0));
 //DISTANCE__ =-(25.0 *log(2.0/new_U))/195728.0;
 DISTANCE__ =fabs(-(25 *log(300/pow(EFIELD,2.0)))/222804);
  
@@ -181,9 +191,9 @@ one++;
 }
 else
 {
-attenuation = ( 1.00/WATT*(new_W/distance_in_material))/7874.0;
+ attenuation = ( 1.00/WATT*(new_W/distance_in_material))/7874.0;
  RESISTANCE =  new_W/(pow(NEWWU,2.0));  
-//DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(relativ_permeability)*1.03e7*freq)) *5;
+
 /*
    		This executes every loop.
 
@@ -200,18 +210,15 @@ relativ_permeability = 179751035759958240.0/(pow(f[3],2.0) + sqrt((3231043485677
 /* 
   Calculate velocity
 */
-f[0] =   sqrt(4*M_PI/(1.03e7*M_PI*relativ_permeability*4e-7*freq));
+position1[work] = 1*fabs(f[0]);
+f[0] = distance_in_material;//  sqrt(4*M_PI/(1.03e7*M_PI*relativ_permeability*4e-7*freq));
 velocity =  1*299792458.0/(sqrt(1*relativ_permeability/2.0*(sqrt(1+pow((1.03e7/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
-
-/* 
-  Calculate f[0]
-*/
 
 /* 
   Calculate mass
 */
-new_m =  ((1.3252e-33* freq)/pow(f[3],2.0));//(3.35677e-35)/(freq* (velocity/freq) *pow(NEWWU,2.0));
-position1[work] = 1*fabs(velocity/freq);
+new_m = (3.35677e-35)/(pow(NEWWU,2.0) *freq* distance_in_material);//(3.35677e-35)/(freq* (velocity/freq) *pow(NEWWU,2.0));
+
 
 } 
  double w;
@@ -220,7 +227,7 @@ if(result_once == 0)
 {   
  w = 2*M_PI*freq;
 DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(relativ_permeability)*1.03e7*freq)) *5;
-energy[work] = 0.5*(pow(w,2)*new_m*pow(f[0],2.0));
+energy[work] = 0.5*(pow(w,2)*new_m*pow(distance_in_material,2.0));
 
 double Q = energy[work]/(energy[work-1]-energy[work])*2*M_PI;
 
@@ -230,7 +237,7 @@ C = 1.0/(2.0*Q);
 }
 else if(result_once == 1){
  w = 2*M_PI*freq;
-energy[work] = 0.5*(pow(w,2)*new_m*pow(f[0],2.0));
+energy[work] = 0.5*(pow(w,2)*new_m*pow(distance_in_material,2.0));
  double Q = energy[work]/(energy[work-1]-energy[work])*2*M_PI;
 
 C = 1.0/(2.0*Q); 
@@ -257,53 +264,50 @@ distance_in_material =distance_in_material    +  fabs((1*fabs(position1[work])-f
  
 }
 }
-double A_atom = pow(1.4e-10 ,2.0)*M_PI*4;
+ 
 
 /*
 ...Then how many photons strikes one atom:
 */
-double how_many_photons_on_one_atom =   (((( new_W)/(6.626e-34* freq)) ) *pow(1.4e-10,2.0)/0.374*M_PI  ) ;
-//printf("megacount = %d :: how_many_photons_on_one_atom = %f\n", megacount,how_many_photons_on_one_atom);
-
-  how_many_photons_on_one_atom = new_W/((6.626e-34*f[3])/(f[0])) *1  ;
+double how_many_photons_on_one_atom = new_W/((6.626e-34*f[3])/(distance_in_material));
 //printf("megacount = %f :: how_many_photons_on_one_atom = %f\n", megacount,fabs(how_many_photons_on_one_atom));
  
 /*
 ...Calculate the gravity of single atom:
 */ 
 
-double amplitude = (0.202642 *powf(velocity,2.0))/(pow(NEWWU,2.0)* powf(freq,2.0)* powf(f[0],2.0));//(0.767495* NEWWU* freq *(velocity/freq))/pow(velocity,2.0);
+double amplitude = (0.202642 *powf(velocity,2.0))/(pow(NEWWU,2.0)* powf(freq,2.0)* powf(distance_in_material,2.0));//(0.767495* NEWWU* freq *(velocity/freq))/pow(velocity,2.0);
 double photonarea = M_PI*pow(amplitude,2.0);
 double ironatomarea =  M_PI*pow(2.48e-10,2.0); 
 double div = photonarea/ironatomarea;
-		 
-atomic_frequency =    (1.02276e7* pow((pow(1.4e-10,2.0)*4*M_PI/0.374),1.0/6.0)* pow(velocity,2.0/3.0)* pow(new_W,1.0/6.0))/(pow(f[0],5.0/6.0)* NEWWU);//(7571.75  *pow(f[3],
+ 		 
+atomic_frequency =    (1.02276e7* pow((pow(1.4e-10,2.0)*1*M_PI),1.0/6.0)* pow(velocity,2.0/3.0)* pow(new_W,1.0/6.0))/(pow(distance_in_material,5.0/6.0)* NEWWU);//(7571.75  *pow(f[3], 
 /*
-9.84014×10^-21 y^2 x^5 = 2/3*m*(x)^2*2*pi*f solve x where x is radius
-*/
-double radius__ =  (7.5225e6*pow(freq,1.0/3.0)* pow( (3.35677e-35)/(pow(NEWWU,2.0) *freq* f[0]),(1.0/3.0))/pow(NEWWU,(2.0/3.0)));
 
- little_g =3.73711 *1e-3* (how_many_photons_on_one_atom)*6.67e-11*(2.0/3.0*powf(radius__,2.0)*9.2732e-26*2*M_PI* (atomic_frequency))/(2*powf(299792458,2.0)*powf(radius__,3.0))*299792458.0/9.78;
+8.85e-12*(integrate( integrate( integrate (x*((U*U/299792458)) ))))*x
+
+1.23002×10^-21 U^2 x^5
+1.23002×10^-21 y^2 x^5 = 2/3*m*(x)^2*2*pi*f solve x
+*/
+double radius__ =  (7.5225e6*pow(freq,1.0/3.0)* pow( (3.35677e-35)/(pow(NEWWU,2.0) *freq* distance_in_material),(1.0/3.0))/pow(NEWWU,(2.0/3.0)));
+ //printf("radius__ = %.20f \n", radius__);
+//g via ang mom
+ little_g =0.00501758*(how_many_photons_on_one_atom)*6.67e-11*(2.0/3.0*powf(radius__,2.0)*9.2732e-26*2*M_PI* (atomic_frequency))/(2*powf(299792458,2.0)*powf(radius__,3.0))*299792458.0/9.78;
  
-GG = GG +little_g;
- 
- /*
-...Calculate the penetrating distance constant!
-*/ 
-double penetratingdistanceconstant = fabs(5.0/(DISTANCE_));
 /*
 ...Calculate how much the electric field decreases in material after every iteration:
 */ 
 if(attenuation < 0)
 attenuation = -attenuation;
-	  NEWWU    =exp(-attenuation *distance_in_material) *EFIELD;// fabs((exp(-(((distance_in_material ) )*9506.30412))*EFIELD  ));
+
+	  NEWWU    =1*exp(-7809.88 *distance_in_material) *EFIELD;// fabs((exp(-(((distance_in_material ) )*9506.30412))*EFIELD  ));
 	  new_W = pow(NEWWU  ,2.0)*RESISTANCE;
 /*  
 ...Calculate the total gravity summation:
 */ 
 if(fabs(distance_in_material_2) > 2.48e-10)  
 {	
-	  count = fabs(distance_in_material_2)/2.48e-10;
+	count = fabs(distance_in_material_2)/2.48e-10;
 	//printf("count = %f \n", count);
 	
 	megacount = megacount + count;
@@ -312,7 +316,7 @@ if(fabs(distance_in_material_2) > 2.48e-10)
 }
 
 
-if(K % HAX == 0 )
+if(K % 1 == 0 )
 {
 printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n"); 
 printf("attenuation = %.10f \n", attenuation);
@@ -335,11 +339,12 @@ printf("distance/atomic_spacing  = %.10f \n", ( distance_in_material)/( 2.48e-10
  printf("torus mass  = %.10f kg \n", 697.0/20.0 - (2905.0 *mega_g)/978.0 ); 
 printf("distance needed  = %.10f \n", DISTANCE__ ); 
 printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n"); 
-if(NEWWU < (pow(0.37,5.0)*EFIELD))
-	for(;;);
+ if(NEWWU < (pow(0.37,5.0)*EFIELD))
+ 	for(;;);
 }
-if( fabs(distance_in_material) > 0.0011835 || mega_g > G ||  velocity < 0 || new_U < (3.0 ))
+if( fabs(distance_in_material) > 0.0006 /* || mega_g > G ||  velocity < 0 || new_U < (3.0 )*/)
  {
+ for(;;);
 	DONE_WITH_THIS_0 = 1;	
 	init_tasks(0,0);
 }
@@ -351,9 +356,9 @@ if(result_once == 0)
     result[1] =             f[4]*1  ;
     result[2] =             f[5]*1  ;
     
-    result[3] = (-(pow(w,2)*1)*0 - (C*2*1*w)*velocity )/1;
-    result[4] = (-(pow(w,2)*1)*0 - (C*2*1*w)*f[4] )/1;
-    result[5] = (-(pow(w,2)*1)*0 - (C*2*1*w)*f[5] )/1;
+    result[3] = (-(pow(w,2)*1)*f[0] - (C*2*1*w)*velocity )/1;
+    result[4] = (-(pow(w,2)*1)*f[0] - (C*2*1*w)*f[4] )/1;
+    result[5] = (-(pow(w,2)*1)*f[0] - (C*2*1*w)*f[5] )/1;
     result_once = 1;
 
 accen = result[3];
@@ -362,9 +367,9 @@ else if(result_once == 1){
     result[0] =             f[3]*1 ;
     result[1] =             f[4]*1  ;
     result[2] =             f[5]*1  ;
-result[3] = (-(pow(w,2)*1)*f[0] - (C*2*1*w)*f[3] )/1;
-result[4] = (-(pow(w,2)*1)*f[0] - (C*2*1*w)*f[4] )/1;
-result[5] = (-(pow(w,2)*1)*f[0]  - (C*2*1*w)*f[5] )/1;
+result[3] = (-(pow(w,2)*new_m)*distance_in_material - (C*2*new_m*w)*f[3] )/new_m;
+result[4] = (-(pow(w,2)*new_m)*distance_in_material- (C*2*new_m*w)*f[4] )/new_m;
+result[5] = (-(pow(w,2)*new_m)*distance_in_material  - (C*2*new_m*w)*f[5] )/new_m;
 
 accen = result[3];
 }
@@ -474,13 +479,13 @@ if(levitatecounter > 100000)
 if(f[1] > 30.0   )
 {
  //printf("sphere_state.vel_new_y1 = %f \n", sphere_state.vel_new_y);
- result[4] =   -58000000000;//*cos(frequency_ball*time____); 
+ result[4] =   -4;//*cos(frequency_ball*time____); 
     result[1] =            f[4]/1.0;
 }
 else if(f[1] < 30.0   )
 {
 
- result[4] =    58000000000;//*cos(frequency_ball*time____) ;
+ result[4] =    4;//*cos(frequency_ball*time____) ;
   //printf("sphere_state.vel_new_y2 = %f \n", sphere_state.vel_new_y);
     result[1] =            f[4]/1.0;
 }
@@ -762,7 +767,7 @@ struct state_vector       SPHERE_STATE_VECTOR(struct state_vector        next_st
 	f0[4] =next_state.vel_new_y;
 	f0[5] = next_state.vel_new_z;
  
-	rk45(rates_sphere_g_acc, t0, f0,f0_result, tf,z,6, 1000000000 );
+	rk45(rates_sphere_g_acc, t0, f0,f0_result, tf,z,6, 1000 );
   printf("sphere_state.pos_new_y = %f \n", sphere_state.pos_new_y);
  printf("sphere_state.vel_new_y = %f \n", sphere_state.vel_new_y);
  printf("frequency_ball = %f \n", frequency_ball);
