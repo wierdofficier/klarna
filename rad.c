@@ -110,10 +110,10 @@ int working_on = 0;
 #define PERMEABILITY 37000.0  
 #define G 9.8
 
-#define EFIELD 850.0
+#define EFIELD 200.0
 #define PERMEABILITY 25000.0  
 #define G 15.1
-#define WATTTT 92673.0 
+#define WATTTT 4576.0 
 
 #define SIZE_BUFFER 10000000000.0
 #define TIME_M 1111191000000.0
@@ -136,8 +136,8 @@ double dipolewattsystemh;
 int one= 0;
 double distance_in_material_2 = 0;
 double distance_in_material = 0;
-double freq = 1.44494e8 ;
-double freq_ = 1.44494e6;
+double freq = 60;//1.44494e8 ;
+double freq_ = 60;//1.44494e6;
 double velocity= 894.43;
 double wavelength = 14.9;
 double new_U =EFIELD;
@@ -189,12 +189,12 @@ if(one < 1)
 	distance_in_material = 0;
 
 	RESISTANCE =  new_W/(pow(EFIELD,2.0));  
-	//DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(25000)*1.03e7*freq)) *5; 
+        DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(25000)*1.03e7*freq)) *5; 
 
 	velocity =  1*299792458.0/(sqrt(1*25000.0/2.0*(sqrt(1+pow((10.0/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
 	relativ_permeability =  179751035759958240.0/(pow(velocity,2.0) + sqrt((32310434856777778462720.0 + pow(freq,2.0))/pow(freq,2.0)) * pow(velocity,2.0));
 
-	DISTANCE__ =fabs(-(25 *log(300/pow(EFIELD,2.0)))/222804);
+	DISTANCE__ =DISTANCE_;//fabs(-(25 *log(300/pow(EFIELD,2.0)))/222804);
 	/*Calculate mass*/
 	new_m = (3.35677e-35)/(pow(NEWWU,2.0) *299792458);
 one++;
@@ -209,7 +209,7 @@ else
 /* 
   Calculate frequency
 */
- //freq =     (((1.58882e10)* powf(f[3],2.0) *relativ_permeability)/sqrtf( 252425272283202775718997981659136.0 + 2808609933552555.0*powf(f[3],2.0)* relativ_permeability));
+ freq =     (((1.58882e10)* powf(f[3],2.0) *relativ_permeability)/sqrtf( 252425272283202775718997981659136.0 + 2808609933552555.0*powf(f[3],2.0)* relativ_permeability));
 
 /* 
   Calculate velocity
@@ -293,7 +293,7 @@ accen = (-(pow(w,2)*1)*distance_in_material - (C*2*1*w)*f[3] )/1;
 double atomic_frequency2 = (0.159155 *accen * photon_mom_inertia  + 1.3252e-33  *pow(freq,2.0) *radius)/(mass_atom* pow(1e-15,2.0));
 
 
-little_g  = (1.0)/(radius*1.9e25*18.6638)*((3162.28) *sqrt(NEWWU/299792458.0) *sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(f[3]); 
+little_g  = (0.99949520263)/(radius*1.9e25*18.6638)*((3162.28) *sqrt(NEWWU/299792458.0) *sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(f[3]); 
 //little_g =   1*(little_g1  /*how_many_photons_on_one_atom*6.67e-11*(2.0/3.0*pow(radius,2.0)*new_m*2*M_PI*freq)/(2*pow(299792458.0,2.0)*(pow(radius,3.0))*1)*/) ;
 /*					
  ...Calculate how much the electric field decreases in material after every iteration:
@@ -356,7 +356,7 @@ printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  //if(NEWWU < (pow(0.37,5.0)*EFIELD))
  //	for(;;);
 }
-if(  (distance_in_material) > 0.0006 /* || mega_g > G ||  velocity < 0 || new_U < (3.0 )*/)
+if(  (distance_in_material) > 0.00064 /* || mega_g > G ||  velocity < 0 || new_U < (3.0 )*/)
 {
         //for(;;);
 	DONE_WITH_THIS_0 = 1;	
