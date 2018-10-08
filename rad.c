@@ -116,7 +116,7 @@ int working_on = 0;
 #define WATTTT 4576.0 
 
 #define SIZE_BUFFER 10000000000.0
-#define TIME_M 1111191000000.0
+#define TIME_M 1111191000000000
 double time_multplier = TIME_M;
 int WORKWORK = 0;
 double  *position1;
@@ -167,12 +167,14 @@ wirepower = aluresistancewire*pow(wirevoltage,2.0);
 
 double GG = 0;
 double atomic_frequency;
+double *velocity1;
 int K;
 #define HAX 100000
 int count ;
 int megacount;
 double mass_photon;
 struct state_vector    state_result_photon;
+int timeonce_ = 0;
 void rates_photon ( double *t, double *f, double result[]   )
 {
 if(DONE_WITH_THIS_0 == 1)
@@ -183,6 +185,7 @@ if(DONE_WITH_THIS_0 == 1)
 if(one < 1)
 {
 	position1 =  malloc(SIZE_BUFFER);
+        velocity1 =  malloc(SIZE_BUFFER);
 	energy =     malloc(SIZE_BUFFER);
 	time_ =      malloc(SIZE_BUFFER);
 	distance_in_material_2 = 0;
@@ -217,6 +220,7 @@ else
 	velocity =  1*299792458.0/(sqrt(1*relativ_permeability/2.0*(sqrt(1+pow((1.03e7/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
 
 	position1[work] = 1* (f[0]);
+	velocity1[work] = f[3];
 	f[0] =   sqrt(4*M_PI/(1.03e7*M_PI*relativ_permeability*4e-7*freq));
 /* 
   Calculate relativ permeability for iron:
@@ -248,7 +252,7 @@ else if(result_once == 1){
 	if(f[3] < 0 || f[3] == 0)
 		f[3] = velocity;
 	energy[work] = 0.5*(pow(w,2)*new_m*pow((distance_in_material),2.0));
-	time_[work] = -1.0/(C*w);
+	//time_[work] = -1.0/(C*w);
 
 	if(position1[work] <0)
 		position1[work] = -position1[work];
@@ -259,17 +263,27 @@ if(time_[work] < 0 || time_[work-1] < 0   )
 	time_[work-1] = -time_[work-1];
 }
  
-double timechange = 0;
-//printf("time_[work] = %.100f \n", time_[work]);  
-if(time_[work] < 0.0009 || time_[work-1] < 0.0009)
+	double timechange = 0; 
+	 
+	if(f[3] < 0 || f[3] == 0)
+		f[3] = velocity;
+if(timeonce_ == 0)
 {
-	timechange = 0.8;
+	distance_in_material =distance_in_material    +((f[3]/0.00064)/(TIME_M*freq_)) ;   
+	distance_in_material_2 =distance_in_material_2+((f[3]/0.00064)/(TIME_M*freq_)) ; 
+	timeonce_ = 1;
 }
-else
-	timechange = fabs(time_[work]-time_[work-1]);
+else if(timeonce_ == 1)
+{
+	timechange =  fabs((position1[work]-position1[work-1])/(velocity1[work]));    
+	// printf("timechange =%.30f :: %.30f\n", 1/timechange,TIME_M*freq_);
+	 if(timechange > 0)
+	 {
+	distance_in_material =distance_in_material    +((f[3]/0.00064)/(1.0/(timechange)*freq_*100000)) ;   
+	distance_in_material_2 =distance_in_material_2+((f[3]/0.00064)/(1.0/(timechange)*freq_*100000)) ;
+ } 
+}
 
-	distance_in_material =distance_in_material    +((velocity/0.0006)/(TIME_M*freq_)) ;   
-	distance_in_material_2 =distance_in_material_2+((velocity/0.0006)/(TIME_M*freq_)) ;     
 }
 /*
 ...Then how many photons strikes one atom:
@@ -293,7 +307,7 @@ accen = (-(pow(w,2)*1)*distance_in_material - (C*2*1*w)*f[3] )/1;
 double atomic_frequency2 = (0.159155 *accen * photon_mom_inertia  + 1.3252e-33  *pow(freq,2.0) *radius)/(mass_atom* pow(1e-15,2.0));
 
 
-little_g  = (0.99949520263)/(radius*1.9e25*18.6638)*((3162.28) *sqrt(NEWWU/299792458.0) *sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(f[3]); 
+little_g  = (1.04925)/(radius*1.9e25*19.622386)*((3162.28) *sqrt(NEWWU/299792458.0) *sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(f[3]); 
 //little_g =   1*(little_g1  /*how_many_photons_on_one_atom*6.67e-11*(2.0/3.0*pow(radius,2.0)*new_m*2*M_PI*freq)/(2*pow(299792458.0,2.0)*(pow(radius,3.0))*1)*/) ;
 /*					
  ...Calculate how much the electric field decreases in material after every iteration:
@@ -363,7 +377,7 @@ if(  (distance_in_material) > 0.00064 /* || mega_g > G ||  velocity < 0 || new_U
 	init_tasks(0,0);
 }
  
-time_[work] = -1.0/(C*w);
+//time_[work] = -1.0/(C*w);
 if(result_once == 0)
 {
 	result[0] =             velocity*1 ;
