@@ -110,10 +110,10 @@ int working_on = 0;
 #define PERMEABILITY 37000.0  
 #define G 9.8
 
-#define EFIELD 250.0
+#define EFIELD 300.0
 #define PERMEABILITY 25000.0  
 #define G 15.1
-#define WATTTT 7151.0 
+#define WATTTT 10297.0 
 
 #define SIZE_BUFFER 10000000000.0
 #define TIME_M 1111191000000000
@@ -169,7 +169,7 @@ double GG = 0;
 double atomic_frequency;
 double *velocity1;
 int K;
-#define HAX 1000  
+#define HAX 10000  
 int count ;
 int megacount;
 double mass_photon;
@@ -222,7 +222,7 @@ else
 	position1[work] = 1* (f[0]);
 	velocity1[work] = f[3];
 	f[0] =  sqrt(4*M_PI/(1.03e7*M_PI*relativ_permeability*4e-7*freq))-distance_in_material;//  sqrt(4*M_PI/(1.03e7*M_PI*relativ_permeability*4e-7*freq));
-
+ 
 
 /* 
   Calculate relativ permeability for iron:
