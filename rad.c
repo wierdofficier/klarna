@@ -110,10 +110,10 @@ int working_on = 0;
 #define PERMEABILITY 37000.0  
 #define G 9.8
 
-#define EFIELD 200.0
+#define EFIELD 250.0
 #define PERMEABILITY 25000.0  
 #define G 15.1
-#define WATTTT 4576.0 
+#define WATTTT 7151.0 
 
 #define SIZE_BUFFER 10000000000.0
 #define TIME_M 1111191000000000
@@ -169,7 +169,7 @@ double GG = 0;
 double atomic_frequency;
 double *velocity1;
 int K;
-#define HAX 100000
+#define HAX 1000  
 int count ;
 int megacount;
 double mass_photon;
@@ -194,12 +194,12 @@ if(one < 1)
 	RESISTANCE =  new_W/(pow(EFIELD,2.0));  
         DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(25000)*1.03e7*freq)) *5; 
 
-	velocity =  1*299792458.0/(sqrt(1*25000.0/2.0*(sqrt(1+pow((10.0/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
+	velocity =  1*299792458.0/(sqrt(1*25000.0/2.0*(sqrt(1+pow((1.03e7/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
 	relativ_permeability =  179751035759958240.0/(pow(velocity,2.0) + sqrt((32310434856777778462720.0 + pow(freq,2.0))/pow(freq,2.0)) * pow(velocity,2.0));
 
 	DISTANCE__ =DISTANCE_;//fabs(-(25 *log(300/pow(EFIELD,2.0)))/222804);
 	/*Calculate mass*/
-	new_m = (3.35677e-35)/(pow(NEWWU,2.0) *299792458);
+	new_m = (3.35677e-35)/(pow(NEWWU,2.0) *894.43);
 one++;
 }
 else
@@ -217,16 +217,20 @@ else
 /* 
   Calculate velocity
 */
-	velocity =  1*299792458.0/(sqrt(1*relativ_permeability/2.0*(sqrt(1+pow((1.03e7/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
-
+	
+ 
 	position1[work] = 1* (f[0]);
 	velocity1[work] = f[3];
-	f[0] =   sqrt(4*M_PI/(1.03e7*M_PI*relativ_permeability*4e-7*freq));
+	f[0] =  sqrt(4*M_PI/(1.03e7*M_PI*relativ_permeability*4e-7*freq))-distance_in_material;//  sqrt(4*M_PI/(1.03e7*M_PI*relativ_permeability*4e-7*freq));
+
+
 /* 
   Calculate relativ permeability for iron:
   therefore the frequency must vary
 */
 	relativ_permeability = 179751035759958240.0/(pow(f[3],2.0) + sqrt((32310434856777778462720.0 + pow(freq,2.0))/pow(freq,2.0)) * pow(f[3],2.0));
+velocity =  1*299792458.0/(sqrt(1*relativ_permeability/2.0*(sqrt(1+pow((1.03e7/(2*M_PI*freq*8.854e-12)),2.0))+1)));
+new_m = (3.35677e-35)/(pow(NEWWU,2.0) *f[3]); 
 // new_m = (3.35677e-35)/(pow(NEWWU,2.0) *f[3]);//(3.35677e-35)/(freq* (velocity/freq) *pow(NEWWU,2.0));
 } 
 double w;
@@ -235,7 +239,7 @@ if(result_once == 0)
 {   
 	w = 2*M_PI*freq;
 	DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(relativ_permeability)*1.03e7*freq)) *5;
-	energy[work] =  (pow(w,2)*new_m*pow(distance_in_material,2.0));
+	energy[work] =  (pow(w,2)*new_m*pow(f[0],2.0));
 
 	double Q = energy[work]/(energy[work-1]-energy[work])*2*M_PI;
 
@@ -245,14 +249,14 @@ if(result_once == 0)
 }
 else if(result_once == 1){
  	w = 2*M_PI*freq;
-	energy[work] = 0.5*(pow(w,2)*new_m*pow(distance_in_material,2.0));
+	energy[work] = 0.5*(pow(w,2)*new_m*pow(f[0],2.0));
 	double Q = energy[work]/(energy[work-1]-energy[work])*2*M_PI;
 
 	C = 1.0/(2.0*Q); 
 	if(f[3] < 0 || f[3] == 0)
 		f[3] = velocity;
-	energy[work] = 0.5*(pow(w,2)*new_m*pow((distance_in_material),2.0));
-	//time_[work] = -1.0/(C*w);
+	energy[work] = 0.5*(pow(w,2)*new_m*pow((f[0]),2.0));
+	 time_[work] = -1.0/(C*w);
 
 	if(position1[work] <0)
 		position1[work] = -position1[work];
@@ -269,18 +273,18 @@ if(time_[work] < 0 || time_[work-1] < 0   )
 		f[3] = velocity;
 if(timeonce_ == 0)
 {
-	distance_in_material =distance_in_material    +((f[3]/0.00064)/(TIME_M*freq_)) ;   
-	distance_in_material_2 =distance_in_material_2+((f[3]/0.00064)/(TIME_M*freq_)) ; 
+	distance_in_material =distance_in_material    +((f[3]/0.0006)/(TIME_M*freq_)) ;   
+	distance_in_material_2 =distance_in_material_2+((f[3]/0.0006)/(TIME_M*freq_)) ; 
 	timeonce_ = 1;
 }
 else if(timeonce_ == 1)
 {
-	timechange =  fabs((position1[work]-position1[work-1])/(velocity1[work]));    
+	timechange =   ((position1[work]-position1[work-1])/(velocity1[work]));    
 	// printf("timechange =%.30f :: %.30f\n", 1/timechange,TIME_M*freq_);
 	 if(timechange > 0)
 	 {
-	distance_in_material =distance_in_material    +((f[3]/0.00064)/(1.0/(timechange)*freq_*100000)) ;   
-	distance_in_material_2 =distance_in_material_2+((f[3]/0.00064)/(1.0/(timechange)*freq_*100000)) ;
+	distance_in_material =distance_in_material    +((f[3]/distance_in_material)/(1.0/(timechange)*freq_*1000000))*1.0 ;   
+	distance_in_material_2 =distance_in_material_2+((f[3]/distance_in_material)/(1.0/(timechange)*freq_*1000000))*1.0 ;
  } 
 }
 
@@ -303,11 +307,11 @@ double photon_mom_inertia = 2.0/3.0*2*new_m*pow(radius,2.0);
 double mass_atom = 1.672e-27*26;
  
 double frequency___atomic = 280474649406688306320629446517287519655646158909710794752.0 *freq* new_m *how_many_photons_on_one_atom* pow(radius,2.0);
-accen = (-(pow(w,2)*1)*distance_in_material - (C*2*1*w)*f[3] )/1;
+accen = (-(pow(w,2)*1)*f[0] - (C*2*1*w)*f[3] )/1;
 double atomic_frequency2 = (0.159155 *accen * photon_mom_inertia  + 1.3252e-33  *pow(freq,2.0) *radius)/(mass_atom* pow(1e-15,2.0));
 
 
-little_g  = (1.04925)/(radius*1.9e25*19.622386)*((3162.28) *sqrt(NEWWU/299792458.0) *sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(f[3]); 
+little_g  = (48.9)/(radius*1.9e25*1)*((3162.28) *sqrt(NEWWU/299792458.0) *sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(f[3]); 
 //little_g =   1*(little_g1  /*how_many_photons_on_one_atom*6.67e-11*(2.0/3.0*pow(radius,2.0)*new_m*2*M_PI*freq)/(2*pow(299792458.0,2.0)*(pow(radius,3.0))*1)*/) ;
 /*					
  ...Calculate how much the electric field decreases in material after every iteration:
@@ -370,14 +374,14 @@ printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  //if(NEWWU < (pow(0.37,5.0)*EFIELD))
  //	for(;;);
 }
-if(  (distance_in_material) > 0.00064 /* || mega_g > G ||  velocity < 0 || new_U < (3.0 )*/)
+if(  (distance_in_material) > 0.0006 /* || mega_g > G ||  velocity < 0 || new_U < (3.0 )*/)
 {
-        //for(;;);
+        for(;;);
 	DONE_WITH_THIS_0 = 1;	
 	init_tasks(0,0);
 }
  
-//time_[work] = -1.0/(C*w);
+
 if(result_once == 0)
 {
 	result[0] =             velocity*1 ;
@@ -395,8 +399,8 @@ else if(result_once == 1){
 	result[1] =             f[4]*1  ;
 	result[2] =             f[5]*1  ;
 	result[3] = (-(pow(w,2)*new_m)*f[0] - (C*2*new_m*w)*f[3] )/new_m;
-	result[4] = (-(pow(w,2)*1)*distance_in_material- (C*2*1*w)*f[4] )/1;
-	result[5] = (-(pow(w,2)*1)*distance_in_material  - (C*2*1*w)*f[5] )/1;
+	result[4] = (-(pow(w,2)*1)*f[0]- (C*2*1*w)*f[4] )/1;
+	result[5] = (-(pow(w,2)*1)*f[0]  - (C*2*1*w)*f[5] )/1;
 	accen = result[3];
 }
 result_once = 1;
