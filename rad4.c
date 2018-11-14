@@ -119,8 +119,8 @@ int working_on = 0;
 
 //0.0004166 556.960
 #define POWER  556.9609  *pow(10.0 ,2.0);
-#define EFIELD 250.0
-double EFIELD_ = 250.0;
+#define EFIELD 300.0
+double EFIELD_ = 300.0;
 #define PERMEABILITY 25000.0  
 #define G 15.1
 #define WATTTT 222222222221.0 
@@ -351,7 +351,7 @@ double ang_mom_g = ((10000/(freq*6.626e-34)))*(ang_mom_g1) *pow(1.4e-10,2.0)*M_P
  
 //ang_mom_g = 6.67e-11*( pow(radius,2.0)*(kinetic_mass)*2*M_PI*freq)/(2*pow(299792458.0,2.0)  *(pow(radius,3.0))*1)*299792458.0/(9.27e-26);
  //
-little_g  =  0.99078* (ang_mom_g1* new_W)/(freq*6.626e-34)*1*((3162.28) *sqrt(NEWWU/299792458.0))* 1*( sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(1*(f[3]));
+little_g  =  0.984078* (ang_mom_g1* new_W)/(freq*6.626e-34)*1*((3162.28) *sqrt(NEWWU/299792458.0))* 1*( sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(1*(f[3]));
 //little_g  =  1*( ang_mom_g1* new_W/(freq*6.626e-34)*1.25*((3162.28) *sqrt(NEWWU/299792458.0) *sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(f[3])); 
 mega_radius = mega_radius + radius;
 //little_g  =  1*( 48.9/(radius*1.9e25) * ((3162.28) *sqrt(NEWWU/299792458.0) *sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(f[3])); 
@@ -416,7 +416,7 @@ printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	printf("Total gravity recording = "CYN"%.40f"RESET" "WHT" m/s² "RESET"\n", mega_g  );
 	printf("Distance traveled in medium by a photon = "CYN"%.20f"RESET" "WHT" meter "RESET"\n",distance_in_material);
 	printf("Distance/atomic_spacing  = "CYN"%.10f"RESET" "WHT" meter"RESET"\n", ( distance_in_material)/( 2.48e-10   ) );
-        printf("Torus mass  = "CYN"%.10f"RESET" "WHT" kg "RESET"\n", 697.0/20.0 - (3485.0* mega_g)/981.0); 
+        printf("Torus mass  = "CYN"%.10f"RESET" "WHT" kg "RESET"\n",697.0/20.0 - (2905.0 *mega_g)/981.0); 
         printf("Distance needed  = "CYN"%.10f"RESET" "WHT" meter"RESET"\n", DISTANCE__ ); 
 	printf("Total radius  = "CYN"%.50f"RESET" "WHT" meter"RESET" or "CYN"%.50f"RESET" "WHT" meter"RESET" or "CYN"%.50f"RESET" "WHT" meter"RESET"\n", mega_radius,radius*(new_W/(6.626e-34*freq))*pow(1.4e-10,2.0)*M_PI/0.374 ,(radius/freq)*sqrt(new_W/6.626e-34)); 
 	printf("Total radius needed  = "CYN"%.10f"RESET" "WHT" meter"RESET"\n",299792458/freq );
