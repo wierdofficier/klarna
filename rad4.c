@@ -1,3 +1,6 @@
+ 
+
+
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
@@ -116,17 +119,17 @@ int working_on = 0;
 
 //0.0004166 556.960
 #define POWER  556.9609  *pow(10.0 ,2.0);
-#define EFIELD 300.0
-double EFIELD_ = 300.0;
+#define EFIELD 250.0
+double EFIELD_ = 250.0;
 #define PERMEABILITY 25000.0  
 #define G 15.1
-#define WATTTT 10297.0 
+#define WATTTT 222222222221.0 
 
 #define SIZE_BUFFER 10000000000.0
  
 
 
-double freq  =  60;////1444939938.1067;
+double freq   =  60;////1444939938.1067;
 #define FREQUE 60
 #define TIME_M 800000000000 *1*1
 double TIME_M__ = TIME_M;
@@ -157,8 +160,8 @@ double distance_in_material = 0;
 double velocity= 894.43;
 double wavelength = 14.9;
 double new_U =EFIELD;
-double new_W = WATTTT;
-double WATT =   WATTTT;
+double new_W = 1;
+double WATT =   1;
 double RESISTANCE;
 double little_g;
 double DISTANCE_;
@@ -202,25 +205,34 @@ if(DONE_WITH_THIS_0 == 1)
 */
 if(one < 1)
 {
+
 	position1 =  malloc(SIZE_BUFFER);
         velocity1 =  malloc(SIZE_BUFFER);
 	energy =     malloc(SIZE_BUFFER);
 	time_ =      malloc(SIZE_BUFFER);
 	distance_in_material_2 = 0;
 	distance_in_material = 0;
-
-	RESISTANCE =   new_W/(pow(NEWWU,2.0));  
-        DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(25000)*1.03e7*freq)) *12; 
+double C =  10 ; // 4e-3 = dricksvatten
+			double P = 75; 
+ wavelength = sqrt(4*M_PI/(P*M_PI*C*4e-7*freq)) ;
+printf("wavelength = %f \n", wavelength);
+ 
+new_W = pow((EFIELD*2*M_PI*freq*wavelength ),2.0)/(3*M_PI*8.854e-12*pow((2*M_PI*freq)/(2*M_PI/(pow((4*M_PI)/(freq*C*P*M_PI*4e-7),0.5))),3.0)*(pow((1+pow((C)/(2*M_PI*freq*8.854e-12),2.0)),0.5)+1)) ;
 
  
-	relativ_permeability =  179751035759958240.0/(pow(f[3],2.0) + sqrt((pow(freq,2.0) + 323104348567777837056.0 *pow(1.03e7,2.0))/pow(freq,2.0)) *pow(f[3],2.0));// 179751035759958240.0/(pow(velocity,2.0) + sqrt((32310434856777778462720.0 + pow(freq,2.0))/pow(freq,2.0)) * pow(velocity,2.0));
+	RESISTANCE =   new_W/(pow(NEWWU,2.0));  
+        DISTANCE_ =1.0/(sqrt(M_PI*M_PI*4e-7*(25000)*1.03e7*freq)) *5; 
+
+ printf("new_W = %f :: freq =%f :: wavelength = %f :: DISTANCE_ = %f :: RESISTANCE = %f\n", new_W,freq,wavelength,DISTANCE_,RESISTANCE);
+ 
+	relativ_permeability = 25000.0;// 179751035759958240.0/(pow(velocity,2.0) + sqrt((32310434856777778462720.0 + pow(freq,2.0))/pow(freq,2.0)) * pow(velocity,2.0));
 
 	velocity =   1*299792458.0/(sqrt(1*relativ_permeability/2.0*(sqrt(1+pow((1.03e7/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
-freq=60;//1589836329275528111456256.0/sqrt(25276867888091238358551364825513984.0* pow(1.03e7,2.0) *pow(f[0],4.0)*pow(relativ_permeability,2.0) + 28123115323093299962657023983616.0* pow(f[0],2.0)* relativ_permeability);
+//1589836329275528111456256.0/sqrt(25276867888091238358551364825513984.0* pow(1.03e7,2.0) *pow(f[0],4.0)*pow(relativ_permeability,2.0) + 28123115323093299962657023983616.0* pow(f[0],2.0)* relativ_permeability);
 	DISTANCE__ =DISTANCE_;//fabs(-(25 *log(300/pow(EFIELD,2.0)))/222804);
 	/*Calculate mass*/
-	new_m = (3.35677e-35)/(pow(NEWWU,2.0) *velocity);
-	wavelength = sqrt(4*M_PI/(25000.0*M_PI*1.03e7*4e-7*freq));
+	new_m = (3.35677e-35)/(pow(NEWWU,2.0) *f[3]);
+	
  	//f[0] = wavelength;
 	//f[3]=velocity;
 one++;
@@ -309,8 +321,8 @@ timechange =   ((position1[work]-position1[work-1])/(velocity1[work]));
 	// printf("timechange =%.30f :: %.30f\n", 1/timechange,TIME_M*freq_);
 	 if(timechange > 0)
 	 {
-	distance_in_material =distance_in_material    +((f[3]/distance_in_material)/(1.0/(timechange)*1*1))*1.0 ;   
-distance_in_material_2 =distance_in_material_2+((f[3]/distance_in_material)/(1.0/(timechange)*1*1))*1.0 ;
+	 	distance_in_material =distance_in_material    +position1[work]-position1[work-1];   
+ 	distance_in_material_2 =distance_in_material_2+position1[work]-position1[work-1];
 }	 
 }
 
@@ -334,12 +346,12 @@ double frequency___atomic = 2804746494066883063206294465172875196556461589097107
 accen = (-(pow(w,2)*1)*f[0] - (C*2*1*w)*f[3] )/1;
 double atomic_frequency2 = (0.159155 *accen * photon_mom_inertia  + 1.3252e-33  *pow(freq,2.0) *radius)/(mass_atom* pow(1e-15,2.0));
 double kinetic_mass = (1.3252e-33 *freq)/pow(f[3],2.0);
-double ang_mom_g1 = 6.67e-11*(2.0/5.0*pow(radius,2.0)*(new_m)*2*M_PI*freq)/(2*pow(299792458.0,2.0)*(pow(radius,3.0))*1)*299792458.0/9.78 ;
+double ang_mom_g1 = 6.67e-11*(2.0/3.0*pow(radius,2.0)*(new_m)*2*M_PI*freq)/(2*pow(299792458.0,2.0)*(pow(radius,3.0))*1)*299792458.0  ;
 double ang_mom_g = ((10000/(freq*6.626e-34)))*(ang_mom_g1) *pow(1.4e-10,2.0)*M_PI/0.374;
  
 //ang_mom_g = 6.67e-11*( pow(radius,2.0)*(kinetic_mass)*2*M_PI*freq)/(2*pow(299792458.0,2.0)  *(pow(radius,3.0))*1)*299792458.0/(9.27e-26);
- 
-little_g  =   (ang_mom_g1* new_W)/(freq*6.626e-34)*1*((1) *sqrt(NEWWU/299792458.0))* 1*( sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(1*(f[3]));
+ //
+little_g  =  0.99078* (ang_mom_g1* new_W)/(freq*6.626e-34)*1*((3162.28) *sqrt(NEWWU/299792458.0))* 1*( sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(1*(f[3]));
 //little_g  =  1*( ang_mom_g1* new_W/(freq*6.626e-34)*1.25*((3162.28) *sqrt(NEWWU/299792458.0) *sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(f[3])); 
 mega_radius = mega_radius + radius;
 //little_g  =  1*( 48.9/(radius*1.9e25) * ((3162.28) *sqrt(NEWWU/299792458.0) *sqrt(NEWWU)* sqrt(6.67e-11))/sqrt(f[3])); 
@@ -351,7 +363,8 @@ if(attenuation < 0)
 	attenuation = -attenuation;
 double constant_atten =(( 11.931 )  )/DISTANCE__;
 //printf("constant_atten = %f \n", constant_atten);
-NEWWU    = exp(- 11550    *distance_in_material) *EFIELD_; 
+NEWWU    = exp(- 7767.6    *distance_in_material) *EFIELD_; //11620 för torus, 4742.86 för kub då kuben: exp(- x    *0.001568) *5 =0.00294584, då 0.00294584 kommer ifrån 0.37^7.47979*5
+// då 7.4797 är x ifrån 0.176750 = 0.37^x*300 och 0.176750 är ifrån exp(- 11620    *0.00064) *300
 new_W = pow(NEWWU  ,2.0)*RESISTANCE;
 /*  
 ...Calculate the total gravity summation:
@@ -417,11 +430,11 @@ printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	double ironshieldmg = 0.000000006392*pow(0.778768,2.0)*7874;
 	printf("Gravity between two equal plates  = "CYN"%.10f"RESET" "WHT" m/s  "RESET"\n",(6.67e-11*mega_g/(1e-12)*ironshieldmg)/pow((2.5/2),2.0));
  
-  	//sleep(1);
+  	  
 printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",RESET); 
     if(NEWWU < (pow(0.37,12.0)*EFIELD) ||(distance_in_material) > 0.0006)
   	{
- for(;;);
+  
 		stage_1_2++;
 		if(stage_1_2 == 1)
 		{
@@ -903,7 +916,7 @@ int main (int argc, char **argv)
  if(first_run == 1)
 {
 
-	photon_oscillate.vel_new_x = 	   1*299792458.0/(sqrt(1*25000.0/2.0*(sqrt(1+pow((1.03e7/(2*M_PI*freq*8.854e-12)),2.0))+1))); 
+	photon_oscillate.vel_new_x = 	894.43; 
 	photon_oscillate.vel_new_y = 894.43;
 	photon_oscillate.vel_new_z = 894.43;
 	photon_oscillate.pos_new_x = photon_oscillate.vel_new_x/freq;
