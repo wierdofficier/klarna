@@ -24,14 +24,14 @@
 
 /* test */
 double o = 3.5e7;
-double V = 0.2;
+//double V = 0.1;
 double K = 17.90281;
 double L = 0.1579151;
-double N = 2;
+//double N = 1;
 double y = 2.434068;
 double D = 2.2309;
 double P = 1;
-double x = 0.04;
+//double x = 0.02;
 double f = 5e-6;
 double R = 4.99;
 double p = 2700;
@@ -40,8 +40,28 @@ double M = 0;
 
 int main()
 {
+int c = 0;
+double V = 0.1;
+double x = 0.02;
+double N = 1;
+while(1)
+{
+	M = (6.2813e-22 *pow(o,(3.0/2.0)) *pow(V,2.0)* ((-K - L)/(pow(N/y,D) + 1) + K) *sqrt((pow(o,3.0)* P* pow(x,4.0))/(pow(f,3.0)* pow(p,2.0)* pow(R,4.0))))/(pow(f,(7.0/2.0))* p* P*pow(x,2.0)* (sqrt((3.23118e20 *pow(o,2.0))/pow(f,2.0) + 1) + 1));
+	
+	x=  x + 0.000001 ;
+	V = V +0.000001;
+	
+	N = N+0.000001*10;
 
-M = (6.2813e-22 *pow(o,(3.0/2.0)) *pow(V,2.0)* ((-K - L)/(pow(N/y,D) + 1) + K) *sqrt((pow(o,3.0)* P* pow(x,4.0))/(pow(f,3.0)* pow(p,2.0)* pow(R,4.0))))/(pow(f,(7.0/2.0))* p* P*pow(x,2.0)* (sqrt((3.23118e20 *pow(o,2.0))/pow(f,2.0) + 1) + 1));
-printf("M = %.10f \n", M);
+	printf("M = %.10f :: V = %.10f :: N = %.10f \n", M,V,N);
+
+	 if(V > 6)
+		for(;;);
+	 if(N > 17.90281)
+		N = 17.90281;
+}
 
 }
+
+//jämför med:
+//9.81- ((1.428e-4-x)/1.428e-4) *9.81 =9.81-(3-  2 sqrt(1 +833.434980^2))*9.81
