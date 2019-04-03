@@ -5,7 +5,7 @@ int main()
 {
 double V = 0.00000001;
 
-double f  =  5e-6 ;
+double f  =  15e-6 ;
 
 double Z[500000]  ;
 
@@ -38,14 +38,14 @@ double end;
 int countme = 0;
 double expo = -1.0;
 FILE *out_file;
-for(int i = 0; i < 1*500; i++)
+for(int i = 0; i < 1*300; i++)
 { 
  
 		v  = (4.23971e8)/sqrt((1.0 + sqrt(1.0 + 3.23118e20 *pow((o/f),2.0)))* P);
  		r = (615.728* 1)/(R* pow(((pow(o,3.0)* P* 1)/(pow(f,3.0)*pow(p,2.0) *pow(R,4.0))),1.0/4.0));
  		U  = sqrt((pow(o,3.0)* P *pow(V,4.0))/(pow(f,3.0)* pow(p,2.0)* pow(R,4.0)))/(1199169832000.0 *sqrt(10.0)*M_PI);
 
-		photonmass =  357.0 *(-1 + sqrt(1 + pow(U,2.0)))/1250000.0;
+		photonmass = 1.428e-4 - (1-2*(sqrt(1+6.67e-14*pow(V,4.0)/pow(f,3.0))-1))*1.428e-4;
  		double acc =  9.81- 9.81*(1.428e-4-photonmass)/1.428e-4;
 		double knas = 1.0 - (50.0* acc)/981.0  ; 
 
@@ -55,8 +55,9 @@ for(int i = 0; i < 1*500; i++)
 		double ZZ = (1.25509e-24 *acc)/(pow(f,(9.0/2.0))* U);
 			
 V = V+ 0.01;
-f = f / 1.00028;
-printf("%.7f\t%.7f\n",796755611151391638159360.0*pow(f,(9.0/2.0))* U,ZZ );
+
+printf("%.7f\t%.7f\n",   U,knas );//ger  ( (-1.01329) + (-(-752136) - (-1.01329))/(1 + (U/3.3621e-7)^0.876795))*U where U =5.78
+
 }
 for(;;);
 
