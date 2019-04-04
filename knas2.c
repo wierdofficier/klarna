@@ -77,5 +77,20 @@ som har formen:
 
 1.0023 - 1/(b*x^a-1)-x = knas
 ***************
+///////////////////////////////////////////////////
 
+1+ 1.06686/(1+1/U) - U = X
+
+(9.81-(X*9.81))*2 = g
+
+g ~ (9.81-((1+ 1.06686/(1+1/U) - U)*9.81))*2 //ungefärligt värde, men principen sitter där.
+
+om magnetfältet kommer ifrån en roterande ledande sfärisk kärna,som exempelvis jorden, så avtar den med:
+integrate(((1220000)^2-x^2)dx)/(1220000^2+(6371000)^2-2*(6371000)*x)^(3/2)) from -1220000 to  1220000
+
+samma sak gäller g, isf (ungefärligt):
+
+g ~ (9.81-((1+ 1.06686/(1+1/U) - U)*9.81))*2*integrate(((1220000)^2-x^2)dx)/(1220000^2+(6371000)^2-2*(6371000)*x)^(3/2)) from -1220000 to  1220000	
+
+///////////////////////////////////////////////////
 */
