@@ -766,7 +766,7 @@ frequency__ =6.95e-5;
  
  		 tk =  fabs( (integratenow(r ,  (mass_motion_state[0]->pos_new_y))));
 
- 		 frequency__ = frequency__*1.005;
+ 		 frequency__ = frequency__*1.0005;
 		 //närmar sig tk en bestämd konstant ?
 		 if(tk < 1 ) 
 		 {
@@ -808,7 +808,7 @@ else if(tk > 0  && tk < 1)
 		fieldnext=magneticfield*tk; 
  		U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
   
-		volt = volt +0.00001;
+		volt = volt +0.000001;
 		//double knas2 =(1.00313+1.1503/(1.06162+1/(U))- U)* 1.1503*0.87;
 		//  acc1=(9.81-(knas2*9.81))*2;
 		 acc1= 9.81-(3 - 2 *sqrt(1 + pow(U,2.0)))*9.81;  
@@ -953,7 +953,7 @@ return sum_triple_big*2;
 } 
 double integratenow  (double a, double b)
 {
-	double n = 870.0;
+	double n = 14.0;
 
 	double lowbound =  a;
 	double hibound = - a;
