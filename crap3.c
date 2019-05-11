@@ -40,7 +40,7 @@ double fieldnext2 ;
  
 double magneticfield2;
  
-double frequency__2 = 1e6  ; 
+double frequency__2 = 3.15e5  ; 
 double r2  ;
  
 double tk2 = 0;
@@ -645,54 +645,55 @@ double PIDOUTPUT(double state)
 return state;
 }
 int freq_stop = 1;
+int m_one= 1;
 double vel_r;
 void source_2_vibrate()
 {
  
-r2 = (615.728* 1)/(R* pow(((pow(o,3.0)* P* 1)/(pow(frequency__2,3.0)*pow(p,2.0) *pow(R,4.0))),1.0/4.0));
- 
- tk2 =  fabs( (integratenow(r2 ,  mass_motion_state[0]->pos_new_y)));
-  double r_change[100000000];
+  double * r_change ;
 double delta_r;
  if(mass_motion_state[0]->pos_new_y > 0)
  {
- 	for(int whatfreq = 0; whatfreq < 1000000000; whatfreq++)
+if(m_one == 1)
+	r_change = malloc(1400000000);
+m_one = 0;
+ 	for(int whatfreq = 0; whatfreq < 10000000000  ; whatfreq++)
 	{
-if(freq_stop == 1)
+ if(freq_stop == 1)
 {
 		 //vilken frekvens gör så att radien tillsammans med massdistansen blir en konstant, men vilken konstant? kanske 1 ?
 		 r2 = (615.728* 1)/(1* pow(((pow(o ,3.0)* P* 1)/(pow(frequency__2,3.0)*pow(p,2.0) *pow(1,4.0))),1.0/4.0));
  
- 		// tk2 =  fabs( (integratenow(r2 ,  (mass_motion_state[0]->pos_new_y))));
+ 		  //tk2 =  fabs( (integratenow(r2 ,  (mass_motion_state[0]->pos_new_y))));
 		
 
 
 		r_change[whatfreq] = r2;
 
- 		 frequency__2 = frequency__2*1.0000005;
+ 		 frequency__2 = frequency__2*1.0000000002;
 
 		double time_ = 1.0/frequency__2;
 		delta_r = r_change[whatfreq] - r_change[whatfreq-1];
 
-		  vel_r = delta_r/time_;
+		  vel_r = r2/time_;	//delta_r är avståndet mellan magnetsfärerna, helst borde delta_r vara lika med materians radie, eftersom 
 
-}
+ }
 
 		 //närmar sig tk en bestämd konstant ?
 		//printf("tk2 = %f \n", tk2);
 		// if(tk2 < 1  ) 
 		// {
-                 	if(  vel_r > 299791458  && vel_r < 299792458 )
+                 	if(  vel_r > 299792457.8  && vel_r < 299792458 )
 			{
-				printf("DONE2: frequency = %.10f tk2 = %.10f  acc12= %.10f  magneticfield= %.10f  volt =%.10f \n", frequency__2,tk2,acc12,magneticfield2,volt2);
+
 				printf("vel_r = %f  :: r2 = %f\n", vel_r,r2);
 				freq_stop = 0;
  					break;
 			}
- 
+ 				//printf("DONE2: frequency = %.10f tk2 = %.10f  acc12= %.10f  magneticfield= %.10f  volt =%.10f \n", frequency__2,tk2,acc12,magneticfield2,volt2);
 		//}
 
-	
+ if((int)vel_r % 10000 == 0)
 printf("vel_r = %f \n", vel_r);
 	
 		
@@ -718,7 +719,7 @@ else if(tk2 > 0  && tk2 < 2)
 }
   if(mass_motion_state[0]->pos_new_y > 0)
 { 
-	for(int whatvolt = 0; whatvolt < 100000; whatvolt++)
+	for(int whatvolt = 0; whatvolt < 10000000  ; whatvolt++)
 	{
 
   		magneticfield2 = ( (volt2/4.99))/(2*M_PI*r2);
@@ -726,14 +727,14 @@ else if(tk2 > 0  && tk2 < 2)
 		fieldnext2=magneticfield2*tk2; 
  		U2 = ((8.85e-12/2.0*pow((fieldnext2*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext2),2.0)))); 
   
-		volt2 = volt2 +0.00001;
+		volt2 = volt2 +0.0001;
 
 		acc12= 9.81-(3 - 2 *sqrtf(1 + pow(U2,2.0)))*9.81;  
+//printf("acceleration = %.20f volt2 = %f  U2= %f magneticfield2=  %f tk2 = %f \n", acc12,volt2,U2,magneticfield2,tk2);
 
-
-		if(acc12 > 0.00005 )
+		if(acc12 > 0.05 )
 		{
-			printf("DONE: volt, U = %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U2,volt2,acc12,fieldnext2,tk2,magneticfield2);
+			printf("DONE2: volt, U2 = %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U2,volt2,acc12,fieldnext2,tk2,magneticfield2);
  				break;
 		}
 
@@ -742,6 +743,7 @@ else if(tk2 > 0  && tk2 < 2)
 	  acc12= 9.81-(3 - 2 *sqrt(1 + pow(U2,2.0)))*9.81;  
 double object_age= t_initial /(1.0 -pow(vel_r,2.0)/pow(299792458,2.0));
 printf("object aging to time = %f seconds :: %f minutes  :: %f hours   :: %f days :: %f years\n", object_age,object_age/60.0, object_age/(60.0*24),object_age/(60.0*24*60.0),object_age/(60.0*24*60*365));
+
 	//  gmass = 1.428e-4-(acc1/9.81)*1.428e-4; 
 
 }
