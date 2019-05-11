@@ -664,7 +664,7 @@ m_one = 0;
 		 //vilken frekvens gör så att radien tillsammans med massdistansen blir en konstant, men vilken konstant? kanske 1 ?
 		 r2 = (615.728* 1)/(1* pow(((pow(o ,3.0)* P* 1)/(pow(frequency__2,3.0)*pow(p,2.0) *pow(1,4.0))),1.0/4.0));
  
- 		  //tk2 =  fabs( (integratenow(r2 ,  (mass_motion_state[0]->pos_new_y))));
+ 		  tk2 =  fabs( (integratenow(r2 ,  (mass_motion_state[0]->pos_new_y))));
 		
 
 
@@ -719,7 +719,7 @@ else if(tk2 > 0  && tk2 < 2)
 }
   if(mass_motion_state[0]->pos_new_y > 0)
 { 
-	for(int whatvolt = 0; whatvolt < 10000000  ; whatvolt++)
+	for(int whatvolt = 0; whatvolt < 100000000  ; whatvolt++)
 	{
 
   		magneticfield2 = ( (volt2/4.99))/(2*M_PI*r2);
@@ -727,12 +727,12 @@ else if(tk2 > 0  && tk2 < 2)
 		fieldnext2=magneticfield2*tk2; 
  		U2 = ((8.85e-12/2.0*pow((fieldnext2*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext2),2.0)))); 
   
-		volt2 = volt2 +0.0001;
+		volt2 = volt2 +0.001;
 
 		acc12= 9.81-(3 - 2 *sqrtf(1 + pow(U2,2.0)))*9.81;  
-//printf("acceleration = %.20f volt2 = %f  U2= %f magneticfield2=  %f tk2 = %f \n", acc12,volt2,U2,magneticfield2,tk2);
+ printf("acceleration = %.20f volt2 = %f  U2= %f magneticfield2=  %f tk2 = %f \n", acc12,volt2,U2,magneticfield2,tk2);
 
-		if(acc12 > 0.05 )
+		if(acc12 > 0.0005 )
 		{
 			printf("DONE2: volt, U2 = %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U2,volt2,acc12,fieldnext2,tk2,magneticfield2);
  				break;
