@@ -656,28 +656,24 @@ double delta_r;
  {
 if(m_one == 1)
 	r_change = malloc(1400000000);
-m_one = 0;
+	m_one = 0;
  	for(int whatfreq = 0; whatfreq < 10000000000  ; whatfreq++)
 	{
- if(freq_stop == 1)
-{
-		 //vilken frekvens gör så att radien tillsammans med massdistansen blir en konstant, men vilken konstant? kanske 1 ?
-		 r2 = (615.728* 1)/(1* pow(((pow(o ,3.0)* P* 1)/(pow(frequency__2,3.0)*pow(p,2.0) *pow(1,4.0))),1.0/4.0));
+ 		if(freq_stop == 1)
+		{		 
+			r2 = (615.728* 1)/(1* pow(((pow(o ,3.0)* P* 1)/(pow(frequency__2,3.0)*pow(p,2.0) *pow(1,4.0))),1.0/4.0));
  
- 		  tk2 =  fabs( (integratenow(r2 ,  (mass_motion_state[0]->pos_new_y))));
+ 			tk2 =  1;//fabs( (integratenow(r2 ,  (mass_motion_state[0]->pos_new_y))));
 		
+			r_change[whatfreq] = r2;
 
+ 			frequency__2 = frequency__2*1.0000000002;
 
-		r_change[whatfreq] = r2;
+			double time_ = 1.0/frequency__2;
+			delta_r = r_change[whatfreq] - r_change[whatfreq-1];
 
- 		 frequency__2 = frequency__2*1.0000000002;
-
-		double time_ = 1.0/frequency__2;
-		delta_r = r_change[whatfreq] - r_change[whatfreq-1];
-
-		  vel_r = r2/time_;	//delta_r är avståndet mellan magnetsfärerna, helst borde delta_r vara lika med materians radie, eftersom 
-
- }
+			vel_r = r2/time_;	 
+		}
 
 		 //närmar sig tk en bestämd konstant ?
 		//printf("tk2 = %f \n", tk2);
@@ -690,7 +686,7 @@ m_one = 0;
 				freq_stop = 0;
  					break;
 			}
- 				//printf("DONE2: frequency = %.10f tk2 = %.10f  acc12= %.10f  magneticfield= %.10f  volt =%.10f \n", frequency__2,tk2,acc12,magneticfield2,volt2);
+ 			 //printf("DONE2: frequency = %.10f tk2 = %.10f  acc12= %.10f  magneticfield= %.10f  volt =%.10f \n", frequency__2,tk2,acc12,magneticfield2,volt2);
 		//}
 
  if((int)vel_r % 10000 == 0)
@@ -770,7 +766,7 @@ void display  (void){
     glMultMatrixf(lightRotation);
 
  
- mass_motion_state[INDEX_NRmore] = mass_motion( mass_motion_state[INDEX_NRmore] ,1);	
+ mass_motion_state[INDEX_NRmore] = mass_motion( mass_motion_state[INDEX_NRmore] ,1);
  
  double state;
 
@@ -869,9 +865,7 @@ sprintf(buf,"height(y): %f m \n velocity(y): %f m/s \n time elapsed: %d\n gravit
  
  		 tk =  fabs( (integratenow(r ,  (mass_motion_state[0]->pos_new_y))));
 		
-
-
-		 
+  
  		 frequency__ = frequency__*1.0005;
 		 //närmar sig tk en bestämd konstant ?
 		 if(tk < 1 ) 
@@ -883,10 +877,7 @@ sprintf(buf,"height(y): %f m \n velocity(y): %f m/s \n time elapsed: %d\n gravit
 			}
  
 		}
-
-	 
- 
-		
+ 	
 	}
 }
 
