@@ -1,11 +1,11 @@
 double PGAIN =0.00001005 ;
 double IGAIN =0 ;
 double DGAIN =0; 
-double frequency__ = 6.95e-5  ; 
+double frequency__ = 6.95e-6  ; 
 double o  = 3.5e7;
 double p  = 2700;
 double P  = 1;
-double R  = 4.99;
+double R  = 10;
 double volt =1.653200000000001 ;
 
 
@@ -519,7 +519,7 @@ struct state_vector   *   mass_motion(struct state_vector     *  next_state, int
 
 	double z[6];
  	double t0[6] = {0,0,0,0,0,0};
- 	double tburn = 1.0;
+ 	double tburn =  .1;
 	double tf[6] = {tburn,tburn,tburn,tburn,tburn,tburn};
 
 	z[0] =  next_state->pos_new_x;
@@ -707,7 +707,7 @@ void display  (void){
 	//modifiera frekvensen så att energidensitetens radie hålls konstant. 
 	if(fabs(mass_motion_state[0]->vel_new_y) > 0)
 	 {
-		frequency__ =6.95e-5;
+		frequency__ =6.95e-3;
 	 	for(int whatfreq = 0; whatfreq < 10000000; whatfreq++)
 		{
 			
@@ -726,7 +726,7 @@ void display  (void){
 	}
 
 	if(volt > 0 && r > 0)
-		magneticfield = ( (volt/4.99))/(2*M_PI*r);
+		magneticfield = ( (volt/R))/(2*M_PI*r);
 
 	if(tk > 1 )
 	{
@@ -736,7 +736,7 @@ void display  (void){
 	}
 	else if(tk > 0  && tk < 1) 
 	{
-		magneticfield = ( (volt/4.99))/(2*M_PI*r);
+		magneticfield = ( (volt/R))/(2*M_PI*r);
 		fieldnext=magneticfield*tk; 
 
 	 	U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
@@ -748,12 +748,12 @@ void display  (void){
 	{ 
 		for(int whatvolt = 0; whatvolt < 400000000 ; whatvolt++)
 		{
-	  		 magneticfield = ( (volt/4.99))/(2*M_PI*r);
+	  		 magneticfield = ( (volt/R))/(2*M_PI*r);
 
 			 fieldnext=magneticfield*tk; 
 	 		 U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
 	  
-			 volt = volt +0.000000001;
+			 volt = volt +0.0000088;
  
 			 acc1= 9.81-(3 - 2 *sqrt(1 + pow(U,2.0)))*9.81;  
 			 //torque accelerationen som ger kroppen spin eftersom massan ändras
@@ -778,17 +778,18 @@ void display  (void){
 
 
 	object_age= 1.0 /(1.0 -pow(mass_motion_state[0]->vel_new_x*r,2.0)/pow(299792458,2.0));
-	if((mass_motion_state[0]->vel_new_x*r) > 299772057.8)
+	if((mass_motion_state[0]->vel_new_x*r) > 299192458)
 	{
-		 printf("object_age = %f \n", object_age);
+		 printf("object_age = %f velocity = %f \n", object_age,mass_motion_state[0]->vel_new_x*r);
 		 stop_inc =0;
+		for(;;);
 	}
 } 
 
 
 	  gmass = 1.428e-4-(acc1/9.81)*1.428e-4; 
 	  tick(createPIDController(PGAIN,IGAIN,DGAIN,PIDSOURCE,PIDOUTPUT,0.2),mass_motion_state[0]->vel_new_y);
-	  printf("U = %.10f %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U,volt,r, mass_motion_state[0]->pos_new_y,fieldnext,tk,acc1);
+	  printf("U = %.10f %.10f %.10f %.10f %.10f %.10f %.10f   %.10f \n",  U,volt,r, mass_motion_state[0]->pos_new_y,fieldnext,tk,acc1,mass_motion_state[0]->vel_new_x*r);
 
 }
 
