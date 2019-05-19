@@ -1,3 +1,14 @@
+double PGAIN =0.00001005 ;
+double IGAIN =0 ;
+double DGAIN =0; 
+double frequency__ = 6.95e-5  ; 
+double o  = 3.5e7;
+double p  = 2700;
+double P  = 1;
+double R  = 4.99;
+double volt =1.653200000000001 ;
+
+
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
@@ -11,65 +22,49 @@
 #include <pthread.h>
 #include "system.h"
 #include "kdtree.h"
-#define NUM_THREADS 2
 #include <stdbool.h>
 #include <math.h>
 #include <complex.h>
- void rates_torque ( double *t, double *f, double result[]   );
- double t_initial = 1.0;
- double PGAIN =0.00001005 ;
- double IGAIN =0 ;
- double DGAIN =0; 
-double U ;
-double newvolt ;
-double fieldnext ; 
- 
-double magneticfield;
 #include <stdio.h>
-double frequency__ = 6.95e-5  ; 
-double r  ;
-double integratenow  (double a, double b);
-double tk = 0;
-float acc1;
-
-
-  
-
-double U2 ;
-double newvolt2 ;
-double fieldnext2 ; 
- 
-double magneticfield2;
- 
-double frequency__2 = 3.15e5  ; 
-double r2  ;
- 
-double tk2 = 0;
-float acc12;
-
-
-
-
-
-double PIDSOURCE();
-double PIDOUTPUT(double state);
-struct state_vector  ** mass_motion_state_torque ; 
-struct state_vector  ** mass_motion_state ;
-int multitasks( );
-
-
 #include <stdlib.h>
 #include <stdint.h>
 #include "PID.h"
+#include <sys/time.h>
 
 
-PIDController *createPIDController(double p, double i, double d, double (*pidSource)(void), void (*pidOutput)(double output)) {
+#define NUM_THREADS 2
+
+int stop_inc =1;
+double human_radie = 2.0;
+double object_age;
+double acc12;
+double U ;
+double newvolt ;
+double fieldnext ; 
+double tk = 0;
+float acc1;
+double magneticfield;
+int human;
+
+double r ;
+double integratenow  (double a, double b);
+double PIDSOURCE();
+double PIDOUTPUT(double state);
+int multitasks( );
+
+struct state_vector   *   mass_motion(struct state_vector     *  next_state, int num );
+struct state_vector  ** mass_motion_state ;
+struct state_vector  ** mass_motion_state_temp ;
+
+
+//algoritm så att volten hålls jämn.
+PIDController *createPIDController(double p, double i, double d, double (*pidSource)(void), void (*pidOutput)(double output),double target) {
 
 	PIDController *controller = malloc(sizeof(PIDController));
 	controller->p = p;
 	controller->i = i;
 	controller->d = d;
-	controller->target = 0.2 ;//0;
+	controller->target = target ;//0;
 	controller->output = 0;
 	controller->enabled = 1;
 	controller->currentFeedback = 0;
@@ -94,12 +89,11 @@ PIDController *createPIDController(double p, double i, double d, double (*pidSou
 }
 
 
-void tick(PIDController *c) {
+void tick(PIDController *c,double input___) {
  
-
 	if(c->enabled) {
 		//Retrieve system feedback from user callback.
-		c->currentFeedback = mass_motion_state[0]->pos_new_y ;
+		c->currentFeedback = input___ ;
 
 		//Apply input bounds if necessary.
 		if(c->inputBounded) {
@@ -273,32 +267,25 @@ void setFeedbackWrapBounds(PIDController *controller, double lower, double upper
 }
 
 double freq;
- 
 double motion_acc;
 double w_0;
 double k;
-double o  = 3.5e7;
-double p  = 2700;
-double P  = 1;
-double R  = 4.99;
 double v ;
 double Q;	
 double M; 
 double zz;
 double LL;
 double A,B,C;
- 
 double photonmass ;
 int count = 0;
 int once = 0;
 double end;
-
 int INDEX_NRmore = 0;
+
 #define SIZE_OBJECT 507904 //126976
- 
- 
 #define FIRST 1
 #define WORK 0
+
 float fovy = 45.0;
 float dNear = 100;
 float dFar = 2000;
@@ -327,7 +314,7 @@ void rates_dorsal ( double *t, double *f, double result[]   );
 void key(unsigned char key, int x, int y);
  
 void display  (void);
-struct state_vector   *   mass_motion(struct state_vector     *  next_state, int num );
+
  
  
 double accen[1000];
@@ -416,7 +403,7 @@ void mouseMotion(int x, int y){
     }
 }
  
- 
+
 void reshape(int w, int h){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -427,7 +414,7 @@ void reshape(int w, int h){
 int initonce =1;
  
   
- double acc_torque;
+ 
 int argc_;
 char **argv_;
 int main (int argc, char **argv)
@@ -441,125 +428,90 @@ multitasks();
 
 void task2( )
 {
-//loadOBJ__("sphere3.obj"); 
- 
-mass_motion_state =(struct state_vector*)malloc(sizeof(struct state_vector*)*SIZE_OBJECT*32);
+//allokering
+	int i,j,k;
+	mass_motion_state =(struct state_vector*)malloc(sizeof(struct state_vector*)*SIZE_OBJECT*32);
 
-int i,j,k;
 
-for(int i=0; i<SIZE_OBJECT*1; i++)
-	mass_motion_state[i] = (struct state_vector*)malloc(sizeof(struct state_vector)*32);
+	for(int i=0; i<SIZE_OBJECT*1; i++)
+		mass_motion_state[i] = (struct state_vector*)malloc(sizeof(struct state_vector)*32);
  
  
- mass_motion_state_torque =(struct state_vector*)malloc(sizeof(struct state_vector*)*SIZE_OBJECT*32);
-
- 
-
-for(int i=0; i<SIZE_OBJECT*1; i++)
-	mass_motion_state_torque[i] = (struct state_vector*)malloc(sizeof(struct state_vector)*32);
- 
-
-if(initonce==1)
-{
-	int ll;
-	for(ll = 0; ll < SIZE_OBJECT  ; ll++)
+	if(initonce==1)
 	{
+		int ll;
+		for(ll = 0; ll < SIZE_OBJECT  ; ll++)
+		{
 	 
-         	  mass_motion_state[ll]->pos_new_x = 0.0 ;
+         	 	 mass_motion_state[ll]->pos_new_x = 0.0 ;
+ 	          	 mass_motion_state[ll]->pos_new_y = 0 ;
+ 		 	 mass_motion_state[ll]->pos_new_z = 0 ;
  
- 	          mass_motion_state[ll]->pos_new_y = 0 ;
- 		  mass_motion_state[ll]->pos_new_z = 0 ;
- 
- 	  	  mass_motion_state[ll]->vel_new_x =   0.0 ;
- 		  mass_motion_state[ll]->vel_new_y =   0 ;
- 		  mass_motion_state[ll]->vel_new_z =   0 ;
-
-	}
-	initonce = 0;
-
-	for(ll = 0; ll < SIZE_OBJECT  ; ll++)
-	{
-	 
-         	  mass_motion_state_torque[ll]->pos_new_x = 0.0 ;
- 
- 	          mass_motion_state_torque[ll]->pos_new_y = 0 ;
- 		  mass_motion_state_torque[ll]->pos_new_z = 0 ;
- 
- 	  	  mass_motion_state_torque[ll]->vel_new_x =   0.0 ;
- 		  mass_motion_state_torque[ll]->vel_new_y =   0 ;
- 		  mass_motion_state_torque[ll]->vel_new_z =   0 ;
-
-	}
-	initonce = 0;
-
-
- 
+ 	  	 	 mass_motion_state[ll]->vel_new_x =   0.0 ;
+ 		  	 mass_motion_state[ll]->vel_new_y =   0 ;
+ 		  	 mass_motion_state[ll]->vel_new_z =   0 ;
+		}
+		initonce = 0;
 }
 
 
-glutInit(&argc_, argv_);
-init_mpgeg();
+	glutInit(&argc_, argv_);
+	init_mpgeg();
 
-GLint glut_display;
+	GLint glut_display;
 
-glutInitWindowSize (1080,1920);
-glutCreateWindow ("gchange");
+	glutInitWindowSize (1080,1920);
+	glutCreateWindow ("gchange");
 
-int mainMenu;
-const GLubyte *str;
-str = glGetString (GL_EXTENSIONS);
+	int mainMenu;
+	const GLubyte *str;
+	str = glGetString (GL_EXTENSIONS);
 
-glEnable(GL_NORMALIZE);
-glEnable(GL_DEPTH_TEST);
-glMatrixMode(GL_PROJECTION);
-glLoadIdentity();
-glMatrixMode(GL_MODELVIEW);
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
 
-glEnable(GL_LIGHTING);
-glEnable(GL_LIGHT0);
-glEnable(GL_NORMALIZE);
-glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	//glEnable(GL_NORMALIZE);
+	//glEnable(GL_COLOR_MATERIAL);
+	 human = loadOBJ__("FinalBaseMesh.obj"); 
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	dirLight = (Light*)malloc(sizeof(Light));
+	dirLight->setPosition_light = setPosition_light;
+	dirLight->setAmbient_light = setAmbient_light;
+	dirLight->setDifusse_light = setDifusse_light;
+	dirLight->setSpecular_light = setSpecular_light;
+	 
+	dirLight->setPosition_light(100,100, 800);
+	dirLight->setAmbient_light(0, 0, 0);
+	dirLight->setDifusse_light(1, 1, 1);
+	dirLight->setSpecular_light(0.995f, 0.1f, 0.88f);
+	 
+	material =(Material*)malloc(sizeof(Material));
+	material->setAmbient_material =setAmbient_material;
+	material->setDifusse_material = setDifusse_material;
+	material->setSpecular_material =setSpecular_material;
+	material->setShininess_material = setShininess_material;
+	material->setAmbient_material(0, 0, 1, 1);
+	material->setDifusse_material(0.5f, 0.1f, 0.995f, 1.0f/450.0f);
+	material->setSpecular_material(0.01f, 0.01f, 0.01f, 1.0f/450.0f);
+	material->setShininess_material(128);
+	 
+	glutDisplayFunc (display );
+	 
+	glutReshapeFunc(reshape);
+	 
+	glutMouseFunc(mouse);
+	glutKeyboardFunc(key);
+	  	
 
-glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-dirLight = (Light*)malloc(sizeof(Light));
-dirLight->setPosition_light = setPosition_light;
-dirLight->setAmbient_light = setAmbient_light;
-dirLight->setDifusse_light = setDifusse_light;
-dirLight->setSpecular_light = setSpecular_light;
- 
-dirLight->setPosition_light(100,100, 800);
-dirLight->setAmbient_light(0, 0, 0);
-dirLight->setDifusse_light(1, 1, 1);
-dirLight->setSpecular_light(0.995f, 0.1f, 0.88f);
- 
-material =(Material*)malloc(sizeof(Material));
-material->setAmbient_material =setAmbient_material;
-material->setDifusse_material = setDifusse_material;
-material->setSpecular_material =setSpecular_material;
-material->setShininess_material = setShininess_material;
-material->setAmbient_material(0, 0, 1, 1);
-material->setDifusse_material(0.5f, 0.1f, 0.995f, 1.0f/450.0f);
-material->setSpecular_material(0.01f, 0.01f, 0.01f, 1.0f/450.0f);
-material->setShininess_material(128);
-glLightfv(GL_LIGHT0, GL_POSITION, dirLight->pos);
-glLightfv(GL_LIGHT0, GL_AMBIENT,   dirLight->ambient);
-glLightfv(GL_LIGHT0, GL_SPECULAR,  dirLight->specular);
-glLightfv(GL_LIGHT0, GL_DIFFUSE,   dirLight->difusse);  
-
-
-glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);  
-glutDisplayFunc (display );
- 
-glutReshapeFunc(reshape);
- 
-glutMouseFunc(mouse);
-glutKeyboardFunc(key);
-  	
-
-glutMotionFunc(mouseMotion);
-glutMainLoop();
-
+	glutMotionFunc(mouseMotion);
+	glutMainLoop();
 }
+
 struct state_vector   *   mass_motion(struct state_vector     *  next_state, int num )
 {
 	double f0[6];
@@ -583,44 +535,8 @@ struct state_vector   *   mass_motion(struct state_vector     *  next_state, int
 	f0[3] =next_state->vel_new_x;
 	f0[4] =next_state->vel_new_y;
 	f0[5] = next_state->vel_new_z;
- 
-	rk45(rates_dorsal, t0, f0,f0_result, tf,z,6, 100000);
-
-	next_state->pos_new_x = f0[0];
-	next_state->pos_new_y = f0[1];
-	next_state->pos_new_z = f0[2];
-
-	next_state->vel_new_x = f0[3];
-	next_state->vel_new_y = f0[4];
-	next_state->vel_new_z = f0[5];
-
-	return   next_state ;
-}
-struct state_vector   *   mass_motion_torque(struct state_vector     *  next_state, int num )
-{
-	double f0[6];
-	double f0_result[6];
-
-	double z[6];
- 	double t0[6] = {0,0,0,0,0,0};
- 	double tburn = 1.0;
-	double tf[6] = {tburn,tburn,tburn,tburn,tburn,tburn};
-
-	z[0] =  next_state->pos_new_x;
-	z[1] =  next_state->pos_new_y;
-	z[2] = next_state->pos_new_z;
-	z[3] =  next_state->vel_new_x;
-	z[4] =  next_state->vel_new_y;
-	z[5] = next_state->vel_new_z;
-
-	f0[0] = next_state->pos_new_x;
-	f0[1] =next_state->pos_new_y;
-	f0[2] =next_state->pos_new_z;
-	f0[3] =next_state->vel_new_x;
-	f0[4] =next_state->vel_new_y;
-	f0[5] = next_state->vel_new_z;
- 
-	rk45(rates_torque, t0, f0,f0_result, tf,z,6, 100000);
+ 	//integrera 
+	rk45(rates_dorsal, t0, f0,f0_result, tf,z,6, 1);
 
 	next_state->pos_new_x = f0[0];
 	next_state->pos_new_y = f0[1];
@@ -641,57 +557,52 @@ double total_period_time = 0;
 double vel[1000000];
 double pos[1000000];
 double difftime1[1000000];
+
 void key(unsigned char key, int x, int y)
 {
  
-   if(key == 'x') cameraEye[0]-= 50;
-   if(key == 'X') cameraEye[0]+= 50;
-   if(key == 'y') cameraEye[1]-= 50;
-   if(key == 'Y') cameraEye[1]+= 50;
-   if(key == 'z') cameraEye[2]-= 50;
-   if(key == 'Z') cameraEye[2]+= 50;
- 
-   if(key == '+')
-   {
-      
-           
-        
-   }
-   if(key == '-')
-   {        
-   }
+	   if(key == 'x') cameraEye[0]-= 50;
+	   if(key == 'X') cameraEye[0]+= 50;
+	   if(key == 'y') cameraEye[1]-= 50;
+	   if(key == 'Y') cameraEye[1]+= 50;
+	   if(key == 'z') cameraEye[2]-= 50;
+	   if(key == 'Z') cameraEye[2]+= 50;
+	 
+	   if(key == '+')
+	   {
+	      
+		   
+		
+	   }
+	   if(key == '-')
+	   {        
+	   }
 
-   glutPostRedisplay();
+	   glutPostRedisplay();
 }
  
 double dif;
- 
-#include <sys/time.h>
-double volt =1.653200000000001 ;
- double volt2 = 1 ;
- 
-double voltinc = 0.1;
 int sect;
- 
 double gmass;
+
 typedef struct {
     float r;
     float g;
     float b;
 } RGB;
+
 int timerseccounter = 0;
 void RenderString(float x, float y, void *font, const char* string )
 {  
-  char *c;
-RGB rgb;
- 
- // glColor3f(rgb.r, rgb.g, rgb.b); 
-  glRasterPos2f(x, y);
+	  char *c;
+	  RGB rgb;
+	  glRasterPos2f(x, y);
 
-  glutBitmapString(font, string);
+	  glutBitmapString(font, string);
 }
+
+
 int cccc = 0;
- 
 int clocksec[100000];
 
 double PIDSOURCE()
@@ -707,334 +618,181 @@ double PIDOUTPUT(double state)
  
 return state;
 }
-double acc_torque;
-double object_age;
-int freq_stop = 1;
-int m_one= 1;
-double vel_r;
-void source_2_vibrate()
-{
- 
-  double * r_change ;
-double delta_r;
- if(mass_motion_state[0]->pos_new_y > 0)
- {
-if(m_one == 1)
-	r_change = malloc(1400000000);
-	m_one = 0;
- 	for(int whatfreq = 0; whatfreq < 10000000000  ; whatfreq++)
-	{
- 		if(freq_stop == 1)
-		{		 
-			r2 = (615.728* 1)/(1* pow(((pow(o ,3.0)* P* 1)/(pow(frequency__2,3.0)*pow(p,2.0) *pow(1,4.0))),1.0/4.0));
- 
- 			tk2 =  1;//fabs( (integratenow(r2 ,  (mass_motion_state[0]->pos_new_y))));
-		
-			r_change[whatfreq] = r2;
-
- 			frequency__2 = frequency__2*1.0000000002;
-
-			double time_ = 1.0/frequency__2;
-			delta_r = r_change[whatfreq] - r_change[whatfreq-1];
-
-			vel_r = r2/time_;	 
-		}
-
-                 	if(  vel_r > 299792057.8  && vel_r < 299792458 )
-			{
- 				printf("DONE2: frequency = %.10f tk2 = %.10f  acc12= %.10f  magneticfield= %.10f  volt =%.10f \n", frequency__2,tk2,acc12,magneticfield2,volt2);
-				printf("vel_r = %f  :: r2 = %f\n", vel_r,r2);
-				freq_stop = 0;
- 					break;
-			}
- 			  
-
-
- if((int)vel_r % 10000 == 0)
-printf("vel_r = %f \n", vel_r);
-	
-		
-	}
-}
-
-if(volt2 > 0 && r2 > 0)
-	magneticfield2 = ( (volt2/4.99))/(2*M_PI*r2);
-
-if(tk2 > 1 )
-{
-	fieldnext2 =magneticfield2;
- 	U2 = ((8.85e-12/2.0*pow((fieldnext2*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext2),2.0)))); 
-}
-else if(tk2 > 0  && tk2 < 2) 
-{
-	magneticfield2 = ( (volt2/4.99))/(2*M_PI*r2);
-	fieldnext2=magneticfield2*tk2; 
-
- 	U2 = ((8.85e-12/2.0*pow((fieldnext2*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext2),2.0)))); 
-
-//printf("U = %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U,volt,r,fieldnext,tk,magneticfield);
-}
-  if(mass_motion_state[0]->pos_new_y > 0.25 &&  mass_motion_state[0]->pos_new_y < 0.5)
-{ 
-	for(int whatvolt = 0; whatvolt < 100000000  ; whatvolt++)
-	{
-
-  		magneticfield2 = ( (volt2/4.99))/(2*M_PI*r2);
-
-		fieldnext2=magneticfield2*tk2; 
- 		U2 = ((8.85e-12/2.0*pow((fieldnext2*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext2),2.0)))); 
-  
-		volt2 = volt2 +0.001;
-
-		acc12= 9.81-(3 - 2 *sqrtf(1 + pow(U2,2.0)))*9.81;  
- 		printf("acceleration = %.20f volt2 = %f  U2= %f magneticfield2=  %f tk2 = %f \n", acc12,volt2,U2,magneticfield2,tk2);
-
-		if((acc12+acc1) > 9.8*1 )
-		{
-			printf("DONE2: volt, U2 = %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U2,volt2,acc12,fieldnext2,tk2,magneticfield2);
- 				break;
-		}
-
-	}
-}  
-	  acc12= 9.81-(3 - 2 *sqrt(1 + pow(U2,2.0)))*9.81;  
-
-
-
-  object_age= t_initial /(1.0 -pow(vel_r,2.0)/pow(299792458,2.0));
-
-
-
-	
-printf("object aging to time = %f seconds :: %f minutes  :: %f hours   :: %f days :: %f years\n", object_age,object_age/60.0, object_age/(60.0*24),object_age/(60.0*24*60.0),object_age/(60.0*24*60*365));
-
-	  
-
-}
-#include <sys/ipc.h>
-#include <sys/msg.h>
-double finc = 0;
 void display  (void){
- 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
- 
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_COLOR_MATERIAL);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glMultMatrixf(lightRotation);
- 
-
-    glLoadIdentity();
-    gluLookAt(cameraEye[0]+0, cameraEye[1]+253, cameraEye[2]-423, cameraLookAt[0], cameraLookAt[1], cameraLookAt[2], cameraUp[0], cameraUp[1], cameraUp[2]);
-
-    glMultMatrixf(viewRotation);
-
-    glRotatef(rotationX+320,1,0,0);
- 
-
-    glMultMatrixf(lightRotation);
-
- //if(mass_motion_state[0]->pos_new_y > 0.25 && mass_motion_state[0]->pos_new_y < 0.5)
-  //source_2_vibrate();
-  mass_motion_state[INDEX_NRmore] = mass_motion( mass_motion_state[INDEX_NRmore] ,1);
-  mass_motion_state_torque[INDEX_NRmore] = mass_motion_torque( mass_motion_state_torque[INDEX_NRmore] ,1);
-
-
- double state;
-
- char  buf[1000];
- 
-vel[cccc]= mass_motion_state[0]->vel_new_y;
-pos[cccc]= mass_motion_state[0]->pos_new_y;
-
-if(vel[cccc] > 0.00000 )
-{
-	difftime1[cccc] =  ( pos[cccc])/(vel[cccc]);	 
-}
- 
- 
-difftime1[cccc] =  ( pos[cccc])/(vel[cccc]);
-osc_freq = 1.0/( (difftime1[cccc] ));
-
-cccc++;
- 
-
-glPushMatrix();
-  
-
-    if(gmass < 0.159*0.02 && gmass > -0.159*0.02 )
-    {
- 	// glutSolidSphere(24,330,100  ); 
-    }
-    else
-    {
 	 
-    } 
+	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	    glEnable(GL_TEXTURE_2D);
+	    glEnable(GL_COLOR_MATERIAL);
+	    glMatrixMode(GL_MODELVIEW);
+	    glLoadIdentity();
 
-   if(mass_motion_state[0]->pos_new_y < 0 && mass_motion_state[0]->vel_new_y < 0 )
-	{
-		 mass_motion_state[0]->vel_new_y =0;
-		 mass_motion_state[0]->pos_new_y = 0;
-	}
+	    glMultMatrixf(lightRotation);
+	    glLoadIdentity();
+	    gluLookAt(cameraEye[0]+0, cameraEye[1]+253, cameraEye[2]-423, cameraLookAt[0], cameraLookAt[1], cameraLookAt[2], cameraUp[0], cameraUp[1], cameraUp[2]);
 
+	    glMultMatrixf(viewRotation);
+	    glRotatef(rotationX+320,1,0,0);
+	    glMultMatrixf(lightRotation);
 
-    time_t now;
-    struct tm *tm;
+	    //ge position och hastighet för kroppen
+	    mass_motion_state[INDEX_NRmore] = mass_motion( mass_motion_state[INDEX_NRmore] ,1);	
 
-    now = time(0);
-    if ((tm = localtime (&now)) == NULL) {
-        printf ("Error extracting time stuff\n");
-        return 1;
-    }
- 
-
-clocksec[cccc] = tm->tm_sec;
- if(mass_motion_state[0]->pos_new_y < 0.6 && mass_motion_state[0]->pos_new_y > 0.09 )
- {
- 
-if(( abs(clocksec[cccc])  - abs(clocksec[cccc-1] )) != 0 && (abs(clocksec[cccc])  - abs(clocksec[cccc-1] )) > 0)  
-	sect =sect+ ( abs(clocksec[cccc])  - abs(clocksec[cccc-1] ));
- 
- }
- else
- sect = 0;
- 
-
-sprintf(buf,"height(y): %f m \n velocity(y): %f m/s \n time elapsed: %d\n gravity: %f m/s^2 \n signal freq: %f Hz\n mass sphere: %f kg\n EBfield radius: %f\n voltage: %f\n EBfield reduce factor: %f\n motionfreq: %f\n energy density %f \n second E_density =%f\n Aging %f days/sec\n You are now %f\n days younger\n",mass_motion_state[0]->pos_new_y,mass_motion_state[0]->vel_new_y,sect,acc1,frequency__,gmass,r,volt,tk,fabs(mass_motion_state[0]->vel_new_y/mass_motion_state[0]->pos_new_y),U,U2,object_age/(60.0*24*60.0),sect*object_age/(60.0*24*60.0));
-if(sect > 1800)
-{
-	printf("Your age is theoretical now ~21 years younger\n");
-
-}
-
-
-
- 
- glPopMatrix();
-  
- glColor3f(23, 1,44); 
- glPushMatrix();
- glScalef(3,3,3);
- glTranslatef(0, -mass_motion_state[0]->pos_new_y*20 -0  , 0 );
- glutWireSphere(24,330,100  ); 
- glPopMatrix();
- RenderString( 105.0f, 1.0f, GLUT_BITMAP_TIMES_ROMAN_24, buf);
-
- glPopMatrix();
- glutPostRedisplay();
- glutSwapBuffers();
- 
- display_mpeg();
-
-
- volt =newvolt;
-
-
- 
-
-if(volt > 0 && r > 0)
-	magneticfield = ( (volt/4.99))/(2*M_PI*r);
-
-if(tk > 1 )
-{
-	fieldnext =magneticfield;
-tk = 1;
- 	U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
-}
-else if(tk > 0  && tk < 1) 
-{
-	magneticfield = ( (volt/4.99))/(2*M_PI*r);
-	fieldnext=magneticfield*tk; 
-
- 	U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
-
-//printf("U = %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U,volt,r,fieldnext,tk,magneticfield);
-}
-  
-	for(int whatvolt = 0; whatvolt < 300000000; whatvolt++)
-	{
-
-  		magneticfield = ( (volt/4.99))/(2*M_PI*r);
-
-		fieldnext=magneticfield*tk; 
- 		U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
-  
-		volt = volt +0.00000021;
-			
-
-			double complex zz;
-	double addme;
-	double ii;
- double length_Sqrtme  = sqrtf(1 + powf(U,2.0));
-	if((length_Sqrtme)  < 0)
-	  {
- 
- 	 	   zz = csqrtf(length_Sqrtme);
-	 	 addme = creal(zz);
-	}
-	else if ((length_Sqrtme)  > 0)
-		addme = sqrtf(length_Sqrtme );
-
-
-		acc1= 9.81-(3 - 2 *addme)*9.81;  
- 
-
-		if(acc1 > 9.81  )
+	    if(mass_motion_state[0]->pos_new_y < 0   )
 		{
-			printf("DONE: volt, U = %.10f %.10f  %.10f %.10f %.10f %.10f %.10f   \n",  U,r,volt,acc1,fieldnext,tk,magneticfield);
- 				break;
+			 mass_motion_state[0]->vel_new_y =0;
+			 mass_motion_state[0]->pos_new_y = 0;
 		}
+	 
+	    if(gmass < 0.159*0.02 && gmass > -0.159*0.02 )
+	    {
+	 	// glutSolidSphere(24,330,100  ); 
+	    }
+	    else
+	    {
+		 
+	    } 
+	 
+	    time_t now;
+	    struct tm *tm;
 
-	}
+	    now = time(0);
+	    if ((tm = localtime (&now)) == NULL) {
+		printf ("Error extracting time stuff\n");
+		return 1;
+	    }
+	 
+	    cccc++;
+	    clocksec[cccc] = tm->tm_sec;
+
+	    if(r < 10000 && mass_motion_state[0]->pos_new_y > 0.09 )
+	    {
+		if(( abs(clocksec[cccc])  - abs(clocksec[cccc-1] )) != 0 && (abs(clocksec[cccc])  - abs(clocksec[cccc-1] )) > 0)  
+			sect =sect+ ( abs(clocksec[cccc])  - abs(clocksec[cccc-1] ));
+	    }
+	    else
+	      sect = 0;
+
  
-	double complex zz;
-	double addme;
-	double ii;
-
- double length_Sqrtme  = sqrtf(1 + powf(U,2.0));
-	if((length_Sqrtme)  < 0)
-	  {
- 
- 	 	   zz = csqrtf(length_Sqrtme);
-	 	 addme = creal(zz);
-	}
-	else if ((length_Sqrtme)  > 0)
-		addme = sqrtf(length_Sqrtme );
-
-
-		acc1= 9.81-(3 - 2 *addme)*9.81;  
+	char  buf[1000];
+	sprintf(buf,"height(y): %f m \n velocity(y): %f m/s \n time over ground: %d\n gravity: %f m/s^2 \n signal freq: %f Hz\n mass sphere: %f kg\n EBfield radius: %f\n voltage: %f\n EBfield reduce factor: %f\n motionfreq: %f\n energy density %f\n object_age %f\n body_linear_velocity %f\n",mass_motion_state[0]->pos_new_y,mass_motion_state[0]->vel_new_y,sect,acc1,frequency__,gmass,r,volt,tk,fabs(mass_motion_state[0]->vel_new_y/mass_motion_state[0]->pos_new_y),U,object_age,mass_motion_state[0]->vel_new_x*r);
 	  
+	 glColor3f(1, 1,1); 
+	 glPushMatrix();
+	 glScalef(11,11,11);
+	 glTranslatef(0,   mass_motion_state[0]->pos_new_y*1 -0  , 0 );
+	 //glutWireSphere(24,330,100  ); 
+	 glRotatef( mass_motion_state[0]->pos_new_y/human_radie,0,1,0);
+	 glCallList(human);
+	 glPopMatrix();
+	 RenderString( 105.0f, 1.0f, GLUT_BITMAP_TIMES_ROMAN_24, buf);
+
+	 glPopMatrix();
+	 glutPostRedisplay();
+	 glutSwapBuffers();
+	 
+	 display_mpeg();
+
+	if(newvolt < 0)
+	{
+		newvolt = -newvolt;
+		volt = volt*1.00150050000000000000000000000000000000000000000000000000000000001;
+	}
+	else
+	 volt =newvolt;
+
+	 //v  = (4.23971e8)/sqrt((1.0 + sqrt(1.0 + 3.23118e20 *pow((o/frequency__),2.0)))* P);
+	 r = (615.728* 1)/(R* pow(((pow(o,3.0)* P* 1)/(pow(frequency__,3.0)*pow(p,2.0) *pow(R,4.0))),1.0/4.0));
+	 tk =  fabs( (integratenow(r ,  mass_motion_state[0]->pos_new_y)));
+
+	//modifiera frekvensen så att energidensitetens radie hålls konstant. 
+	if(fabs(mass_motion_state[0]->vel_new_y) > 0)
+	 {
+		frequency__ =6.95e-5;
+	 	for(int whatfreq = 0; whatfreq < 10000000; whatfreq++)
+		{
+			
+			 //vilken frekvens gör så att radien tillsammans med massdistansen blir en konstant, men vilken konstant? kanske 1 ?
+			 r = (615.728* 1)/(R* pow(((pow(o,3.0)* P* 1)/(pow(frequency__,3.0)*pow(p,2.0) *pow(R,4.0))),1.0/4.0));
+	 		 tk =  fabs( (integratenow(r ,  (mass_motion_state[0]->pos_new_y))));
+
+	 		 frequency__ = frequency__*1.02;
+	 
+		         if( tk > 0.975 )
+			 {
+				printf("DONE: frequency = %.10f tk = %.10f \n", frequency__,tk);
+	 			break;
+			 } 
+		}
+	}
+
+	if(volt > 0 && r > 0)
+		magneticfield = ( (volt/4.99))/(2*M_PI*r);
+
+	if(tk > 1 )
+	{
+		fieldnext =magneticfield;
+	 	U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
+
+	}
+	else if(tk > 0  && tk < 1) 
+	{
+		magneticfield = ( (volt/4.99))/(2*M_PI*r);
+		fieldnext=magneticfield*tk; 
+
+	 	U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
+		//printf("U = %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U,volt,r,fieldnext,tk,magneticfield);
+	}
+
+
+	if(fabs(mass_motion_state[0]->vel_new_y) > 0)
+	{ 
+		for(int whatvolt = 0; whatvolt < 400000000 ; whatvolt++)
+		{
+	  		 magneticfield = ( (volt/4.99))/(2*M_PI*r);
+
+			 fieldnext=magneticfield*tk; 
+	 		 U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
+	  
+			 volt = volt +0.000000001;
+ 
+			 acc1= 9.81-(3 - 2 *sqrt(1 + pow(U,2.0)))*9.81;  
+			 //torque accelerationen som ger kroppen spin eftersom massan ändras
+	  		 acc12 =  -(2*pow(mass_motion_state[0]->pos_new_y,2.0)*mass_motion_state[0]->vel_new_y)/(pow(2.0,3.0)-2*mass_motion_state[0]->pos_new_y);
+
+			 if(acc1 > 9.8100000001 && (mass_motion_state[0]->vel_new_x*r) < 299792458)
+			 {
+			        printf("angular velocity*E_radius  %f ::acc12 =%.20f ::acc12  %f :: light speed in medium %f :: %f \n", mass_motion_state[0]->vel_new_x*r,acc1,acc12,v,mass_motion_state[0]->vel_new_y  );
+				printf("DONE: volt, U = %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U,volt,acc1,fieldnext,tk,magneticfield);
+	 				break;
+			 }
+	                 else
+	 		{
+			if(stop_inc == 1)
+			{
+				frequency__ = frequency__/1.005;
+
+			}
+		}
+	}
 
 
 
-printf("mass_motion_state[0]->vel_new_x = %f ::acc12 =%.20f\n", mass_motion_state[0]->vel_new_x,acc1 );
-int mq; /* the queue handler */
-  /* create a key for the queue */
-  key_t k = ftok("/var", 'c');
-  if(k != -1) { /* did we succeed? */
-    /* get the queue (create if it doesn't exist) */
-mq = msgget(k, 0644 | IPC_CREAT);
+	object_age= 1.0 /(1.0 -pow(mass_motion_state[0]->vel_new_x*r,2.0)/pow(299792458,2.0));
+	if((mass_motion_state[0]->vel_new_x*r) > 299772057.8)
+	{
+		 printf("object_age = %f \n", object_age);
+		 stop_inc =0;
+	}
+} 
 
- char b[256] ; 
-sprintf(b,"%f",acc1+acc12);
 
-if(msgsnd(mq, &b, strlen(b), 0) == -1) {
-            perror("msgsnd()");
-             
+	  gmass = 1.428e-4-(acc1/9.81)*1.428e-4; 
+	  tick(createPIDController(PGAIN,IGAIN,DGAIN,PIDSOURCE,PIDOUTPUT,0.2),mass_motion_state[0]->vel_new_y);
+	  printf("U = %.10f %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U,volt,r, mass_motion_state[0]->pos_new_y,fieldnext,tk,acc1);
+
 }
-msgctl(mq, 0, NULL);
-}
-
-
-tick(createPIDController(PGAIN,IGAIN,DGAIN,PIDSOURCE,PIDOUTPUT));
-
-}
-
 
 //integrate( ( a^2-x^2)dx)/(a^2+b^2-2*b*x)^(3/2)) ) from -a to  a
-
 double fun_experiment1(double x,double inc_funx,double inc_funy)
 {
 	 double x2 = 1.0/(pow((pow((inc_funx+x),2.0) + pow(2.0/*(0.275/2.0)*/+inc_funy,2.0)),(1.0/2.0))) -pow((inc_funx+ x),2.0)*pow((pow((inc_funx+x),2.0) + (pow(2.0/*(0.275/2.0)*/+inc_funy,2.0))), -(3.0/2.0) );
@@ -1134,9 +892,10 @@ for(t = 0; t < n_total; t++)
 	
 return sum_triple_big*2;
 } 
+
 double integratenow  (double a, double b)
 {
-	double n = 14.0;
+	double n = 3.0;
 
 	double lowbound =  a;
 	double hibound = - a;
@@ -1159,56 +918,16 @@ double integratenow  (double a, double b)
 		n_inc++;
 	}
 }
- 
- void rates_torque ( double *t, double *f, double result[]   )
-{
- 
-}	
- 
 
 void rates_dorsal ( double *t, double *f, double result[]   )
 {
     result[0] =             f[3]/1.0;
     result[1] =             f[4]/1.0;
     result[2] =             f[5]/1.0;
-  gmass = 1.428e-4-((acc1)/9.81)*1.428e-4; 
-  double pp = mass_motion_state[0]->vel_new_y*gmass;
-
-
- v  = (4.23971e8)/sqrt((1.0 + sqrt(1.0 + 3.23118e20 *pow((o/frequency__),2.0)))* P);
- r = (615.728* 1)/(R* pow(((pow(o,3.0)* P* 1)/(pow(frequency__,3.0)*pow(p,2.0) *pow(R,4.0))),1.0/4.0));
- tk =1;
- //tk =  fabs( (integratenow(r ,  mass_motion_state[0]->pos_new_y)));
-  frequency__ = 30000/finc;
- finc += 1;
- 	for(int whatfreq = 0; whatfreq < 60000; whatfreq++)
-	{
-
-		 //vilken frekvens gör så att radien tillsammans med massdistansen blir en konstant, men vilken konstant? kanske 1 ?
-		 r = (615.728* 1)/(R* pow(((pow(o,3.0)* P* 1)/(pow(frequency__,3.0)*pow(p,2.0) *pow(R,4.0))),1.0/4.0));
- 
- 		// tk =  fabs( (integratenow(r ,  (mass_motion_state[0]->pos_new_y))));
-		
   
- 		 frequency__ = frequency__*1.000008;
-		 //närmar sig tk en bestämd konstant ?
-		// if(tk < 1 ) 
-		// {
-                 	if( r > 1 )
-			{
-				printf("DONE: frequency = %.10f tk = %.10f \n", frequency__,tk);
- 					break;
-			}
- //
-		//}
- 	
-	}
-
-
-double xxxx = gmass*pow(r  ,2.0);
-    result[3] =  -( 4 *frequency__  *pp * M_PI* r  )/(xxxx - gmass *r );
+    result[3] =  acc12;
     result[4] =  -9.81 +acc1;
-    result[5] =   0;
+    result[5] =  0;
 }	
 
  
