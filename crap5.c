@@ -1,12 +1,14 @@
 double PGAIN =0.00001005 ;
 double IGAIN =0 ;
 double DGAIN =0; 
-double frequency__ = 6.95e-6  ; 
+double frequency__ = 6.95e-3  ; 
 double o  = 3.5e7;
 double p  = 2700;
 double P  = 1;
 double R  = 10;
 double volt =1.653200000000001 ;
+int simulate_frequency_to_sound(float freq__);
+//frequency = (141959 (141959/76966)^(1/3) 3.5e7 1^(1/3) 0.078047^(4/3))/(1231456 p^(2/3) R^(4/3) U^(2/3)) where U = 1.118 where R = 10 where p = 2700  
 
 
 #include <assert.h>
@@ -519,7 +521,7 @@ struct state_vector   *   mass_motion(struct state_vector     *  next_state, int
 
 	double z[6];
  	double t0[6] = {0,0,0,0,0,0};
- 	double tburn =  .1;
+ 	double tburn =  1;
 	double tf[6] = {tburn,tburn,tburn,tburn,tburn,tburn};
 
 	z[0] =  next_state->pos_new_x;
@@ -673,24 +675,21 @@ void display  (void){
 	      sect = 0;
 
  
-	char  buf[1000];
-	sprintf(buf,"height(y): %f m \n velocity(y): %f m/s \n time over ground: %d\n gravity: %f m/s^2 \n signal freq: %f Hz\n mass sphere: %f kg\n EBfield radius: %f\n voltage: %f\n EBfield reduce factor: %f\n motionfreq: %f\n energy density %f\n object_age %f\n body_linear_velocity %f\n",mass_motion_state[0]->pos_new_y,mass_motion_state[0]->vel_new_y,sect,acc1,frequency__,gmass,r,volt,tk,fabs(mass_motion_state[0]->vel_new_y/mass_motion_state[0]->pos_new_y),U,object_age,mass_motion_state[0]->vel_new_x*r);
+	
 	  
 	 glColor3f(1, 1,1); 
 	 glPushMatrix();
 	 glScalef(11,11,11);
 	 glTranslatef(0,   mass_motion_state[0]->pos_new_y*1 -0  , 0 );
 	 //glutWireSphere(24,330,100  ); 
-	 glRotatef( mass_motion_state[0]->pos_new_y/human_radie,0,1,0);
+	 glRotatef( mass_motion_state[0]->vel_new_x/human_radie,0,1,0);
 	 glCallList(human);
 	 glPopMatrix();
-	 RenderString( 105.0f, 1.0f, GLUT_BITMAP_TIMES_ROMAN_24, buf);
-
+	
 	 glPopMatrix();
 	 glutPostRedisplay();
-	 glutSwapBuffers();
-	 
-	 display_mpeg();
+	
+	  
 
 	if(newvolt < 0)
 	{
@@ -707,7 +706,7 @@ void display  (void){
 	//modifiera frekvensen så att energidensitetens radie hålls konstant. 
 	if(fabs(mass_motion_state[0]->vel_new_y) > 0)
 	 {
-		frequency__ =6.95e-3;
+		frequency__ =20;
 	 	for(int whatfreq = 0; whatfreq < 10000000; whatfreq++)
 		{
 			
@@ -752,8 +751,8 @@ void display  (void){
 
 			 fieldnext=magneticfield*tk; 
 	 		 U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
-	  
-			 volt = volt +0.0000088;
+	 
+			 volt = volt +0.00000088;
  
 			 acc1= 9.81-(3 - 2 *sqrt(1 + pow(U,2.0)))*9.81;  
 			 //torque accelerationen som ger kroppen spin eftersom massan ändras
@@ -769,8 +768,8 @@ void display  (void){
 	 		{
 			if(stop_inc == 1)
 			{
-				frequency__ = frequency__/1.005;
-
+				frequency__ = frequency__/1.00005;
+ //printf("1frequency__ %.40f \n",frequency__);
 			}
 		}
 	}
@@ -786,10 +785,17 @@ void display  (void){
 	}
 } 
 
+char  buf[1000];
+	sprintf(buf,"height(y): %f m \n velocity(y): %f m/s \n time over ground: %d\n total gravity: %f m/s^2 \n signal freq: %f Hz\n mass sphere: %f kg\n EBfield radius: %f\n voltage: %f\n EBfield reduce factor: %f\n motionfreq: %f\n energy density %f\n object_age %f\n body_linear_velocity %f\n",mass_motion_state[0]->pos_new_y,mass_motion_state[0]->vel_new_y,sect,-9.8+acc1,frequency__,gmass,r,volt,tk,fabs(mass_motion_state[0]->vel_new_y/mass_motion_state[0]->pos_new_y),U,object_age,mass_motion_state[0]->vel_new_x*r);
 
+RenderString( 105.0f, 1.0f, GLUT_BITMAP_TIMES_ROMAN_24, buf);
+ glutSwapBuffers();
+	 display_mpeg();
 	  gmass = 1.428e-4-(acc1/9.81)*1.428e-4; 
 	  tick(createPIDController(PGAIN,IGAIN,DGAIN,PIDSOURCE,PIDOUTPUT,0.2),mass_motion_state[0]->vel_new_y);
 	  printf("U = %.10f %.10f %.10f %.10f %.10f %.10f %.10f   %.10f \n",  U,volt,r, mass_motion_state[0]->pos_new_y,fieldnext,tk,acc1,mass_motion_state[0]->vel_new_x*r);
+
+	         
 
 }
 
@@ -925,7 +931,14 @@ void rates_dorsal ( double *t, double *f, double result[]   )
     result[0] =             f[3]/1.0;
     result[1] =             f[4]/1.0;
     result[2] =             f[5]/1.0;
-  
+	double frequency = (141959.0 *pow((141959.0/76966.0),(1.0/3.0)) *o* pow(P,(1.0/3.0)) *pow(volt,(4.0/3.0)))/(1231456.0 *pow(p,(2.0/3.0)) *pow(R,(4.0/3.0)) *pow(U,(2.0/3.0)));
+	//simulate_frequency_to_sound(frequency);
+printf("frequency = %f volt = %f \n", frequency,volt);
+ 
+
+//printf("frequency = %f \n", frequency);
+//simulate_frequency_to_sound(frequency);
+
     result[3] =  acc12;
     result[4] =  -9.81 +acc1;
     result[5] =  0;
@@ -936,16 +949,142 @@ void rates_dorsal ( double *t, double *f, double result[]   )
   int tid;
   double stuff;
 } thread_data_t;
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_audio.h>
+#include <math.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+#include <alsa/asoundlib.h>
+/* These are in charge of maintaining our sine function */
+float sinPos;
+float sinStep;
+
+/* These are the audio card settings */
+#define FREQ 44100.0
+#define SAMPLES 8192.0 
+
+/* This is basically an arbitrary number */
+#define VOLUME 127.0
+int audio_once = 1;
+void populate(void* data, Uint8 *stream, int len) {
+	int i=0;
+	for (i=0; i<len; i++) {
+		/* Just fill the stream with sine! */
+		stream[i] = (Uint8) (VOLUME * sinf(sinPos))+127;
+		sinPos += sinStep;
+	}
+}
 
 
+
+void SetAlsaMasterVolume(long volume)
+{
+    long min, max;
+    snd_mixer_t *handle;
+    snd_mixer_selem_id_t *sid;
+    const char *card = "default";
+    const char *selem_name = "Master";
+
+    snd_mixer_open(&handle, 0);
+    snd_mixer_attach(handle, card);
+    snd_mixer_selem_register(handle, NULL, NULL);
+    snd_mixer_load(handle);
+
+    snd_mixer_selem_id_alloca(&sid);
+    snd_mixer_selem_id_set_index(sid, 0);
+    snd_mixer_selem_id_set_name(sid, selem_name);
+    snd_mixer_elem_t* elem = snd_mixer_find_selem(handle, sid);
+
+    snd_mixer_selem_get_playback_volume_range(elem, &min, &max);
+    snd_mixer_selem_set_playback_volume_all(elem, volume * max / 100);
+
+    snd_mixer_close(handle);
+}
+void task1()
+{
+while(1)
+{
+	 double frequency = (141959.0 *pow((141959.0/76966.0),(1.0/3.0)) *o* pow(P,(1.0/3.0)) *pow(volt,(4.0/3.0)))/(1231456.0 *pow(p,(2.0/3.0)) *pow(R,(4.0/3.0)) *pow(U,(2.0/3.0)));
+	//simulate_frequency_to_sound(frequency);
+ printf("frequency = %f volt = %f \n", frequency,volt);
+
+
+
+
+	/* This will hold our data */
+	SDL_AudioSpec spec;
+	/* This will hold the requested frequency */
+	double reqFreq = 440;
+	/* This is the duration to hold the note for */
+	//int duration = 1;
+
+	/* Process Command Line Arguments */
+	//if (argc <= 1) {
+		/* Nothing Given, output usage */
+	//	usage();
+		//exit(EXIT_FAILURE);
+	//} else if (argc >= 2) {
+		/* Has frequency */
+		reqFreq = frequency; //strtol(argv[1], NULL, 10);
+	printf("reqFreq  = %f \n", reqFreq);
+		//if (errno == EINVAL) {
+		//	fprintf (stderr, "Frequency '%s' is invalid\n", argv[1]);
+		//	exit(EXIT_FAILURE);
+		//}
+
+		//if (argc >= 3) {
+			/* Has duration */
+		//	duration = (int) strtol(argv[2], NULL, 10);
+		//	if (errno == EINVAL) {
+			//	fprintf (stderr,"Duration '%s' is invalid\n", argv[2]);
+			//	exit(EXIT_FAILURE);
+			//}
+		//}
+
+		//if (argc >=4) {
+			/* Who knows what's here */
+		//	puts ("Warning: Arguments found past frequency and duration, disregarding them\n");
+	//	}
+//	} 
+
+	/* Set up the requested settings */
+	spec.freq = FREQ;
+	spec.format = AUDIO_U8;
+	spec.channels = 1;
+	spec.samples = SAMPLES;
+	spec.callback = (*populate);
+	spec.userdata = NULL;
+if(audio_once == 1)
+{
+	/* Open the audio channel */
+	if (SDL_OpenAudio(&spec, NULL) < 0) { 
+		/* FAIL! */
+		fprintf(stderr, "Failed to open audio: %s \n", SDL_GetError());
+		exit(1); 
+	} 
+audio_once = 0;
+}
+	/* Initialize the position of our sine wave */
+	sinPos = 0;
+	/* Calculate the step of our sin wave */
+	sinStep = 2 * M_PI * reqFreq / FREQ;
+	printf("sinStep  = %f  pow(volt,2.0)/4.99 = %f\n", sinStep,pow(volt,2.0)/4.99*1000);
+	/* Now, run this thing */
+	SDL_PauseAudio(0); 
+ SetAlsaMasterVolume(pow(volt,2.0)/4.99*10000);
+}
+
+}
 void *thr_func(void *arg) {
   thread_data_t *data = (thread_data_t *)arg;
  
  if(data->tid == 0)
 	task2();
 
- //if(data->tid ==1)
- //	task1();
+ if(data->tid ==1)
+ 	task1();
 
   //pthread_exit(NULL);
 }
