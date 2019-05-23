@@ -8,6 +8,7 @@ double P  = 1;
 double R  = 4.99;
 double volt =1.653200000000001 ;
 int giving_current = 0;
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
 #include <math.h>
@@ -25,7 +26,7 @@ float sinStep;
 #define SAMPLES 8192.0 
 
 /* This is basically an arbitrary number */
-#define VOLUME 127.0
+#define VOLUME 1.0
 int audio_once = 1;
 void populate(void* data, Uint8 *stream, int len) {
 	int i=0;
@@ -34,6 +35,8 @@ void populate(void* data, Uint8 *stream, int len) {
 		/* Just fill the stream with sine! */
 		stream[i] = (Uint8) (pow(volt,2.0)/R*VOLUME  * sinf(sinPos))+0;
 		sinPos += sinStep;
+
+		 //printf("volt  = %f   freq %f\n", pow(volt,2.0),frequency__);
 		//SDL_MixAudio(stream, (unsigned char *) stream + len, len, pow(1,2.0)/1000*1);
 	}
 }
@@ -63,7 +66,7 @@ int simulate_frequency_to_sound(float freq__);
 #include "PID.h"
 #include <sys/time.h>
 
-
+double K = M_PI*4e-7;
 #define NUM_THREADS 2
 
 int stop_inc =1;
@@ -651,6 +654,9 @@ double PIDOUTPUT(double state)
 return state;
 }
 
+
+double HEIGHT = 9.81;
+int height_once = 1;
 double inc_freq=1.00006;
 double makesound(double volt,double freq )
 {
@@ -658,39 +664,9 @@ double makesound(double volt,double freq )
 	SDL_AudioSpec spec;
 	/* This will hold the requested frequency */
 	double reqFreq = 440;
-	/* This is the duration to hold the note for */
-	//int duration = 1;
-
-	/* Process Command Line Arguments */
-	//if (argc <= 1) {
-		/* Nothing Given, output usage */
-	//	usage();
-		//exit(EXIT_FAILURE);
-	//} else if (argc >= 2) {
-		/* Has frequency */
-		reqFreq = freq; //strtol(argv[1], NULL, 10);
-	//printf("reqFreq  = %f \n", reqFreq);
-		//if (errno == EINVAL) {
-		//	fprintf (stderr, "Frequency '%s' is invalid\n", argv[1]);
-		//	exit(EXIT_FAILURE);
-		//}
-
-		//if (argc >= 3) {
-			/* Has duration */
-		//	duration = (int) strtol(argv[2], NULL, 10);
-		//	if (errno == EINVAL) {
-			//	fprintf (stderr,"Duration '%s' is invalid\n", argv[2]);
-			//	exit(EXIT_FAILURE);
-			//}
-		//}
-
-		//if (argc >=4) {
-			/* Who knows what's here */
-		//	puts ("Warning: Arguments found past frequency and duration, disregarding them\n");
-	//	}
-//	} 
-
-	/* Set up the requested settings */
+ 
+	reqFreq = freq; //strtol(argv[1], NULL, 10);
+ 
 	spec.freq = FREQ;
 	spec.format = AUDIO_F32;
 	spec.channels = 4;
@@ -711,7 +687,7 @@ audio_once = 0;
 	sinPos = 0;
 	/* Calculate the step of our sin wave */
 	sinStep = 2 * M_PI * reqFreq / FREQ;
-	//printf("sinStep  = %f  pow(volt,2.0)/4.99 = %f\n", sinStep,pow(volt,2.0)/4.99*1);
+	
 // SetAlsaMasterVolume(pow(volt,2.0)/4.99*1000);
 	/* Now, run this thing */
 	SDL_PauseAudio(0); 
@@ -823,7 +799,7 @@ printf("object_age = %f :: object_age_total = %f :: velocity = %f \n", object_ag
 	}
 
 	if(volt > 0 && r > 0)
-		magneticfield = ( (volt/R))/(2*M_PI*r);
+		magneticfield = ( K *(volt/R))/(2*M_PI*r);
 
 	if(tk > 1 )
 	{
@@ -833,38 +809,54 @@ printf("object_age = %f :: object_age_total = %f :: velocity = %f \n", object_ag
 	}
 	else if(tk > 0  && tk < 1) 
 	{
-		magneticfield = ( (volt/R))/(2*M_PI*r);
+		magneticfield = (K * (volt/R))/(2*M_PI*r);
 		fieldnext=magneticfield*tk; 
 
 	 	U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
 		//printf("U = %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U,volt,r,fieldnext,tk,magneticfield);
 	}
+if(height_once == 1)
+{
+	HEIGHT = 9.81;
+	 
+}
+else
+if(height_once == 0)
+{
+	HEIGHT = 9.8101;
+	height_once = 1;
 
-
+}
 	if(fabs(mass_motion_state[0]->vel_new_y) > 0)
 	{ 
-		for(int whatvolt = 0; whatvolt < 4000000000 ; whatvolt++)
+		for(int whatvolt = 0; whatvolt < 40000000 ; whatvolt++)
 		{
-	  		 magneticfield = ( (volt/R))/(2*M_PI*r);
+	  		 magneticfield = (  K *(volt/R))/(2*M_PI*r);
 
 			 fieldnext=magneticfield*tk; 
 	 		 U = ((8.85e-12/2.0*pow((fieldnext*299792458),2.0) +1.0/(2*M_PI*4e-7)*(pow((fieldnext),2.0)))); 
 	 		if(stop_inc == 1)
 			{
-				 volt = volt +0.00011  ;
+				 volt = volt +0.000105  ;
  			 }
 		 
 			 acc1= 9.81-(3 - 2 *sqrt(1 + pow(U,2.0)))*9.81;  
 			 //torque accelerationen som ger kroppen spin eftersom massan ändras
-			 //m*a*r = (m*r^2)*a + 2*r*(m*v)*(2*pi*f) solve a
-	  		 acc12 =  (16 *frequency__* M_PI* mass_motion_state[0]->vel_new_y)/(5 - 2* human_radie);// -(4 *frequency__* M_PI *mass_motion_state[0]->vel_new_y)/(-1 + human_radie); //-(2*pow(mass_motion_state[0]->pos_new_y,2.0)*mass_motion_state[0]->vel_new_y)/(pow(2.0,3.0)-2*mass_motion_state[0]->pos_new_y);
+			 //m*a*r = (m*r^2)*a + 2*r*(m*v)*(2*pi*f) solve a <-- fel
+			 //(0.5*m*r^2*(v)^2)  =(m*r^2*a + 2*r*p*v)*v solve a
+			 // ger a = (1/2 - (2 p)/(m r)) v
 
-			 if(acc1 > 9.8100000001  )
+
+
+	  		 acc12 =  mass_motion_state[0]->vel_new_x* (1.0/2.0 - (2 *mass_motion_state[0]->vel_new_y)/r);
+			 
+			// printf("acc12 = %f acc1 = %f :: mass_motion_state[0]->vel_new_x =%f\n", acc12,acc1,mass_motion_state[0]->vel_new_x);
+			 if(acc1 > HEIGHT )
 			 {
 			        printf("angular velocity*E_radius  %f ::acc12 =%.20f ::acc12  %f :: light speed in medium %f :: %f \n", mass_motion_state[0]->vel_new_x*human_radie,acc1,acc12,v,mass_motion_state[0]->vel_new_y  );
 				printf("DONE: volt, U = %.10f %.10f %.10f %.10f %.10f %.10f   \n",  U,volt,acc1,fieldnext,tk,magneticfield);
-frequency__ =20;
-	 	for(int whatfreq = 0; whatfreq < 100000000; whatfreq++)
+frequency__ =200*K;
+	 	for(int whatfreq = 0; whatfreq < 10000000; whatfreq++)
 		{
 			
 			 //vilken frekvens gör så att radien tillsammans med massdistansen blir en konstant, men vilken konstant? kanske 1 ?
@@ -881,7 +873,7 @@ frequency__ =20;
 		}
  
  
-
+ 			makesound(  volt,   frequency__);
 	 				break;
 			 }
 	                 else
@@ -1048,14 +1040,9 @@ void rates_dorsal ( double *t, double *f, double result[]   )
     result[1] =             f[4]/1.0;
     result[2] =             f[5]/1.0;
 
-	double frequency = (141959.0 *pow((141959.0/76966.0),(1.0/3.0)) *o* pow(P,(1.0/3.0)) *pow(volt,(4.0/3.0)))/(1231456.0 *pow(p,(2.0/3.0)) *pow(R,(4.0/3.0)) *pow(U,(2.0/3.0)));
-	//simulate_frequency_to_sound(frequency);
-//printf("frequency = %f volt = %f \n", frequency,volt);
-// makesound(  volt,   frequency);
-
-//printf("frequency = %f \n", frequency);
-//simulate_frequency_to_sound(frequency);
-
+ 
+    if(acc12 == 0)
+		acc12 = 0.001;
     result[3] =  acc12;
     result[4] =  -9.81 +acc1;
     result[5] =  0;
@@ -1095,81 +1082,7 @@ void SetAlsaMasterVolume(long volume)
 int counter=0;
 void task1()
 {
-while(1)
-{
-if(giving_current == 1)
-{
-	 double frequency = (141959.0 *pow((141959.0/76966.0),(1.0/3.0)) *o* pow(P,(1.0/3.0)) *pow(volt,(4.0/3.0)))/(1231456.0 *pow(p,(2.0/3.0)) *pow(R,(4.0/3.0)) *pow(U,(2.0/3.0)));
-	//simulate_frequency_to_sound(frequency);
- //printf("frequency = %f volt = %f \n", frequency,volt);
-if(counter % 60000 == 0)
-printf("frequency = %f  volt = %f\n", frequency,volt);
-counter++;
-
-	/* This will hold our data */
-	SDL_AudioSpec spec;
-	/* This will hold the requested frequency */
-	double reqFreq = 440;
-	/* This is the duration to hold the note for */
-	//int duration = 1;
-
-	/* Process Command Line Arguments */
-	//if (argc <= 1) {
-		/* Nothing Given, output usage */
-	//	usage();
-		//exit(EXIT_FAILURE);
-	//} else if (argc >= 2) {
-		/* Has frequency */
-		reqFreq = frequency; //strtol(argv[1], NULL, 10);
-	//printf("reqFreq  = %f \n", reqFreq);
-		//if (errno == EINVAL) {
-		//	fprintf (stderr, "Frequency '%s' is invalid\n", argv[1]);
-		//	exit(EXIT_FAILURE);
-		//}
-
-		//if (argc >= 3) {
-			/* Has duration */
-		//	duration = (int) strtol(argv[2], NULL, 10);
-		//	if (errno == EINVAL) {
-			//	fprintf (stderr,"Duration '%s' is invalid\n", argv[2]);
-			//	exit(EXIT_FAILURE);
-			//}
-		//}
-
-		//if (argc >=4) {
-			/* Who knows what's here */
-		//	puts ("Warning: Arguments found past frequency and duration, disregarding them\n");
-	//	}
-//	} 
-
-	/* Set up the requested settings */
-	spec.freq = FREQ;
-	spec.format = AUDIO_F32;
-	spec.channels = 2;
-	spec.samples = SAMPLES*10;
-	spec.callback = (*populate);
-	spec.userdata = NULL;
-if(audio_once == 1)
-{
-	/* Open the audio channel */
-	if (SDL_OpenAudio(&spec, NULL) < 0) { 
-		/* FAIL! */
-		fprintf(stderr, "Failed to open audio: %s \n", SDL_GetError());
-		exit(1); 
-	} 
-audio_once = 0;
-}
-	/* Initialize the position of our sine wave */
-	sinPos = 0;
-	/* Calculate the step of our sin wave */
-	sinStep = 2 * M_PI * reqFreq / FREQ;
-	//printf("sinStep  = %f  pow(volt,2.0)/4.99 = %f\n", sinStep,pow(volt,2.0)/4.99*1);
-// SetAlsaMasterVolume(pow(volt,2.0)/4.99*1000);
-	/* Now, run this thing */
-	SDL_PauseAudio(0); 
-
-}
-}
+ 
 }
 void *thr_func(void *arg) {
   thread_data_t *data = (thread_data_t *)arg;
