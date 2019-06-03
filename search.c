@@ -4,10 +4,74 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define MAX_PAIRS   16
+#include <pthread.h>
+#define NUM_THREADS 3
+#define MAX_PAIRS   3
 double _count = 0;
 int iterator = 0;
+void task1()
+{
+
+	char e[] = "abcdefghijklmno"; 
+          permute_number(e, 0, 14,NULL);
+
+}
+
+void task2()
+{
+
+	char e[] = "+-*/^+-*/^+-*/^"; 
+        permute_sign(e, 0, 14,NULL);
+
+}
+
+
+void task3()
+{
+while(1)
+ matching_parenthesis_pairs(0, 0);
+
+}
+typedef struct _thread_data_t {
+  int tid;
+  double stuff;
+} thread_data_t;
+
+
+void *thr_func(void *arg) {
+  thread_data_t *data = (thread_data_t *)arg;
  
+ if(data->tid == 0)
+	task1();
+
+ if(data->tid ==1)
+  	task2();
+
+  if(data->tid ==2)
+  	 task3();
+  	
+}
+
+
+ int multitasks( ) {
+  pthread_t thr[NUM_THREADS];
+  int i, rc;
+  thread_data_t thr_data[NUM_THREADS];
+ 
+  for (i = 0; i < NUM_THREADS; ++i) {
+    thr_data[i].tid = i;
+    if ((rc = pthread_create(&thr[i], NULL, thr_func, &thr_data[i]))) {
+      fprintf(stderr, "error: pthread_create, rc: %d\n", rc);
+      return EXIT_FAILURE;
+    }
+  }
+  for (i = 0; i < NUM_THREADS; ++i) {
+    pthread_join(thr[i], NULL);
+  }
+ 
+  return EXIT_SUCCESS;
+}
+
 typedef enum _PARENTHESIS {                   
     NONE,
     LEFT,
@@ -23,25 +87,28 @@ int onceopen = 1;
 
 char equation_[1000];
 char eq_[1000];
-char CHARACTER[100];
+char CHARACTER[10000];
+char CHARACTER_2[10000];
  void print_stack_()
 {
 	if(onceopen == 1)
 	{	     
-	   fp = fopen ("datac.txt","w");
+	   fp = fopen ("datae.txt","w");
 	   onceopen =0;
 	}
 
         int i;
-        char a[5] = {'+','-','/','*','^'};
+  
 
         for (i = 1; i <= n * 2; i++) {
+ 
         	if (stack[i] == LEFT) {
              
-			if(i < 11   )
+			if(i < 15  )
 			{
-			    printf("%c(%c",a[rand() % 5],CHARACTER[i-1]);
-			    sprintf(equation_,"%c(%c",a[rand() % 5],CHARACTER[i-1]);
+
+			    // printf("%c(%c",CHARACTER_2[i-1],CHARACTER[i-1]);
+			    sprintf(equation_,"%c(%c",CHARACTER_2[i-1],CHARACTER[i-1]);
 			    strcpy(eq_,equation_);
 				if(i == 1)
 				    fprintf (fp, "%s", (char*)(eq_+1));
@@ -50,44 +117,44 @@ char CHARACTER[100];
 			}
 			else
 			{
-			   printf("(");
+			   //printf("(");
 			   char C = '(';
 			   sprintf(equation_,"%c",C);
 			   fprintf (fp, "%c", equation_);
 			}
         }
         	else if (stack[i] == RIGHT) {
-			if(i < 11   )
+			if(i < 15  )
 			{
-			    printf(")%c%c",a[rand() % 5],CHARACTER[i-1]);
-			    sprintf(equation_,")%c%c",a[rand() % 5],CHARACTER[i-1]);
+			     //printf(")%c%c",CHARACTER_2[i-1],CHARACTER[i-1]);
+			    sprintf(equation_,")%c%c",CHARACTER_2[i-1],CHARACTER[i-1]);
 			    fprintf (fp, "%s", equation_);
 			}
 			else
 			{
-			   printf(")");
+		 	  //  printf(")");
 			   char C = ')';
 			   sprintf(equation_,"%c",C);
 			   fprintf (fp, "%c", equation_);
 			}
        		 }
 		else {
-		    printf("ERROR!!!!\n");
-		    exit(-1);
+		    //printf("ERROR!!!!\n");
+		   // exit(-1);
 		}
     }
-
-    printf("\n");
+ 
+  // printf("\n");
     fprintf (fp, "\n");
 }
 
  
-void matching_parenthesis_pairs(int left_in_stack, int right_in_stack,char *var,char *num)
+void matching_parenthesis_pairs(int left_in_stack, int right_in_stack)
 {
     if (left_in_stack < right_in_stack) {
         return;
     }
-
+ 
     if (ind == n * 2 + 1)
     {
         print_stack_();
@@ -96,12 +163,12 @@ void matching_parenthesis_pairs(int left_in_stack, int right_in_stack,char *var,
 
     if (left_in_stack < n) {
         stack[ind++] = LEFT;
-        matching_parenthesis_pairs(left_in_stack + 1, right_in_stack,var,num);
+        matching_parenthesis_pairs(left_in_stack + 1, right_in_stack);
         ind--;
     }
     if (right_in_stack < left_in_stack) {
         stack[ind++]= RIGHT;
-        matching_parenthesis_pairs(left_in_stack, right_in_stack + 1,var,num);
+        matching_parenthesis_pairs(left_in_stack, right_in_stack + 1);
         ind--;
     }
 }
@@ -115,6 +182,13 @@ void swap_num (char *x, char *y)
     *y = temp;
 }
 
+void swap_sign (char *x, char *y)
+{
+    char temp;
+    temp = *x;
+    *x = *y;
+    *y = temp;
+}
 void permute_number(char *a, int i, int n,char *var)
 {
    int j;
@@ -122,7 +196,7 @@ void permute_number(char *a, int i, int n,char *var)
 	{
   
  
- 	printf("%c%c%c%c%c%c%c%c%c%c\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
+ 	// printf("%c%c%c%c%c%c%c%c%c%c\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
 	CHARACTER[0] = a[0];
 	CHARACTER[1] = a[1];
 	CHARACTER[2] = a[2];
@@ -133,7 +207,13 @@ void permute_number(char *a, int i, int n,char *var)
 	CHARACTER[7] = a[7];
 	CHARACTER[8] = a[8];
 	CHARACTER[9] = a[9];
- 	   matching_parenthesis_pairs(0, 0,var,a);
+	CHARACTER[10] = a[10];
+	CHARACTER[11] = a[11];
+	CHARACTER[12] = a[12];
+	CHARACTER[13] = a[13];
+	CHARACTER[14] = a[14];
+	CHARACTER[15] = a[15];
+ 	 
 
  
 	}
@@ -149,6 +229,46 @@ void permute_number(char *a, int i, int n,char *var)
    }
 }
 
+
+void permute_sign(char *a, int i, int n,char *var)
+{
+   int j;
+   if (i == n) 
+	{
+  
+ 
+ 	// printf("%c%c%c%c%c%c%c%c%c%c\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
+	CHARACTER_2[0] = a[0];
+	CHARACTER_2[1] = a[1];
+	CHARACTER_2[2] = a[2];
+	CHARACTER_2[3] = a[3];
+	CHARACTER_2[4] = a[4];
+	CHARACTER_2[5] = a[5];
+	CHARACTER_2[6] = a[6];
+	CHARACTER_2[7] = a[7];
+	CHARACTER_2[8] = a[8];
+	CHARACTER_2[9] = a[9];
+	CHARACTER_2[10] = a[10];
+	CHARACTER_2[11] = a[11];
+	CHARACTER_2[12] = a[12];
+	CHARACTER_2[13] = a[13];
+	CHARACTER_2[14] = a[14];
+	CHARACTER_2[15] = a[15];
+ 	 
+
+ 
+	}
+  
+   else
+   {
+        for (j = i; j <= n; j++)
+       {
+          swap_sign((a+i), (a+j));
+          permute_sign(a, i+1, n,var);
+          swap_sign((a+i), (a+j)); //backtrack
+       }
+   }
+}
 // fork from https://github.com/irl/la-cucina/blob/master/str_replace.c
 char* str_replace(char* string, const char* substr, const char* replacement) {
 	char* tok = NULL;
@@ -188,7 +308,7 @@ char* str_replace(char* string, const char* substr, const char* replacement) {
 
 	return newstr;
 }
-int f = 0;
+double f = 0;
 int c = 0;
 int main()
 {
@@ -200,16 +320,16 @@ int main()
 while(1)
 {
 	_count = _count + 1;
-	char e[] = "abcdefghijk"; 
-        permute_number(e, 0, 10,NULL);
-	for(;;);
+	// multitasks();
+
+	//  for(;;);
  
         FILE *fp5;
  
         char str[1000000];
         char str2[1000];
         char str3[1000];
-        char* filename = "datac.txt";
+        char* filename = "datae.txt";
         fp5 = fopen(filename, "r");
  
 
@@ -220,7 +340,7 @@ while(1)
  
  
 	int cccc = 0;
-	char search[1000][1000] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","o","p","q"};
+	char search[1000][1000] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q"};
 
 	char   *strnew  = malloc(1000);
 	char   *strnew2 = malloc(1000);
@@ -308,67 +428,39 @@ while(1)
 		strcpy(new_str5, line_buf);
 		strcpy(new_str6, line_buf);
 		strcpy(new_str7, line_buf);
- 
+ 	 
 		for(int ll = 0; ll < 16; ll++)
 		{	
- 
-			ch = 299792458.0/(2*M_PI*6371000.0);
-			double ch1 = 299792458.0/(2*M_PI*3389500.0);
-			double ch2 = 299792458.0/(2*M_PI*6051800.0);
-			double ch3 = 299792458.0/(2*M_PI*2439700.0);
-			double ch4 = 299792458.0/(2*M_PI*25362000.0);
-			double ch5 = 299792458.0/(2*M_PI*1188300.0);
-			double ch6 = 299792458.0/(2*M_PI*1737100.0);
 
-			  DE = 8.99e9*1.0/6371000.0;  
-			double DE1 = 8.99e9*1.0/3389500.0;
-			double DE2 = 8.99e9*1.0/6051800.0;
-			double DE3 = 8.99e9*1.0/2439700.0;  
-			double DE4 = 8.99e9*1.0/25362000.0;
-			double DE5 = 8.99e9*1.0/1188300.0;
-			double DE6 = 8.99e9*1.0/1737100.0;
-				
-			  V = (1*pow(299792458,2.0))/(pow(6371000.0, 3.0)*4.0/3.0*M_PI);  
-			double V1 = (1*pow(299792458,2.0))/(pow(3389500.0, 3.0)*4.0/3.0*M_PI);
-			double V2 =(1*pow(299792458,2.0))/(pow(6051800.0, 3.0)*4.0/3.0*M_PI);
+			double a1[] = {0.367 , 5.972e24  , 23.439 ,  465.1  ,  5514  , 0.016708, 6371000.0, 149598023000 ,  288, 1 , 29.78,         7.155,  0.0033528, 3.15581e7, 11186 ,  6.67e-11};	 
+			double a2[] = {0.170 , 6.4171e23 , 25.19  ,  241.17 ,  3933.5, 0.0934,   3389500.0, 227939200000 ,  210, 2, 24.007,        1.850 , 0.00589 ,  5.93543e7, 5027  ,  6.67e-11};	 
+			double a3[] = {0.689 , 4.8675e24 , 177.36 ,  1.81   ,  5243  , 0.006772, 6051800.0, 108208000000 ,  737, 0, 35.02,         3.394,  0,         1.9414e7 , 10360 ,  6.67e-11};	
 
-			double V3 = (1*pow(299792458,2.0))/(pow(2439700.0, 3.0)*4.0/3.0*M_PI);  
-			double V4 = (1*pow(299792458,2.0))/(pow(25362000.0, 3.0)*4.0/3.0*M_PI);
-			double V5 =(1*pow(299792458,2.0))/(pow(1188300.0, 3.0)*4.0/3.0*M_PI);
-			double V6 =(1*pow(299792458,2.0))/(pow(1737100.0, 3.0)*4.0/3.0*M_PI);
- 
-			f++;
+			 int one = rand() % 16;
+		 
 
+
+			double VARA1[] = {a1[one] , 	a1[one]   ,  a1[one] ,   a1[one],  a1[one]  ,  a1[one], a1[one],a1[one] ,  a1[one],    a1[one],   a1[one],   a1[one] };	 
+			double VARA2[] = {a2[one] , 	a2[one]   ,  a2[one] ,   a2[one],  a2[one]  ,  a2[one], a2[one],a2[one] ,  a2[one],    a2[one],   a2[one],   a1[one] };	 	 
+			double VARA3[] =  {a3[one] , 	a3[one]   ,  a3[one] ,   a3[one],  a3[one]  ,  a3[one], a3[one],a3[one] ,  a3[one],    a3[one],   a3[one],   a1[one] };	 
+
+			
+			double VARA4[] = {2439700 ,  1    ,     1,   1,   6.67e-11 ,  1, 1, 1 ,  1,     1,    2439700    };
+			double VARA5[] = {25362000 ,  1    ,     1,   1,   6.67e-11 ,  1, 1, 1 ,  1,     1,    25362000    };
+			double VARA6[] = {1188300 ,  1    ,     1,   1,   6.67e-11 ,  1, 1, 1 ,  1,     1,    1188300    };
+			double VARA7[] = {1737100 ,  1    ,     1,   1,   6.67e-11 ,  1, 1, 1 ,  1,     1,    1737100    };			
+			
+			f = f + 0.1;
 			if(f > 9)
-			f = 0;
- 
-			/*
-			double VARA1[] = {6371000 ,  465.1 ,    1,   1 ,  6.67e-11 ,  0.306, 1, 0.306,288, 23.439,  6371000  };
-			//mars 
-			double VARA2[] = {3389500 , 241.17 ,    1,   1,  6.67e-11 ,   0.170, 1, 0.170 , 210,  25.19 , 3389500  };
-			//venus
-			double VARA3[] = {6051800 , 1.81   ,    1,   1,  6.67e-11 ,  0.689, 1,  0.689 , 737, 177.36 , 6051800  };
+			f = 1;
 
-
-			double VARA4[] = {2439700 , 3.026   ,    1,   1, 6.67e-11 ,  0.142, 1, 0.142 ,340,2.04 , 2439700 };
-			//mars 
-			double VARA5[] = {25362000 , 2590   ,    1,  1, 6.67e-11 ,  0.488, 1, 0.488 ,76,97.77 ,  25362000   };
-			//venus
-			double VARA6[] = {1188300 , 13.106    ,    1,   1, 6.67e-11 ,  0.55, 1,0.55 ,44,   122.53, 1188300  };
-
-			double VARA7[] = {1737100 , 4.627    ,    1,   1, 6.67e-11 ,  0.55, 1,0.136 ,220,   6.687, 1737100  };
-			*/
-
-			double VARA1[] = {7.43e-6 , 5e-6    ,    1,   0.1,  1,  0.231, 0.231,  1 ,f,   5e-6  ,  1, 0.1, 7.43e-6,  0.231,  0.1, 5e-6  };
+		      /*double VARA1[] = {7.43e-6 , 5e-6    ,    1,   0.1,  1,  0.231, 0.231,  1 ,f,   5e-6  ,  1, 0.1, 7.43e-6,  0.231,  0.1, 5e-6  };
 			double VARA2[] = {7.43e-6 , 5e-6    ,    1,   0.2,  1,  0.925, 0.925,  1 ,f,   5e-6  ,  1, 0.2, 7.43e-6,  0.925,  0.2, 5e-6  };
 			double VARA3[] = {7.43e-6 , 5e-6    ,    1,   0.3,  1,  2.077, 2.077,  1 ,f,   5e-6  ,  1, 0.3, 7.43e-6,  2.077,  0.3, 5e-6  };
 			double VARA4[] = {7.43e-6 , 5e-6    ,    1,   0.4,  1,  3.7,   3.7,    1 ,f,   5e-6  ,  1, 0.4, 7.43e-6,  3.7,    0.4, 5e-6  };
 			double VARA5[] = {7.43e-6 , 5e-6    ,    1,   0.5,  1,  5.78,  5.78,   1 ,f,   5e-6  ,  1, 0.5, 7.43e-6,  5.78,   0.5, 5e-6  };
 			double VARA6[] = {7.43e-6 , 5e-6    ,    1,   0.6,  1,  8,     8,      1 ,f,   5e-6  ,  1, 0.6, 7.43e-6,  8,      0.6, 5e-6  };
-			double VARA7[16]; 
-
- 
- 
+			double VARA7[16]; */
 
 			 ptr = strstr(new_str, search[ll]);
 			 ptr2 = strstr(new_str2, search[ll]);
@@ -415,8 +507,7 @@ while(1)
 
 		 }	
 		
-
-		inc_ = inc_ + .0001 ; 
+		inc_ = inc_ + .00000001 ; 
 
 		#define RED   "\x1B[31m"
 		#define GRN   "\x1B[32m"
@@ -427,17 +518,23 @@ while(1)
 		#define WHT   "\x1B[37m"
 		#define RESET "\x1B[0m" 
 
-		if((((te_interp(new_str, 0))) < 0.947*1.05   && (te_interp(new_str, 0)) > .947*0.95)  )
+		/*if((((te_interp(new_str, 0))) < 0.947*1.05   && (te_interp(new_str, 0)) > .947*0.95)  )
 		{
  
 			if((((te_interp(new_str2, 0))) < 0.277*1.05   && (te_interp(new_str2, 0)) > .277*0.95)  )
 			{
  
-				printf("\n%d",iterator );
+				
 				if( (( (te_interp(new_str3, 0))) >  -1.61*1.05   &&  (te_interp(new_str3, 0)) < -1.61*0.95)  )
-				{
-					printf(" .. ");
-			 		printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",RESET); 
+				{*/
+			 	
+				
+		if( ((te_interp(new_str, 0)) < 9.805*1.03  && (te_interp(new_str, 0)) > 9.805*0.97)   )
+		{
+	 
+			if(( (te_interp(new_str2, 0)) < 3.720*1.03  && (te_interp(new_str2, 0)) > 3.720*0.97)  )
+			{
+					printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",RESET); 
 					printf(RESET"");
 					printf("\nEarth: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str, (te_interp(new_str, 0)) ,randme);
 			 		printf("\nMars: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str2, (te_interp(new_str2, 0)) ,randme);
@@ -448,7 +545,14 @@ while(1)
 					printf("\nPluto: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str6, (te_interp(new_str6, 0)) ,randme);
 			 		printf("\nMoon: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str7, (te_interp(new_str7, 0)) ,randme);
 					printf("\n__Earth DE: ="CYN" %f\n"RESET" "WHT" ch: "YEL" %f\n"RESET" "WHT" V: "CYN" %f\n"RESET" "WHT" "RESET"", ch, DE ,V );
-			 		printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",RESET);
+					printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",RESET); 		
+					printf("\n%d",iterator );
+					printf(" .. ");
+	
+				if(((te_interp(new_str3, 0)) < 8.87*1.02  && (te_interp(new_str3, 0)) > 8.87*0.98)   )
+		{
+
+			
 				 }
 			}
 		}
@@ -461,3 +565,7 @@ while(1)
 
     return 0;
 }
+
+
+ 
+ 
