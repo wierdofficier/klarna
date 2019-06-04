@@ -5,23 +5,34 @@
 #include <stdlib.h>
 #include <math.h>
 #include <pthread.h>
+#include <complex.h>
 #define NUM_THREADS 3
 #define MAX_PAIRS   16
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
+#define RESET "\x1B[0m" 
+char search[1000][1000] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q"};
 double _count = 0;
 int iterator = 0;
+int isbreaked = 0;
 void task1()
 {
 
-	char e[] = "abcdefghijklmnopqrstuvwxyz123456789"; 
-          permute_number(e, 0, 32,NULL);
+	char e[] = "abcdefghijk"; 
+          permute_number(e, 0, 10,NULL);
 
 }
 
 void task2()
 {
 
-	char e[] = "+-*/^+-*/^+-*/^+-*/^+-*/^+-*/^+-*/^+-*/^"; 
-        permute_sign(e, 0, 32,NULL);
+	char e[] = "+-*/^+-*/^+"; 
+        permute_sign(e, 0, 10,NULL);
 
 }
 
@@ -43,12 +54,7 @@ void *thr_func(void *arg) {
  
  if(data->tid == 0)
 	task1();
-
- if(data->tid ==1)
-  	task2();
-
-  if(data->tid ==2)
-  	 task3();
+ 
   	
 }
 
@@ -89,70 +95,63 @@ char equation_[100011];
 char eq_[100110];
 char CHARACTER[1110000];
 char CHARACTER_2[1001100];
- void print_stack_()
+ void print_stack_(char *a,char *var)
 {
 	if(onceopen == 1)
 	{	     
-	   fp = fopen ("dataf.txt","w");
+	   fp = fopen ("datah.txt","w");
 	   onceopen =0;
 	}
 
         int i;
-  
-
         for (i = 1; i <= n * 2; i++) {
  
         	if (stack[i] == LEFT) {
              
 			 if(i < 33  )
 			{
-
-			  	//    printf("%c(%c",CHARACTER_2[kk],CHARACTER[kk]);
-			    sprintf(equation_,"%c(%c",CHARACTER_2[kk],CHARACTER[kk]);
+			 //  printf("%c(%c",a[kk],var[kk]);
+			    sprintf(equation_,"%c(%c",a[kk],var[kk]);
+ 
 			    strcpy(eq_,equation_);
-				if(i == 1)
-				    fprintf (fp, "%s", (char*)(eq_+1));
-				else
-				    fprintf (fp, "%s", eq_);
+			    if(i == 1)
+			       fprintf (fp, "%s", (char*)(eq_+1));
+			    else
+			       fprintf (fp, "%s", eq_);				 
 			}
-			else
-			{
-			//   printf("(");
+			 else
+			 {
+			  // printf("(");
 			   char C = '(';
-			   sprintf(equation_,"%c",C);
-			   fprintf (fp, "%c", equation_);
-			}
-
-		 
-			 
-		 
+			   sprintf(eq_,"%c",C);
+			   	if(i == 1)
+				  fprintf (fp, "%s", (char*)(eq_+1));
+				else
+			     	  fprintf (fp, "%s", eq_);					
+			}		 
         }
-        	else if (stack[i] == RIGHT) {
-			 
-			   //   printf(")%c%c",CHARACTER_2[kk],CHARACTER[kk]);
-			    sprintf(equation_,")%c%c",CHARACTER_2[kk],CHARACTER[kk]);
-			    fprintf (fp, "%s", equation_);
-		 
-		 	  
+        	else if (stack[i] == RIGHT) {		 
+			//    printf(")%c%c",a[kk],var[kk]);
+			    sprintf(equation_,")%c%c",a[kk],var[kk]);
+			    fprintf (fp, "%s", equation_);		 	  
        		 }
 		else {
 		    //printf("ERROR!!!!\n");
 		   // exit(-1);
 		}
-kk++;
-if(kk > 16)
-{
-kk  = 0; 
-
-}
+	kk++;
+	if(kk > 10)
+	{
+		kk  = 0; 
+	}
     }
  
-  // printf("\n");
+ //printf("\n");
     fprintf (fp, "\n");
 }
 
  
-void matching_parenthesis_pairs(int left_in_stack, int right_in_stack)
+void matching_parenthesis_pairs(int left_in_stack, int right_in_stack,char *a,char *var)
 {
     if (left_in_stack < right_in_stack) {
         return;
@@ -160,18 +159,18 @@ void matching_parenthesis_pairs(int left_in_stack, int right_in_stack)
  
     if (ind == n * 2 + 1)
     {
-        print_stack_();
+        print_stack_(a,var);
         return;
     }
 
     if (left_in_stack < n) {
         stack[ind++] = LEFT;
-        matching_parenthesis_pairs(left_in_stack + 1, right_in_stack);
+        matching_parenthesis_pairs(left_in_stack + 1, right_in_stack,a,var);
         ind--;
     }
     if (right_in_stack < left_in_stack) {
         stack[ind++]= RIGHT;
-        matching_parenthesis_pairs(left_in_stack, right_in_stack + 1);
+        matching_parenthesis_pairs(left_in_stack, right_in_stack + 1,a,var);
         ind--;
     }
 }
@@ -197,27 +196,9 @@ void permute_number(char *a, int i, int n,char *var)
    int j;
    if (i == n) 
 	{
-  
- 
- 	// printf("%c%c%c%c%c%c%c%c%c%c\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
-	CHARACTER[0] = a[0];
-	CHARACTER[1] = a[1];
-	CHARACTER[2] = a[2];
-	CHARACTER[3] = a[3];
-	CHARACTER[4] = a[4];
-	CHARACTER[5] = a[5];
-	CHARACTER[6] = a[6];
-	CHARACTER[7] = a[7];
-	CHARACTER[8] = a[8];
-	CHARACTER[9] = a[9];
-	CHARACTER[10] = a[10];
-	CHARACTER[11] = a[11];
-	CHARACTER[12] = a[12];
-	CHARACTER[13] = a[13];
-	CHARACTER[14] = a[14];
-	CHARACTER[15] = a[15];
- 	 
-
+ 	 //printf("%c%c%c%c%c%c%c%c%c%c\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
+	 char e[] = "+-*/^+-*/^+"; 
+	 permute_sign(e, 0, 10,a);
  
 	}
   
@@ -239,27 +220,8 @@ void permute_sign(char *a, int i, int n,char *var)
    if (i == n) 
 	{
   
- 
- 	// printf("%c%c%c%c%c%c%c%c%c%c\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
-	CHARACTER_2[0] = a[0];
-	CHARACTER_2[1] = a[1];
-	CHARACTER_2[2] = a[2];
-	CHARACTER_2[3] = a[3];
-	CHARACTER_2[4] = a[4];
-	CHARACTER_2[5] = a[5];
-	CHARACTER_2[6] = a[6];
-	CHARACTER_2[7] = a[7];
-	CHARACTER_2[8] = a[8];
-	CHARACTER_2[9] = a[9];
-	CHARACTER_2[10] = a[10];
-	CHARACTER_2[11] = a[11];
-	CHARACTER_2[12] = a[12];
-	CHARACTER_2[13] = a[13];
-	CHARACTER_2[14] = a[14];
-	CHARACTER_2[15] = a[15];
- 	 
-
- 
+ 	  //printf("%c%c%c%c%c%c%c%c%c%c\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
+ 	  matching_parenthesis_pairs(0, 0,a,var);
 	}
   
    else
@@ -313,26 +275,57 @@ char* str_replace(char* string, const char* substr, const char* replacement) {
 }
 double f = 0;
 int c = 0;
+char   *new_str;
+char   *strnew;
+char * fill_equation(char * line_buf, double   **data )
+{
+			char buf[1000];
+			strcpy(new_str, line_buf);
+ 
+			 for(int lll = 0; lll < 3; lll++)
+			 {
+				for(int ll = 0; ll < 12; ll++)
+				{	
+ 			
+					 char * ptr = strstr(new_str, search[ll]);
+				 
+					 if (ptr != NULL) /* Substring found */
+					 {
+						//printf("%s contains '%s'\n", new_str, search[ll]);
+						 
+						sprintf(buf,"%f" ,data[lll][ll] );
+					 
+						strnew = str_replace(new_str,search[ll],buf);
+						 
+				 		strcpy(new_str,strnew);
+						 
+						free(strnew);
+				 
+ 					}
+				 }
+	}
+return new_str;
+}
+
 int main()
 {
     printf("Number of parenthesis pairs (max %d): ", MAX_PAIRS);
     scanf("%d", &n);
     ind = 1;
-    srand(time(NULL));
+    //srand(time(NULL));
 
 while(1)
 {
 	_count = _count + 1;
 	//  multitasks();
 
-	//  for(;;);
+	//    for(;;);
  
         FILE *fp5;
  
         char str[1000000];
-        char str2[1000];
-        char str3[1000];
-        char* filename = "dataf.txt";
+ 
+        char* filename = "datah.txt";
         fp5 = fopen(filename, "r");
  
 
@@ -340,32 +333,11 @@ while(1)
         	printf("Could not open file %s",filename);
         	return 1;
        }
+  
+	strnew  = malloc(1000);
+ 	new_str  = malloc(1000);
  
  
-	int cccc = 0;
-	char search[1000][1000] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q"};
-
-	char   *strnew  = malloc(1000);
-	char   *strnew2 = malloc(1000);
-	char   *strnew3 = malloc(1000);
-	char   *strnew4 = malloc(1000);
-	char   *strnew5 = malloc(1000);
-	char   *strnew6 = malloc(1000);
-	char   *strnew7 = malloc(1000);
-
-
-	char   *new_str  = malloc(1000);
-	char   *new_str2 = malloc(1000);
-	char   *new_str3 = malloc(1000);
-	char   *new_str4 = malloc(1000);
-	char   *new_str5 = malloc(1000);
-	char   *new_str6 = malloc(1000);
-	char   *new_str7 = malloc(1000);
-
-
-	double inc_ = 1;
-	 
-	char  *str_44 = malloc(10000);
  
 	#include <stdio.h>
 	#define MAXBUFLEN 44*20000000 
@@ -378,251 +350,134 @@ while(1)
 
  
 	line_size = malloc(   MAXBUFLEN );
-	 
-	double ch;
-	double DE;
-	double V;
-
  
+	double complex_solution2;
 	int clocksec[1000000];
 	int seconds = 0;
 	 
 	iterator = 0;
   
-  	double increaser = 0.0006;
+  	double increaser = 0.00001;
  
-	int investigate = 0;
-	double VARA1[] = {100 , 100*2 , 200 ,    300  ,  100  , 100,     100, 100 ,  100, 100 , 100,          100,  100, 	  100,  100 ,   1001};	 
-	double VARA2[] = {1 , 1*2 , 2  ,   3 ,   1,   4,     5.0, 1 ,  7, 1,  24007,          1.850 , 1 ,          5.93543e7,  3389500  ,  6.67e-11};	 
-	double VARA3[] = {1 , 1*2 , 2 ,    3  ,  1  , 4,     5.0, 1 ,  7, 1,  35020,          3.394,  1,           1.9414e7 ,  6051800 ,   6.67e-11};
-	double var[] = { 1.5,2.12,2.12,2.2,2.5,2.12  };
-	VARA1[0] += increaser;
-	int lookupX[]   =  { 1,0,2,0,2,2,3,3,3,0,1,2,4,4,4,4,0,1,2,3,5,5,5,5,5,0,1,2,3,4,6,6,6,6,6,6,0,1,2,3,4,5,7,7,7,7,7,7,7,0,1,2,3,4,5,6,8,8,8,8,8,8,8,8,0,1,2,3,4,5,6,7,8,10,10,10,10,10,10,10,10,10,10,0,1,2,3,4,5,6,7,8,9,11,11,11,11,11,11,11,11,11,11,11,12,12,12,12,12,12,12,12,12,12,12,12,13,13,13,13,13,13,13,13,13,13,13,13,13,0,1,2,3,4,5,6,7,8,9,10,11,12,14,14,14,14,14,14,14,14,14,14,14,14,14,14,0,1,2,3,4,5,6,7,8,9,10,11,0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16   };
-				int lookupY[]	=  { 0,2,1,1,0,1,0,1,2,3,3,3,0,1,2,3,4,4,4,4,0,1,2,3,4,5,5,5,5,5,0,1,2,3,4,5,6,6,6,6,6,6,0,1,2,3,4,5,6,7,7,7,7,7,7,7,0,1,2,3,4,5,6,7,9,9,9,9,9,9,9,9,9,0,1,2,3,4,5,6,7,8,9,10,10,10,10,10,10,10,10,10,10,0,1,2,3,4,5,6,7,8,9,10,11,11,11,11,11,11,11,11,11,11,11,0,1,2,3,4,5,6,7,8,9,10,11,0,1,2,3,4,5,6,7,8,9,10,11,12,13,13,13,13,13,13,13,13,13,13,13,13,13,0,1,2,3,4,5,6,7,8,9,10,11,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,14,14,14,14,14,14,14,14,14,14,14,14,14,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15  };
-	double *result = malloc(1000000);
-	char *new_str_ 	= malloc(1000000);
+ 
+	double **VARA1;
 
 
+	VARA1 = malloc( 10000*32);
+	 
+	int iiiii;
+
+	for(int iiiii=0; iiiii<10000*1; iiiii++)
+	VARA1[iiiii] =  malloc(32);
+ 
+	VARA1[0][0] += increaser;
+	VARA1[1][0] += increaser;
+	VARA1[2][0] += increaser;
+	double   result[20][1000];
+	 
+
+ 	double a = 0.1;
 	while(line_size >= 0 && line_count < 600000000)
 	{
  		//leta upp en ekvation
 		line_size[line_count] = getline(  &line_buf  , &line_buf_size, fp5);		 
 		line_count++;
-
-	for(int i = 0; i < 16; i++)
- 			 	VARA1[i] = 1.001;
-
-       	for(int llll = 0; llll < 10000; llll++)
-		{ 
+		double a1[] = {1 ,  465.1 ,    1,   6371000 ,  6.67e-11 ,   0.306, 1, 0.306,  288,  23.439,  1,   1   };
+		//mars 
+		double a2[] = {1 , 241.17 ,    1,   3389500,   6.67e-11 ,   0.170, 1, 0.170 , 210,  25.19 ,  1 ,  1   };
+		 
+		double a3[] = {1 , 1.81 ,      1,   6051800,   6.67e-11 ,   0.689, 1, 0.689 , 737,  177.36,  1,   1   };
+		for(int i = 0; i < 12; i++)
+		{
+	 		VARA1[0][i] = a1[i]; 
+			VARA1[1][i] = a2[i]; 
+			VARA1[2][i] = a3[i]; 
+		}
+ 
 		iterator++;
-		char buf[1000],buf1[1000],buf2[1000],buf3[1000],buf4[1000],buf5[1000],buf6[1000];
- 	 
-
-			/*
-			 time_t now;
-			    struct tm *tm;
-
-			    now = time(0);
-			    if ((tm = localtime (&now)) == NULL) {
-				printf ("Error extracting time stuff\n");
-				return 1;
-			    }
-			 
-
-			 clocksec[cccc] = tm->tm_sec;
-			 
-			 
-			if(( abs(clocksec[cccc])  - abs(clocksec[cccc-1] )) != 0 && (abs(clocksec[cccc])  - abs(clocksec[cccc-1] )) > 0)  
-				seconds =  ( abs(clocksec[cccc]) - abs(clocksec[cccc-1] ));
-
-
-			if(seconds > 2)
-			break;*/
-
+	       	for(int llll = 0; llll < 100 ; llll++)
+			{ 
+			isbreaked = 0;	
+ 
 
 			char *ptr,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7; 
 			int randme = iterator; 
-		for(int lll = 0; lll < 16; lll++)
-		{ 
-			
-	 
-			
-				strcpy(new_str, line_buf);
-				/*strcpy(new_str2, line_buf);
-				strcpy(new_str3, line_buf);
+	 			
+ 						
+ 			double solution[] = {9.8,3.7,8.89};
 
+	 		for(int oooo = 0; oooo < 3; oooo++)
+			{ 
+				 
+				for(int kkk = 0; kkk < 12; kkk++)
+				{ 
+					for(int lll = 1; lll < 12; lll++)
+					{ 
+						if(kkk != lll)
+						{
+							if( (result[oooo][kkk]) >  (result[oooo][lll]))
+							{
+								VARA1[oooo][kkk] -= a;
 
-				strcpy(new_str4,line_buf);
-				strcpy(new_str5, line_buf);
-				strcpy(new_str6, line_buf);
-				strcpy(new_str7, line_buf);*/
-		 
-				for(int ll = 0; ll < 16; ll++)
-				{	
-
-	 			        //double VARA1[] = {a1[one] , 	a1[one]   ,  a1[one] ,   a1[one],  a1[one]  ,  a1[one], a1[one],a1[one] ,  a1[one],    a1[one],   a1[one],   a1[one] };	 
-					//double VARA2[] = {a2[one] , 	a2[one]   ,  a2[one] ,   a2[one],  a2[one]  ,  a2[one], a2[one],a2[one] ,  a2[one],    a2[one],   a2[one],   a2[one] };	 	 
-					//double VARA3[] =  {a3[one] , 	a3[one]   ,  a3[one] ,   a3[one],  a3[one]  ,  a3[one], a3[one],a3[one] ,  a3[one],    a3[one],   a3[one],   a3[one] };	 
-
-					
-					double VARA4[] = {2439700 ,  1    ,     1,   1,   6.67e-11 ,  1, 1, 1 ,  1,     1,    2439700    };
-					double VARA5[] = {25362000 ,  1    ,     1,   1,   6.67e-11 ,  1, 1, 1 ,  1,     1,    25362000    };
-					double VARA6[] = {1188300 ,  1    ,     1,   1,   6.67e-11 ,  1, 1, 1 ,  1,     1,    1188300    };
-					double VARA7[] = {1737100 ,  1    ,     1,   1,   6.67e-11 ,  1, 1, 1 ,  1,     1,    1737100    };			
-					
-					f = f + 0.1;
-					if(f > 9)
-					f = 1;
-
-				      /*double VARA1[] = {7.43e-6 , 5e-6    ,    1,   0.1,  1,  0.231, 0.231,  1 ,f,   5e-6  ,  1, 0.1, 7.43e-6,  0.231,  0.1, 5e-6  };
-					double VARA2[] = {7.43e-6 , 5e-6    ,    1,   0.2,  1,  0.925, 0.925,  1 ,f,   5e-6  ,  1, 0.2, 7.43e-6,  0.925,  0.2, 5e-6  };
-					double VARA3[] = {7.43e-6 , 5e-6    ,    1,   0.3,  1,  2.077, 2.077,  1 ,f,   5e-6  ,  1, 0.3, 7.43e-6,  2.077,  0.3, 5e-6  };
-					double VARA4[] = {7.43e-6 , 5e-6    ,    1,   0.4,  1,  3.7,   3.7,    1 ,f,   5e-6  ,  1, 0.4, 7.43e-6,  3.7,    0.4, 5e-6  };
-					double VARA5[] = {7.43e-6 , 5e-6    ,    1,   0.5,  1,  5.78,  5.78,   1 ,f,   5e-6  ,  1, 0.5, 7.43e-6,  5.78,   0.5, 5e-6  };
-					double VARA6[] = {7.43e-6 , 5e-6    ,    1,   0.6,  1,  8,     8,      1 ,f,   5e-6  ,  1, 0.6, 7.43e-6,  8,      0.6, 5e-6  };
-					double VARA7[16]; */
-
-					 ptr = strstr(new_str, search[ll]);
-					/* ptr2 = strstr(new_str2, search[ll]);
-					 ptr3 = strstr(new_str3, search[ll]);
-
-					 ptr4 = strstr(new_str4, search[ll]);
-					 ptr5 = strstr(new_str5, search[ll]);
-					 ptr6 = strstr(new_str6, search[ll]);
-					 ptr7 = strstr(new_str7, search[ll]);*/
-					 if (ptr != NULL) /* Substring found */
-					 {
-						//printf("%s contains '%s'\n", new_str, search[ll]);
-						sprintf(buf,"%.35f" ,VARA1[ll]);
-						/*sprintf(buf1,"%.35f",VARA2[ll]);
-						sprintf(buf2,"%.35f",VARA3[ll]);
-						sprintf(buf3,"%.35f",VARA4[ll]);
-						sprintf(buf4,"%.35f",VARA5[ll]);
-						sprintf(buf5,"%.35f",VARA6[ll]);
-						sprintf(buf6,"%.35f",VARA7[ll]);*/
-						strnew = str_replace(new_str,search[ll],buf);
-						/*strnew2 = str_replace(new_str2,search[ll],buf1);
-						strnew3 = str_replace(new_str3,search[ll],buf2);
-
-				 		strnew4 = str_replace(new_str4,search[ll],buf3);
-						strnew5 = str_replace(new_str5,search[ll],buf4);
-						strnew6 = str_replace(new_str6,search[ll],buf5);
-						strnew7 = str_replace(new_str7,search[ll],buf6);*/
-				 		strcpy(new_str,strnew);
-						/*strcpy(new_str2,strnew2);
-						strcpy(new_str3,strnew3);
-
-				 		strcpy(new_str4,strnew4);
-						strcpy(new_str5,strnew5);
-						strcpy(new_str6,strnew6);
-						strcpy(new_str7,strnew7);*/
-						free(strnew);
-						/*free(strnew2);
-						free(strnew3);
-						free(strnew4);
-						free(strnew5);
-						free(strnew6);
-						free(strnew7);*/
-				 VARA1[ll] += increaser;
-				 }
-
-				
-
-				result[0+lll] = te_interp(new_str, 0);
-				
-				
-
-			}
- 
-			
-			int k = 0;
-			int l = 1;
-			for(int i = 0; i < 16; i++)
-			{
-				if(result[0+lookupX[i]] > result[0+lookupY[i]])
-				{
-				 	VARA1[k] -= increaser;	 	
+								new_str = fill_equation(line_buf,  VARA1 );
+								result[oooo][kkk] = te_interp(new_str, 0);
+								if(isnan( (result[oooo][kkk])) == 0 ||  (result[oooo][kkk]) == 0)
+								{
+									isbreaked =1;
+									break;	
+								}								 	
+							}		
+								else
+								{
+									 //printf("kkk = %d ::: oooo = %d\n",  kkk,oooo);
+						   			 VARA1[oooo][kkk] += a;
+									 new_str = fill_equation(line_buf,  VARA1 );	
+									 result[oooo][kkk] = te_interp(new_str, 0);	
+									 if(isnan( (result[oooo][kkk])) == 0 ||  (result[oooo][kkk]) == 0)
+									{
+										isbreaked =1;	
+										break;
+									}	 	 	
+					 			}
+						 
+							}
+					  
+					}
+			 
 				}
-				 else
-				     VARA1[k] += increaser;
-				
-			   if(l == 2)
-			   {
-				k++;
-				l = 0;
-			   }
-				l++;
-			}
-		
-			//printf(":%s\n  %f\n",new_str,  te_interp(new_str , 0) );
-	 
-			//  for(int i = 0; i < 16; i++)
- 			 //	printf("variables: %f ", VARA1[i]  );
-			// printf("\n");
-			if(9.8 - result[0+15]  < 1 && isnan(result[0+15]) == 0)
-			{
-			printf(":%s\n  %f\n",new_str,  result[0+15] );
-				// for(;;);
-				break;	
-			}
-			//investigate++;
-			//sprintf(new_str,"%f",var[0]+pow(var[1],2.0)*pow(var[1],2.0)*var[2]*var[3]*var[4]*var[5] );
-				//printf("solution: %s with variables: %f %f %f %f %f %f\n", new_str,VARA1[0],VARA1[1],VARA1[2],VARA1[3],VARA1[4],VARA1[5],VARA1[6] );
-		}
-
  
-			inc_ = inc_ + .00000001 ; 
-
-			#define RED   "\x1B[31m"
-			#define GRN   "\x1B[32m"
-			#define YEL   "\x1B[33m"
-			#define BLU   "\x1B[34m"
-			#define MAG   "\x1B[35m"
-			#define CYN   "\x1B[36m"
-			#define WHT   "\x1B[37m"
-			#define RESET "\x1B[0m" 
-
-			/*if((((te_interp(new_str, 0))) < 0.947*1.05   && (te_interp(new_str, 0)) > .947*0.95)  )
-			{
-	 
-				if((((te_interp(new_str2, 0))) < 0.277*1.05   && (te_interp(new_str2, 0)) > .277*0.95)  )
-				{
-	 
-					
-					if( (( (te_interp(new_str3, 0))) >  -1.61*1.05   &&  (te_interp(new_str3, 0)) < -1.61*0.95)  )
-					{*/
-				 	
-					
-			if((((te_interp(new_str, 0))) < 5.97237e24*1.03   && (te_interp(new_str, 0)) > 5.97237e24*0.97)   || ((te_interp(new_str, 0)) < 9.805*1.02  && (te_interp(new_str, 0)) > 9.805*0.98)  || 			((te_interp(new_str, 0)) <  5514*1.03    && (te_interp(new_str, 0)) > 5514*0.97)  )
-			{
-
-				if((((te_interp(new_str2, 0))) < 6.4171e23*1.03   && (te_interp(new_str2, 0)) > 6.4171e23*0.97)   || ((te_interp(new_str2, 0)) < 3.720*1.02  && (te_interp(new_str2, 0)) > 3.720*0.98)  || ((te_interp(new_str2, 0)) <  3933.5 *1.03    && (te_interp(new_str2, 0)) > 3933.5*0.97)  )
-				{
-						printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",RESET); 
-						printf(RESET"");
-						printf("\nEarth: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str, (te_interp(new_str, 0)) ,randme);
-				 		printf("\nMars: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str2, (te_interp(new_str2, 0)) ,randme);
-						printf("\nVenus: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str3, (te_interp(new_str3, 0)) ,randme);
-
-						printf("\nMercury: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str4, (te_interp(new_str4, 0)) ,randme);
-				 		printf("\nUranus: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str5, (te_interp(new_str5, 0)) ,randme);
-						printf("\nPluto: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str6, (te_interp(new_str6, 0)) ,randme);
-				 		printf("\nMoon: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"", new_str7, (te_interp(new_str7, 0)) ,randme);
-						printf("\n__Earth DE: ="CYN" %f\n"RESET" "WHT" ch: "YEL" %f\n"RESET" "WHT" V: "CYN" %f\n"RESET" "WHT" "RESET"", ch, DE ,V );
-						printf(YEL "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",RESET); 
-					if((((te_interp(new_str3, 0))) < 4.8675e24*1.03   && (te_interp(new_str3, 0)) > 4.8675e24*0.97)   || ((te_interp(new_str3, 0)) < 8.87*1.02  && (te_interp(new_str3, 0)) > 8.87*0.98)  || ((te_interp(new_str3, 0)) <  5243*1.03    && (te_interp(new_str3, 0)) > 5243*0.97)  )
+					if((((( (result[0][11]))) < 5.97237e24*1.03   && ((result[0][11])) > 5.97237e24*0.97)   || (((result[0][11])) < solution[0]*1.02  && ((result[0][11])) > solution[0]*0.98)  || 			(((result[0][11])) <  5514*1.03    && ((result[0][11])) > 5514*0.97)  ) && isnan((result[0][11])) == 0)
 					{
-		
-						printf("\n%d",iterator );
-						printf(" .. ");
-		
-	 
-				}
-			}
-	 
-	 	}
-	 	}
-	 
+						printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+						printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",new_str,(result[0][11]),randme);
+						printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",new_str,(result[1][11]),randme);
+						printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",new_str,(result[2][11]),randme);
+						printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+						if((((((result[1][11]))) < 6.4171e23*1.03   && ((result[1][11])) > 6.4171e23*0.97)   || (((result[1][11])) < solution[1]*1.02  && ((result[1][11])) > solution[oooo]*0.98)  || 			(((result[1][11])) <  3933.5*1.03    && ((result[1][11])) > 3933.5*0.97)  ) && isnan((result[1][11])) == 0)
+						{
+
+
+
+							for(int ppp = 0; ppp < 12; ppp++)
+			 					printf("%f ",VARA1[oooo][ppp] );
+							printf("\n");
+							for(int i = 0; i < 12; i++)
+							{
+				 			 	VARA1[0][i] = a1[i]; 
+							 	VARA1[1][i] = a2[i]; 
+								VARA1[2][i] = a3[i]; 
+							}
+							isbreaked = 1;
+							break;	
+					}
+					 	 
+				 }
+			 
+		 	if(isbreaked == 1)			
+				break;
+ 		 
+	 		}
+		}
 	}
  }
   //fclose(fp5);
