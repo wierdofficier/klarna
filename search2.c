@@ -1,4 +1,3 @@
-//tryck 8 i början
 #include "tinyexpr.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -390,10 +389,10 @@ while(1)
 	 
 	iterator = 0;
   
-  	double increaser = 0.006;
+  	double increaser = 0.0006;
  
 	int investigate = 0;
-	double VARA1[] = {1 , 1*2 , 2 ,    3  ,  1  , 1,     1, 1 ,  1, 1 , 1,          1,  1, 	  1,  1 ,   1};	 
+	double VARA1[] = {100 , 100*2 , 200 ,    300  ,  100  , 100,     100, 100 ,  100, 100 , 100,          100,  100, 	  100,  100 ,   1001};	 
 	double VARA2[] = {1 , 1*2 , 2  ,   3 ,   1,   4,     5.0, 1 ,  7, 1,  24007,          1.850 , 1 ,          5.93543e7,  3389500  ,  6.67e-11};	 
 	double VARA3[] = {1 , 1*2 , 2 ,    3  ,  1  , 4,     5.0, 1 ,  7, 1,  35020,          3.394,  1,           1.9414e7 ,  6051800 ,   6.67e-11};
 	double var[] = { 1.5,2.12,2.12,2.2,2.5,2.12  };
@@ -409,8 +408,12 @@ while(1)
  		//leta upp en ekvation
 		line_size[line_count] = getline(  &line_buf  , &line_buf_size, fp5);		 
 		line_count++;
-       	while(1)
-		{
+
+	for(int i = 0; i < 16; i++)
+ 			 	VARA1[i] = 1.001;
+
+       	for(int llll = 0; llll < 10000; llll++)
+		{ 
 		iterator++;
 		char buf[1000],buf1[1000],buf2[1000],buf3[1000],buf4[1000],buf5[1000],buf6[1000];
  	 
@@ -436,16 +439,14 @@ while(1)
 			if(seconds > 2)
 			break;*/
 
-			 for(int i = 0; i < 16; i++)
- 			 	VARA1[i] = 0;
+
 			char *ptr,ptr2,ptr3,ptr4,ptr5,ptr6,ptr7; 
 			int randme = iterator; 
 		for(int lll = 0; lll < 16; lll++)
 		{ 
 			
 	 
-			for(int i = 0; i < 16; i++)
-			{
+			
 				strcpy(new_str, line_buf);
 				/*strcpy(new_str2, line_buf);
 				strcpy(new_str3, line_buf);
@@ -522,10 +523,10 @@ while(1)
 						free(strnew5);
 						free(strnew6);
 						free(strnew7);*/
-				VARA1[ll] += increaser;
+				 VARA1[ll] += increaser;
 				 }
 
-			 }	
+				
 
 				result[0+lll] = te_interp(new_str, 0);
 				
@@ -540,10 +541,10 @@ while(1)
 			{
 				if(result[0+lookupX[i]] > result[0+lookupY[i]])
 				{
-					VARA1[k] -= increaser;	 	
+				 	VARA1[k] -= increaser;	 	
 				}
-				else
-				    VARA1[k] += increaser;
+				 else
+				     VARA1[k] += increaser;
 				
 			   if(l == 2)
 			   {
@@ -553,14 +554,15 @@ while(1)
 				l++;
 			}
 		
-			printf(":%s\n  %f\n",new_str,  te_interp(new_str , 0) );
+			//printf(":%s\n  %f\n",new_str,  te_interp(new_str , 0) );
+	 
 			//  for(int i = 0; i < 16; i++)
  			 //	printf("variables: %f ", VARA1[i]  );
 			// printf("\n");
-			if(9.8 - result[0+15]  < 1)
+			if(9.8 - result[0+15]  < 1 && isnan(result[0+15]) == 0)
 			{
-			printf(":%s\n  %f\n",new_str,  te_interp(new_str , 0) );
-				 for(;;);
+			printf(":%s\n  %f\n",new_str,  result[0+15] );
+				// for(;;);
 				break;	
 			}
 			//investigate++;
