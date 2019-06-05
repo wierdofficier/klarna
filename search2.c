@@ -19,6 +19,7 @@
 #define WHT   "\x1B[37m"
 #define RESET "\x1B[0m" 
 char search[1000][1000] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q"};
+double solution[] = {9.8,3.7,8.89};
 double _count = 0;
 int iterator = 0;
 int isbreaked = 0;
@@ -307,7 +308,7 @@ int main()
 	FILE *fp5;	
         char* filename = "datah.txt";
         fp5 = fopen(filename, "r");
-
+	ind = 1;
         if (fp5 == NULL  ){
         	printf("Could not open file %s",filename);
         	return 1;
@@ -330,7 +331,7 @@ int main()
 	line_size = malloc(   MAXBUFLEN );	 
 	iterator = 0;
   
- 	double a = 0.01;
+ 	double a = 0.00001;
 	double **VARA1;
 	VARA1 = malloc( 10000*32);
 	 
@@ -341,15 +342,15 @@ int main()
 	VARA1[1][0] += a;
 	VARA1[2][0] += a;
 	
-
-
+double inc  = 0;
+int counter = 0;
 	while(line_size >= 0 && line_count < 600000000)
 	{
 		line_size[line_count] = getline(  &line_buf  , &line_buf_size, fp5);	
-		double a1[] = {1 ,  465.1 ,    1,   6371000 ,  6.67e-11 ,   0.306, 1, 0.306,  288,  23.439,  1,   1   };
-		double a2[] = {1 , 241.17 ,    1,   3389500,   6.67e-11 ,   0.170, 1, 0.170 , 210,  25.19 ,  1 ,  1   };	 
-		double a3[] = {1 , 1.81 ,      1,   6051800,   6.67e-11 ,   0.689, 1, 0.689 , 737,  177.36,  1,   1   };	 
-	       	for(int llll = 0; llll < 120020 ; llll++)
+		double a1[] = {1 ,  1 ,    1,   1 ,  1,   1, 1, 1,  1,  1,  1,   1   };
+		double a2[] = {1 , 1 ,    1,   1,  1 ,   1, 1, 1 , 1,  1 ,  1 ,  1   };	 
+		double a3[] = {1 , 1 ,      1,   1,  1,   1, 1, 1 , 1,  1,  1,   1   };	 
+	       	for(int llll = 0; llll < 100000000000  ; llll++)
 		{ 
 	 		for(int oooo = 0; oooo < 3; oooo++)
 			{ 				 
@@ -388,6 +389,8 @@ int main()
 								if(oooo == 2)	
 								{  	  
 									a3[kkk] += a;
+									
+										
 								}
 									 	 	 	
 					 		}
@@ -400,8 +403,85 @@ int main()
 
 							new_str3 = fill_equation(line_buf,a3,2,new_str3,strnew3);
 							result[2][kkk] = te_interp(new_str3, 0);
+							
+							// if((result[0][kkk] < solution[0]*1.02)  && ( result[0][kkk] > solution[0]*0.98))
+							// {
+								double diff = result[0][kkk]/result[2][kkk];
+										
+								if(diff > (9.8/8.89))	//result[2][kkk] är för liten
+								{
+									a3[kkk] += a;		
+								}
+								else
+								{
+									a3[kkk] -= a;
+								}
+								double diff2 = result[0][kkk]/result[1][kkk];
+								if(diff2 > (9.8/3.7))	//result[1][kkk] är för liten
+								{
+									a2[kkk] += a;		
+								}
+								else
+								{
+									a2[kkk] -= a;
+								}
+							
+
+								  diff = result[1][kkk]/result[2][kkk];
+										
+								if(diff > (3.7/8.89))	//result[2][kkk] är för liten
+								{
+									a3[kkk] += a;		
+								}
+								else
+								{
+									a3[kkk] -= a;
+								}
+								  diff2 = result[1][kkk] /result[0][kkk];
+								if(diff2 > ( 3.7/9.8))	//result[1][kkk] är för liten
+								{
+									a1[kkk] += a;		
+								}
+								else
+								{
+									a1[kkk] -= a;
+								}
+
+
+								 diff = result[2][kkk]/result[1][kkk];
+										
+								if(diff > (8.89/3.7))	//result[2][kkk] är för liten
+								{
+									a2[kkk] += a;		
+								}
+								else
+								{
+									a2[kkk] -= a;
+								}
+								  diff2 = result[2][kkk]/result[0][kkk];
+								if(diff2 > ( 8.89/9.8))	//result[1][kkk] är för liten
+								{
+									a1[kkk] += a;		
+								}
+								else
+								{
+									a1[kkk] -= a;
+								}
+
+							//}
+							a1[kkk] += a;
+							a2[kkk] += a;
+							a3[kkk] += a;
 
 							check_eq(oooo,kkk,new_str,new_str2,new_str3);
+							counter++;
+							if(counter % 1000  == 0)
+							{
+
+				printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",new_str, result[0][kkk],randme);
+				printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",new_str2, result[1][kkk],randme);
+				printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",new_str3, result[2][kkk],randme);
+							}
 							}
 						}
 			 		}
@@ -429,19 +509,20 @@ int main()
 void check_eq(int oooo,int kkk, char *resultstr,char *resultstr2,char *resultstr3)
 {
 	
-	double solution[] = {9.8,3.7,8.89};
+	
 	if((((( ( result[0][kkk]))) < 5.97237e24*1.03   && (( result[0][kkk])) > 5.97237e24*0.97)   || ((( result[0][kkk])) < solution[0]*1.02  && (( result[0][kkk])) > solution[0]*0.98)  || 				((( result[0][kkk])) <  5514*1.03    && (( result[0][kkk])) > 5514*0.97)  ) && isnan(( result[0][kkk])) == 0)
 	{		
  		
-		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr, result[0][kkk],randme);
-		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr2, result[1][kkk],randme);
-		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr3, result[2]	[kkk],randme);
-		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+		
 		if((((((result[1][11]))) < 6.4171e23*1.03   && ((result[1][11])) > 6.4171e23*0.97)   || (((result[1][11])) < solution[1]*1.02  && ((result[1][11])) > solution[1]*0.98)  || 			(((result[1][11])) <  3933.5*1.03    && ((result[1][11])) > 3933.5*0.97)  ) && isnan((result[1][11])) == 0)
 		{
 
-					
+			printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr, result[0][kkk],randme);
+		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr2, result[1][kkk],randme);
+		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr3, result[2][kkk],randme);
+		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");	
+for(;;);	
 						//	for(int ppp = 0; ppp < 12; ppp++)
 			 			//		printf("%f ",VARA1[0][ppp] );
 							printf("\n");
