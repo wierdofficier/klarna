@@ -7,7 +7,7 @@
 #include <pthread.h>
 #include <complex.h>
 #include <stdio.h>
-#define NUMEQ  6
+#define NUMEQ  20
 #define NUMVAR 12
 #define MAXBUFLEN 44*20000000
 #define NUM_THREADS 3
@@ -26,9 +26,9 @@ double solution2[] = {30.0,10.0,20.0,60.0,1.0,25.0};
 
 double solution3[] = {2, 1  ,  3,1.5,4.2,1.4 };
 
-double solution[] = {9.8,3.7,8.89,24.79,0.62,8.69};
+double solution99[] = {9.8,3.7,8.89,24.79,0.62,8.69};
 
-double solution77[] = {9.0,1.0,5.0,5.0,8.0,9.0,1.0,1.0,1.0,8.0,5.0,4.0,5.0,7.0,6.0,8.0,2.0,3.0,1.0,6.0 };
+double solution[] = {2.0,9.0,1.0,5.0,5.0,8.0,9.0,1.0,1.0,1.0,8.0,5.0,4.0,5.0,7.0,6.0,8.0,2.0,3.0,1.0,6.0,6.0,6.0 ,5.0,1.0,7.0 };
 double a[NUMEQ+1];
 #define AMP 10 
 int bufcnt = 0;
@@ -522,40 +522,35 @@ int main()
 }
 
 void check_eq(int oooo,int kkk, char **resultstr )
-{
-
-  	
-	if((result[0][kkk]) < solution[0]*1.05  && ((result[0][kkk])) > solution[0]*0.95)
-	{
-
-		if((result[1][kkk]) < solution[1]*1.05  && ((result[1][kkk])) > solution[1]*0.95)
-		{
-
-			if((result[2][kkk]) < solution[2]*1.05  && ((result[2][kkk])) > solution[2]*0.95)
-			{
-				if((result[3][kkk]) < solution[3]*1.05  && ((result[3][kkk])) > solution[3]*0.95)
-				{
-printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr[0], result[0][kkk],randme);
-		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr[1], result[1][kkk],randme);
-		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr[2], result[2][kkk],randme);
-		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr[3], result[3][kkk],randme);
-		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr[4], result[4][kkk],randme);
-		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr[5], result[5][kkk],randme);
-		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-	
- 
-					if((result[4][kkk]) < solution[4]*1.05  && ((result[4][kkk])) > solution[4]*0.95)
-				{
-					 
-				}		 
-	 
-					 	 
+{	
+	if((result[0][kkk]) < solution[0]*1.05 && ((result[0][kkk])) > solution[0]*0.95)
+	if((result[1][kkk]) < solution[1]*1.05 && ((result[1][kkk])) > solution[1]*0.95)
+	if((result[2][kkk]) < solution[2]*1.05 && ((result[2][kkk])) > solution[2]*0.95)
+	if((result[3][kkk]) < solution[3]*1.05 && ((result[3][kkk])) > solution[3]*0.95)
+	if((result[4][kkk]) < solution[4]*1.05 && ((result[4][kkk])) > solution[4]*0.95)
+	if((result[5][kkk]) < solution[5]*1.05 && ((result[5][kkk])) > solution[5]*0.95)
+	if((result[6][kkk]) < solution[6]*1.05 && ((result[6][kkk])) > solution[6]*0.95)
+	if((result[7][kkk]) < solution[7]*1.05 && ((result[7][kkk])) > solution[7]*0.95)
+	if((result[8][kkk]) < solution[8]*1.05 && ((result[8][kkk])) > solution[8]*0.95)
+	if((result[9][kkk]) < solution[9]*1.05 && ((result[9][kkk])) > solution[9]*0.95)
+	if((result[10][kkk]) < solution[10]*1.05 && ((result[10][kkk])) > solution[10]*0.95)
+	if((result[11][kkk]) < solution[11]*1.05 && ((result[11][kkk])) > solution[11]*0.95)
+	if((result[12][kkk]) < solution[12]*1.05 && ((result[12][kkk])) > solution[12]*0.95)
+	if((result[13][kkk]) < solution[13]*1.05 && ((result[13][kkk])) > solution[13]*0.95)
+	if((result[14][kkk]) < solution[14]*1.05 && ((result[14][kkk])) > solution[14]*0.95)
+	if((result[15][kkk]) < solution[15]*1.05 && ((result[15][kkk])) > solution[15]*0.95)
+	if((result[16][kkk]) < solution[16]*1.05 && ((result[16][kkk])) > solution[16]*0.95)
+	if((result[17][kkk]) < solution[17]*1.05 && ((result[17][kkk])) > solution[17]*0.95)
+	if((result[18][kkk]) < solution[18]*1.05 && ((result[18][kkk])) > solution[18]*0.95)
+	if((result[19][kkk]) < solution[19]*1.05 && ((result[19][kkk])) > solution[19]*0.95)
+	{	
+  		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+		for(int oooo = 0; oooo < NUMEQ; oooo++)
+		printf("eq: ="CYN" %s"RESET" "WHT" solution: "YEL" %f"RESET" "WHT" EQ linenr: "CYN" %d"RESET" "WHT" "RESET"\n",resultstr[oooo], result[oooo][kkk],randme);
+		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");			 
 	}
- 
-}
-}
-}
+
+			 
 }
  
  
