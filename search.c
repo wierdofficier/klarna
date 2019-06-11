@@ -27,8 +27,9 @@ double solution2[] = {30.0,10.0,20.0,60.0,1.0,25.0};
 double solution3[] = {2, 1  ,  3,1.5,4.2,1.4 };
 
 double solution99[] = {9.8,3.7,8.89,24.79,0.62,8.69};
-
+   
 double solution[] = {2.0,9.0,1.0,5.0,5.0,8.0,9.0,1.0,1.0,1.0,8.0,5.0,4.0,5.0,7.0,6.0,8.0,2.0,3.0,1.0,6.0,6.0,6.0 ,5.0,1.0,7.0 };
+
 double a[NUMEQ+1];
 #define AMP 10 
 int bufcnt = 0;
@@ -328,7 +329,7 @@ int main()
 
 	  //    for(;;);
 	FILE *fp5;	
-        char* filename = "data2.txt";
+        char* filename = "data4.txt";
         fp5 = fopen(filename, "r");
 	ind = 1;
         if (fp5 == NULL  ){
@@ -413,7 +414,8 @@ int main()
 						{
  							new_str[oooo] = fill_equation(line_buf,VARA1 ,oooo,new_str,strnew);
 							result[oooo][kkk] = te_interp(new_str[oooo], 0);
- 							 
+ 							check_eq(oooo,kkk,new_str);
+							
 							newloop++;
 						}
 					else
@@ -428,7 +430,7 @@ int main()
 				{ 
 					double ratio = result[oooo][kkk]/solution[oooo];
 			 
-					a[oooo] =  a[oooo] + 0.000005;		 
+					a[oooo] =  a[oooo] + 0.0000005;		 
 				}
 
 				for(int lll = 0; lll < NUMVAR; lll++)
@@ -481,7 +483,7 @@ int main()
 						for(int oooo = 0; oooo < NUMEQ; oooo++)
 						{
 							VARA1[oooo][kkk] += a[oooo];
-							check_eq(NULL,kkk,new_str);
+
 					 	}
 							counter++;
 							if(counter % 10000 == 0)
@@ -523,6 +525,7 @@ int main()
 
 void check_eq(int oooo,int kkk, char **resultstr )
 {	
+
 	if((result[0][kkk]) < solution[0]*1.05 && ((result[0][kkk])) > solution[0]*0.95)
 	if((result[1][kkk]) < solution[1]*1.05 && ((result[1][kkk])) > solution[1]*0.95)
 	if((result[2][kkk]) < solution[2]*1.05 && ((result[2][kkk])) > solution[2]*0.95)
@@ -543,14 +546,11 @@ void check_eq(int oooo,int kkk, char **resultstr )
 	if((result[17][kkk]) < solution[17]*1.05 && ((result[17][kkk])) > solution[17]*0.95)
 	if((result[18][kkk]) < solution[18]*1.05 && ((result[18][kkk])) > solution[18]*0.95)
 	if((result[19][kkk]) < solution[19]*1.05 && ((result[19][kkk])) > solution[19]*0.95)
-	{	
-  		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-		for(int oooo = 0; oooo < NUMEQ; oooo++)
-		printf("eq: ="CYN" %s"RESET" "WHT" solution: "YEL" %f"RESET" "WHT" EQ linenr: "CYN" %d"RESET" "WHT" "RESET"\n",resultstr[oooo], result[oooo][kkk],randme);
-		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");			 
+	{		
+			printf("eq: ="CYN" %s"RESET" "WHT" solution: "YEL" %f"RESET" "WHT" EQ linenr: "CYN" %d"RESET" "WHT" "RESET"\n",resultstr[oooo], result[oooo][kkk],randme);
+			if(oooo == 19) printf("\n");					 
 	}
 
-			 
 }
  
  
