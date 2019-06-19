@@ -29,7 +29,7 @@ double solution2[] = {30.0,10.0,20.0,60.0,1.0,25.0};
 double solution3[] = {2, 1  ,  3,1.5,4.2,1.4 };
 double solution[] = {9.8,3.7,8.89,24.79,0.62,8.69};
 double solutiona[] = {2.0,9.0,1.0,5.0,5.0,8.0,9.0,1.0,1.0,1.0,8.0,5.0,4.0,5.0,7.0,6.0,8.0,2.0,3.0,1.0,6.0,6.0,6.0 ,5.0,1.0,7.0 };
-double solutionj[] = {1,4,27};
+double solutionk[] = {1,4,27};
 double a[NUMEQ+1];
 #define AMP 10 
 int bufcnt = 0;
@@ -381,7 +381,7 @@ int main()
  
 	newloopnew = 0;
 	line_size[line_count] = getline(  &line_buf  , &line_buf_size, fp5);	
-if(line_count > 0)
+if(line_count > 5)
 {
 	for(int oooo = 0; oooo < NUMEQ; oooo++)
 	{
@@ -413,7 +413,13 @@ if(line_count > 0)
 		{
 		if(result[oooo][kkk] != INFINITY && result[oooo][kkk] > 0 && result[oooo][kkk])
 			{
-				check_eq(oooo,kkk,new_str,eqline);
+				if(result[oooo][kkk] < 100000.0)
+					check_eq(oooo,kkk,new_str,eqline);
+				else
+				{
+				newloopnew = 1;
+				break;
+				}
 				
 			}
 		else
