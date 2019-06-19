@@ -7,7 +7,10 @@
 #include <pthread.h>
 #include <complex.h>
 #include <stdio.h>
-#define NUMEQ  6
+#include "beamfreq.h"
+#define NUMEQ  1000  
+#define MAXALLOCSIZE 10000
+#define LINENUMBERSTOTAL 600000000
 #define NUMVAR 12
 #define MAXBUFLEN 44*20000000
 #define NUM_THREADS 3
@@ -21,26 +24,25 @@
 #define WHT   "\x1B[37m"
 #define RESET "\x1B[0m" 
 char search[1000][1000] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q"};
-double solution99[] ={160.72,79.99,110.35,337.10,13.21,0.44};
+double solution666[] ={160.72,79.99,110.35,337.10,13.21,0.44};
 double solution2[] = {30.0,10.0,20.0,60.0,1.0,25.0};
-
 double solution3[] = {2, 1  ,  3,1.5,4.2,1.4 };
+double solution99[] = {9.8,3.7,8.89,24.79,0.62,8.69};
+double solutionc[] = {2.0,9.0,1.0,5.0,5.0,8.0,9.0,1.0,1.0,1.0,8.0,5.0,4.0,5.0,7.0,6.0,8.0,2.0,3.0,1.0,6.0,6.0,6.0 ,5.0,1.0,7.0 };
 
-double solution[] = {9.8,3.7,8.89,24.79,0.62,8.69};
-double a[] =  {.0006,.0006,.0006,.0006,.0006,.0006};
+double a[NUMEQ+1];
 #define AMP 10 
 int bufcnt = 0;
 char BIGBUF[1000][1000][3];
 char BIGBUF2[1000][1000][3];
 char BIGBUF3[1000][1000][3];
 double _count = 0;
-int iterator = 0;
+int iterator =  0;
 int isbreaked = 0;
 void task1()
 {
 	char e[] = "abcdefghijkl"; 
         permute_number(e, 0, NUMVAR-1,NULL);
-
 }
 
 void task2()
@@ -66,9 +68,7 @@ void *thr_func(void *arg) {
   thread_data_t *data = (thread_data_t *)arg;
  
  if(data->tid == 0)
-	task1();
- 
-  	
+	task1();	
 }
 
 int multitasks( ) {
@@ -230,11 +230,9 @@ void permute_sign(char *a, int i, int n,char *var)
    int j;
    if (i == n) 
 	{
-  
  	  //printf("%c%c%c%c%c%c%c%c%c%c\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
  	  matching_parenthesis_pairs(0, 0,a,var);
 	}
-  
    else
    {
         for (j = i; j <= n; j++)
@@ -286,23 +284,12 @@ double f = 0;
 int c = 0;
 char   *new_str;
 char   *strnew;
-char   *strnew2;
-char   *strnew3;
-char   *strnew4;
-char   *strnew5;
-char   *strnew6;
-char * new_str2; 
-char * new_str3;
-char * new_str4;
-char * new_str5;
-char * new_str6;
 int newloop = 0;
-int newloopnow = 0;
+
 char * fill_equation(char * line_buf, double ** data , int lll,char * str,char *str2 )
 {
 	strcpy(str, line_buf);
 	char buf1[1000];
-
 
 	for(int ll = 0; ll < 12; ll++)
 	{			 			
@@ -310,18 +297,18 @@ char * fill_equation(char * line_buf, double ** data , int lll,char * str,char *
 		if (ptr != NULL) /* Substring found */
 		{
 			//printf("%s contains '%s'\n", new_str, search[ll]);												 
-			sprintf(buf1,"%f" ,data[lll][ll]  );
-							 
-			str2 = str_replace(str,search[ll],buf1);	 
+			sprintf(buf1,"%f" ,data[lll][ll]  );							 
+			str2= str_replace(str,search[ll],buf1);	 
 			strcpy(str,str2); 	
 			free(str2);		 
 		}
 	} 
-return str;
+return str ;
 }
+
 int randme;
-double   result[20][1000];
- 
+double   **result ;
+int newloopnew = 0;
 int main()
 {
         printf("Number of parenthesis pairs (max %d): ", MAX_PAIRS);
@@ -330,7 +317,7 @@ int main()
         srand(time(NULL));
 	//multitasks();
 
-	  //    for(;;);
+	//for(;;);
 	FILE *fp5;	
         char* filename = "data4.txt";
         fp5 = fopen(filename, "r");
@@ -339,24 +326,10 @@ int main()
         	printf("Could not open file %s",filename);
         	return 1;
         }
-  
-	strnew  = malloc(1000);
- 	new_str  = malloc(1000);
 
- 	strnew2  = malloc(1000);
- 	new_str2  = malloc(1000);
+	strnew = malloc(20000);
+	new_str = malloc(20000);
 
-	strnew3  = malloc(1000);
- 	new_str3  = malloc(1000);
-
-	strnew4  = malloc(1000);
- 	new_str4  = malloc(1000);
-
-	strnew5  = malloc(1000);
- 	new_str5  = malloc(1000);
-
-	strnew6  = malloc(1000);
- 	new_str6  = malloc(1000);
  	char * line_buf = NULL;
  	size_t line_buf_size = 0;
 	int line_count = 0;
@@ -366,166 +339,151 @@ int main()
 	iterator = 0;
    
  	double **VARA1;
-	VARA1 = malloc( 100*32);
+	VARA1 = malloc( MAXALLOCSIZE);
 	 
-  		for(int iiiii=0; iiiii<200*1; iiiii++)
-			VARA1[iiiii] =  malloc(1233);
+	for(int iiiii=0; iiiii<2000*1; iiiii++)
+		VARA1[iiiii] =  malloc(MAXALLOCSIZE);
+
+ 	double  **earth_i ;
+	earth_i = malloc( MAXALLOCSIZE);
+	 
+	for(int iiiii=0; iiiii<2000*1; iiiii++)
+		earth_i[iiiii] =  malloc(MAXALLOCSIZE);
+
+	result = malloc( MAXALLOCSIZE);
+	 
+	for(int iiiii=0; iiiii<MAXALLOCSIZE*1; iiiii++)
+		result[iiiii] =  malloc(MAXALLOCSIZE);
+
+	for(int aa = 0; aa <= NUMEQ; aa++)
+	{
+	for(int bb = 0; bb <= NUMEQ; bb++)
+	{
+	 	if(bb != aa)
+			earth_i[aa][bb] = BEAMFREQ[aa]/BEAMFREQ[bb];	
+	} 
+	}
+ 
+  	printf("done\n");
 	double inc  = 0;
 	int counter = 0;
-	while(line_size >= 0 && line_count < 600000000)
+	while(line_size >= 0 && line_count < LINENUMBERSTOTAL)
 	{
- 	int oooo = 0;
- double a1[]  =   {25 ,   pow(6371000.0,1.0/(2+1)) ,      a[oooo]/6371000.0,   1.0 ,   a[oooo]/6371000.0 ,  pow(6371000.0,1.0/(3+1)) ,       a[oooo] ,   6.67e-11 ,       a[oooo],  6371000.0,     a[oooo]/6371000.0 ,   a[oooo]/6371000.0  };
-oooo++;
-				  double a2[] =    {25 ,   pow(3389500.0,1.0/(2+1)) ,      a[oooo]/3389500.0,   1.0,    a[oooo]/3389500.0 ,  pow(3389500.0,1.0/(3+1))  ,     a[oooo] ,   6.67e-11 ,       a[oooo],    3389500.0,    a[oooo]/3389500.0,   a[oooo]/ 3389500.0   };	
-oooo++; 
-				  double a3[]  =   {25 ,   pow(6051800.0,1.0/(2+1)),       a[oooo]/6051800.0,   1.0,    a[oooo]/6051800.0 ,  pow(6051800.0,1.0/(3+1)) ,        a[oooo] ,   6.67e-11,        a[oooo] ,  6051800.0,     a[oooo]/6051800.0 ,  a[oooo]/ 6051800.0   };
-oooo++;
-				  double a4[] =   {25 ,   pow(2439700.0,1.0/(2+1)),      a[oooo]/2439700.0,    1.0,    a[oooo]/2439700.0 ,  pow(2439700.0,1.0/(3+1)) ,        a[oooo] ,   6.67e-11,        a[oooo],   2439700.0,     a[oooo]/2439700.0,  a[oooo]/  2439700.0   };
-oooo++;	 
-				  double a5[]  =   {25 ,   pow(69911000.0,1.0/(2+1)),       a[oooo]/69911000.0,   1.0 ,  a[oooo]/69911000.0   ,pow(69911000.0,1.0/(3+1))  ,    a[oooo] ,   6.67e-11  ,      a[oooo],   69911000.0 ,    a[oooo]/69911000.0 ,  a[oooo]/69911000.0 } ;
-oooo++;
-				  double a6[] =   { 25 ,   pow(1188300.0,1.0/(2+1)),       a[oooo]/1188300.0,   1.0,    a[oooo]/1188300.0 ,  pow(1188300.0,1.0/(3+1)),       a[oooo] ,   6.67e-11,        a[oooo],   1188300.0,    a[oooo]/1188300.0,   a[oooo]/ 1188300.0  };
-
-			/*double a1[] = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-			double a2[]= {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-			double a3[]= {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-			double a4[]= {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-			double a5[]= {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-			double a6[]= {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};*/
+ 	
+/*	double a1[]  =  {6371000.0 ,  1.0 ,      6.67e-11,   6371000.0 ,     1,   1.0,     6371000.0 ,  6371000.0,  1.0   };
+	double a2[] =   {3389500.0 ,  1.0 ,     6.67e-11,   3389500.0,       1,    1,   3389500.0,   3389500.0 ,  1.0  };	 
+	double a3[]  =  {6051800.0 ,  1.0 ,     6.67e-11,   6051800.0,       1 ,   1.0,     6051800.0 ,  6051800.0, 1.0    };
+	double a4[] =   {2439700.0 ,  1.0 ,     6.67e-11,   2439700.0,       1.0,   1.0,     2439700.0,   2439700.0 , 1.0  };	 
+	double a5[]  =  {25362000.0 , 1.0 ,    6.67e-11,   25362000.0 ,     1.0,    1.0 ,    25362000.0 ,  25362000.0,   1.0   };
+	double a6[] =  {1188300.0 ,   1.0 ,     6.67e-11,   1188300.0,       1.0,   1.0,     1188300.0,   1188300.0 ,  1.0  };	*/
  
- 
-		line_size[line_count] = getline(  &line_buf  , &line_buf_size, fp5);	
+	newloopnew = 0;
+	line_size[line_count] = getline(  &line_buf  , &line_buf_size, fp5);	
 
+	for(int oooo = 0; oooo < NUMEQ; oooo++)
+	{
+		a[oooo] = 0.001;
+		for(int kkk = 0; kkk < NUMVAR; kkk++)
+		{ 
+		 //srand(time(NULL));
+		 //int slump1 =  rand() % 12;
+		 VARA1[oooo][kkk] = 4.0002;
+		}
+	} 	 
+	
+       	for(int llll = 0; llll < 1000   ; llll++)
+	{ 
+ 		// for(int oooo = 0; oooo < NUMEQ; oooo++)
+		// { 	
+		if(newloopnew == 1)
+		break;			 
+		for(int kkk = 0; kkk < NUMVAR; kkk++)
+		{ 
+		for(int oooo = 0; oooo < NUMEQ; oooo++)
+		{
+				 
+		new_str  = fill_equation(line_buf,VARA1 ,oooo,new_str,strnew);
+		result[oooo][kkk] = te_interp(new_str , 0);
+		if(newloop == 0  || isnan(result[oooo][kkk]) == 0  &&  (result[oooo][kkk] < 100000.0) && result[oooo][kkk] > 0.0 && result[oooo][kkk] != INFINITY && result[oooo][kkk] != NAN && result[oooo][kkk] != -NAN)
+		{
+		if(isnan(result[oooo][kkk]) == 0) 
+		{
+		if(result[oooo][kkk] > 0.0)
+			check_eq(oooo,kkk,new_str);
+		}
+		else
+		{
+		newloopnew = 1;
+		break;
+		}
+		}
+		else
+		{
+		newloopnew = 1;
+		break;
+		}
+		}
+		if(newloopnew == 1)
+				break;	
 		for(int oooo = 0; oooo < NUMEQ; oooo++)
 		{ 
-			for(int kkk = 0; kkk < NUMVAR; kkk++)
-			{ 
-				  VARA1[0][kkk] = a1[kkk];
-				  VARA1[1][kkk] = a2[kkk];
-				  VARA1[2][kkk] = a3[kkk];
-				  VARA1[3][kkk] = a4[kkk];
-				  VARA1[4][kkk] = a5[kkk];
-				  VARA1[5][kkk] = a6[kkk];
-			}
- 		a[oooo] = 0;
-		}	 	 
-		newloop = 0;
-	       	for(int llll = 0; llll < 100  ; llll++)
-		{ 
-	 		// for(int oooo = 0; oooo < NUMEQ; oooo++)
-			// { 				 
-				for(int kkk = 0; kkk < NUMVAR; kkk++)
-				{ 
-
- 							new_str = fill_equation(line_buf,VARA1 ,0,new_str,strnew);
-							result[0][kkk] = te_interp(new_str, 0);
- 
-							new_str2 = fill_equation(line_buf,VARA1 ,1,new_str2,strnew2);
-							result[1][kkk] = te_interp(new_str2, 0);
-
-							new_str3 = fill_equation(line_buf,VARA1 ,2,new_str3,strnew3);
-							result[2][kkk] = te_interp(new_str3, 0);
-							
-							new_str4 = fill_equation(line_buf,VARA1 ,3,new_str4,strnew4);
-							result[3][kkk] = te_interp(new_str4, 0);
-
-							new_str5 = fill_equation(line_buf,VARA1 ,4,new_str5,strnew5);
-							result[4][kkk] = te_interp(new_str5, 0);
-
-							new_str6 = fill_equation(line_buf,VARA1 ,5,new_str6,strnew6);
-							result[5][kkk] = te_interp(new_str6, 0);
-				
-				for(int oooo = 0; oooo < NUMEQ; oooo++)
-				{ 
-					double ratio = result[oooo][kkk]/solution[oooo];
-			 
-					a[oooo] =  a[oooo] + 0.000005;		 
-				}
-
-				for(int lll = 0; lll < NUMVAR; lll++)
-				{ 
-						 if(kkk != lll)
-						 {				
-						
- 		 
-				double earth_i[100][100];
-				int look[100][100];
-				for(int aa = 0; aa <= NUMEQ; aa++)
-				{
-				for(int bb = 0; bb < NUMEQ; bb++)
-				{
-				 	if(bb != aa)
-					{
-						earth_i[aa][bb] = solution[aa]/solution[bb];	
-						look[aa][bb] =bb; 
-					}
-				} 
-				}
-
-							int cc = 0;
-							int xxxc = 0;	
- 
-							cc = 0;
- 
-		 					for(int xxxx = 0; xxxx <  NUMEQ; xxxx++)
-							{ 
-
-								for(int llllll = 0; llllll <  NUMEQ; llllll++)
-								{ 
-								 
-									double diff = result[xxxx][kkk]/result[look[xxxx][llllll]][kkk];
-										 
-									double ratio = earth_i[xxxx][cc];
-									if(llllll != xxxx)
-								{	 
-									if(diff > (ratio))	
-									{
-										VARA1[look[xxxx][llllll]][kkk]  += a[xxxx];	
-											
-									}
-									else
-									{
-										VARA1[look[xxxx][llllll]][kkk]  -= a[xxxx];
-										 									
-									}
-								 }
-										cc++;
-								}				 
-								 cc = 0;
-							} 
- 				
-						for(int oooo = 0; oooo < NUMEQ; oooo++)
-						{
-							VARA1[oooo][kkk] += a[oooo];
-
-						}
-							counter++;
-
-					check_eq(NULL,kkk,new_str,new_str2,new_str3,new_str4,new_str5,new_str6);
-							}
-							if(newloop == 1)
-								break;
-						 }						
-			 		 }
-				if(newloopnow == 1  )
-				{
-					newloopnow = 0;
-					break;
-				}
-				}
-			
-	 		// }
-
-		line_count++;	 
-		iterator++;
-		isbreaked = 0;	
-		randme = iterator;
-
-	if(bufcnt > 25)
-		break;											
+			a[oooo] =  a[oooo] + 0.00000005;		 
 		}
-	 for(int i = 0; i < 25; i++)
+
+		for(int lll = 0; lll < NUMVAR; lll++)
+		{ 
+		if(kkk != lll)
+		{							
+		int cc = 0;
+		int xxxc = 0;	
+
+		cc = 0;
+
+		for(int xxxx = 0; xxxx <  NUMEQ; xxxx++)
+		{ 
+
+			for(int llllll = 0; llllll <  NUMEQ; llllll++)
+			{ 
+			if(llllll != xxxx)
+			{
+				double diff = result[xxxx][kkk]/result[llllll][kkk];
+					 
+				double ratio = earth_i[xxxx][cc];
+					 
+				if(diff > (ratio))	
+				{
+					VARA1[llllll][kkk]  += a[xxxx];	
+						
+				}
+				else
+				{
+					VARA1[llllll][kkk]  -= a[xxxx];
+					 									
+				}
+			}
+					cc++;
+			}				 
+			 cc = 0;
+		} 			
+	for(int oooo = 0; oooo < NUMEQ; oooo++)
+	{
+	//VARA1[oooo][kkk] += a[oooo];
+ 	}
+	}			 
+}	 
+}
+ if(newloopnew == 1)
+		break;	
+
+}
+ 
+line_count++;	 
+iterator++;
+isbreaked = 0;	
+randme = iterator;
+								
+}
+	for(int i = 0; i < 25; i++)
 	{
 		printf("eq[%d] %s = %f\n",i,BIGBUF[i][0],te_interp(BIGBUF[i][0], 0));
 		//printf("%s\n", BIGBUF2[i][1]);
@@ -536,59 +494,14 @@ oooo++;
     return 0;
 }
 
-void check_eq(int oooo,int kkk, char *resultstr,char *resultstr2,char *resultstr3,char *resultstr4,char *resultstr5,char *resultstr6)
-{
-	
-  
-	if((result[0][kkk]) < solution[0]*1.05  && ((result[0][kkk])) > solution[0]*0.95)
-	{
-	
-		if((result[1][kkk]) < solution[1]*1.05  && ((result[1][kkk])) > solution[1]*0.95)
-		{
-			if((result[2][kkk]) < solution[2]*1.05  && ((result[2][kkk])) > solution[2]*0.95)
-			{
-
-		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-		printf("eq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n",resultstr, result[0][kkk],randme);
-		printf("eq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n",resultstr2, result[1][kkk],randme);
-		printf("eq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n",resultstr3, result[2][kkk],randme);
-		printf("eq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n",resultstr4, result[3][kkk],randme);
-		printf("eq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n",resultstr5, result[4][kkk],randme);
-		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n",resultstr6, result[5][kkk],randme);
-		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-				if((result[3][kkk]) < solution[3]*1.05  && ((result[3][kkk])) > solution[3]*0.95)
-				{
-
-
- 
-					if((result[4][kkk]) < solution[4]*1.05  && ((result[4][kkk])) > solution[4]*0.95)
-				{
-		 bufcnt++;
-			sprintf(BIGBUF[bufcnt][0],"%s",resultstr);
-			sprintf(BIGBUF2[bufcnt][1],"%s",resultstr2);
-			sprintf(BIGBUF3[bufcnt][2],"%s",resultstr3);
-			printf("%s\n", BIGBUF[bufcnt][0]);
-			printf("%s\n", BIGBUF2[bufcnt][1]);
-			printf("%s\n", BIGBUF3[bufcnt][2]);
- 		newloop = 1;	
-						//	for(int ppp = 0; ppp < 12; ppp++)
-			 			//		printf("%f ",a1[0][ppp] );
-							printf("\n");
-							for(int i = 0; i < 12; i++)
-							{
-				 			 //	a1[0][i] = a1[i]; 
-							 //	a1[1][i] = a2[i]; 
-							//	a1[2][i] = a3[i]; 
-							}
-							isbreaked = 1;
-							//break;	
-	 
-					 	 
+void check_eq(int oooo,int kkk, char *resultstr )
+{	
+        if((result[0][kkk]) < BEAMFREQ[0]*1.04 && ((result[0][kkk])) > BEAMFREQ[0]*0.96)
+	{		
+		printf("eq: ="CYN" %s"RESET" "WHT" solution: "YEL" %f"RESET" "WHT" EQ linenr: "CYN" %d"RESET" "WHT" "RESET"\n",resultstr , result[oooo][kkk],randme);
+		if(oooo == (NUMEQ-1)) printf("\n");					 
 	}
-} 
-}
-}
-}
+
 }
  
  
