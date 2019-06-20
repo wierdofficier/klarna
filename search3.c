@@ -8,7 +8,7 @@
 #include <complex.h>
 #include <stdio.h>
 #include "beamfreq.h"
-#define NUMEQ  500 
+#define NUMEQ  6  
 #define MAXALLOCSIZE 10000
 #define LINENUMBERSTOTAL 600000000
 #define NUMVAR 16
@@ -24,10 +24,10 @@
 #define WHT   "\x1B[37m"
 #define RESET "\x1B[0m" 
 char search[1000][1000] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q"};
-double solution[] ={160.72,79.99,110.35,337.10,13.21,0.44};
+double solutionkk[] ={160.72,79.99,110.35,337.10,13.21,0.44};
 double solution2[] = {30.0,10.0,20.0,60.0,1.0,25.0};
 double solution3[] = {2, 1  ,  3,1.5,4.2,1.4 };
-double solutiona[] = {9.8,3.7,8.89,24.79,0.62,8.69};
+double solution[] = {9.8,3.7,8.89,24.79,0.62,8.69};
 double solution66[] = {2.0,9.0,1.0,5.0,5.0,8.0,9.0,1.0,1.0,1.0,8.0,5.0,4.0,5.0,7.0,6.0,8.0,2.0,3.0,1.0,6.0,6.0,6.0 ,5.0,1.0,7.0 };
 double solutionk[] = {1,4,27};
 double a[NUMEQ+1];
@@ -356,12 +356,12 @@ int main()
 	for(int iiiii=0; iiiii<MAXALLOCSIZE*10; iiiii++)
 		result[iiiii] =  malloc(MAXALLOCSIZE*100);
 	printf("done\n");
-	for(int aa = 0; aa <= NUMEQ; aa++)
+	for(int aa = 0; aa < NUMEQ; aa++)
 	{
-	for(int bb = 0; bb <= NUMEQ; bb++)
+	for(int bb = 0; bb < NUMEQ; bb++)
 	{
 	 	if(bb != aa)
-			earth_i[aa][bb] = BEAMFREQ[aa]/BEAMFREQ[bb];
+			earth_i[aa][bb] = solution[aa]/solution[bb];
 	//printf("aa =%d \n", aa);	
 	} 
 	}
@@ -381,7 +381,7 @@ int main()
  
 	newloopnew = 0;
 	line_size[line_count] = getline(  &line_buf  , &line_buf_size, fp5);	
-if(line_count > 100)
+if(line_count > 0)
 {
 	for(int oooo = 0; oooo < NUMEQ; oooo++)
 	{
@@ -390,11 +390,12 @@ if(line_count > 100)
 		{ 
 		 //srand(time(NULL));
 		 //int slump1 =  rand() % 12;
-		 VARA1[oooo][kkk] = 4;
+		 VARA1[oooo][kkk] = 1;
 		}
 	} 	 
 	eqline = 0;
-       	for(int llll = 0; llll < 1000     ; llll++)
+	int xxxc = -1;
+       	for(int llll = 0; llll < 100      ; llll++)
 	{ 	
 		if(newloopnew == 1)
 		break;			 
@@ -402,8 +403,8 @@ if(line_count > 100)
 		{ 
 		for(int oooo = 0; oooo < NUMEQ; oooo++)
 		{
-		a[oooo] =  a[oooo] + 0.000001;		
-		 VARA1[oooo][kkk] += a[oooo]; 
+		a[oooo] =  a[oooo] + 0.0001;		
+		VARA1[oooo][kkk] += a[oooo]; 
 		new_str  = fill_equation(line_buf,VARA1 ,oooo,new_str,strnew);
 		result[oooo][kkk] = te_interp(new_str , 0);
 		if(newloop == 0  || isnan(result[oooo][kkk]) == 0  &&  (result[oooo][kkk] < 100000.0) && result[oooo][kkk] > 0.0 && result[oooo][kkk] != INFINITY && result[oooo][kkk] != NAN && result[oooo][kkk] != -NAN)
@@ -440,22 +441,20 @@ if(line_count > 100)
 		
 		if(newloopnew == 1)
 				break;	
+		xxxc++;
 
-		if(kkk != llll)
+		if(kkk != xxxc)
 		{							
 		int cc = 0;
-		int xxxc = 0;	
-
-		cc = 0;
  
-			for(int llllll = 0; llllll <  NUMEQ; llllll++)
+			for(int llllll = 0; llllll < NUMEQ; llllll++)
 			{ 
 			if(llllll != oooo)
 			{
-				double diff = result[oooo][kkk]/result[llllll][kkk];
+				double diff = result[oooo][kkk]/result[llllll][kkk-1];
 					 
 				double ratio = earth_i[oooo][cc];
-					 
+				//printf("ratio = %f diff = %f \n", ratio,diff);		 		
 				if(diff > (ratio))	
 				{
 					VARA1[llllll][kkk]  += a[oooo];	
@@ -465,12 +464,14 @@ if(line_count > 100)
 				{
 					VARA1[llllll][kkk]  -= a[oooo];
 					 									
-				}
+				}					
 			}
-					cc++;
+			cc++;		
 			}				 
 			 cc = 0;
-		} 			
+		}
+	if(xxxc >NUMVAR)
+		xxxc = -1;		
 	 } 
 }
  if(newloopnew == 1)
@@ -497,8 +498,8 @@ randme = iterator;
 
 void check_eq(int oooo,int kkk, char *resultstr,int eqline_)
 {	
- 	 if((result[0][kkk]) < BEAMFREQ[0]*1.02 && ((result[0][kkk])) > BEAMFREQ[0]*0.98)
-    // if((result[4][kkk]) < BEAMFREQ[4]*1.02 && ((result[4][kkk])) > BEAMFREQ[4]*0.98)
+ 	  if((result[0][kkk]) < solution[0]*1.02 && ((result[0][kkk])) > solution[0]*0.98)
+   if((result[4][kkk]) < solution[4]*1.02 && ((result[4][kkk])) > solution[4]*0.98)
 	{
 eqline++;
  	if(oooo == 0)
