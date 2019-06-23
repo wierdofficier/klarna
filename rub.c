@@ -50,16 +50,13 @@ int iterator =  0;
 int isbreaked = 0;
 void task1()
 {
-	char e[] = "21202121212"; 
-        permute_number(e, 0, NUMVAR-1,NULL);
+ 
 }
 
 void task2()
 {
-	char e[] = "+-*/^+-*/^+"; 
-        permute_sign(e, 0, 10,NULL);
+	 
 }
-
 
 void task3()
 {
@@ -122,15 +119,14 @@ char eq_[1000];
 	   fp = fopen ("data8ny.txt","w");
 	   onceopen =0;
 	}
- 	int i; 
-	int x[N];	
-	char array[] =  { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' }; 
+ 	 int i; 
+	 int x[N];	
+	 char array[] =  { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' }; 
 	 for (i = 0; i < N; i++) x[i] = array[i];
  
-	/* three different methods */
-	//perm1(x, N, show);
-	perm1(x, N, show,NULL);
-       
+	 /* three different methods */
+	 //perm1(x, N, show);
+	 perm1(x, N, show,NULL);    
 }
 
  
@@ -175,87 +171,15 @@ void swap_sign (char *x, char *y)
     *y = temp;
 }
 int counter_num = 0;
-void permute_number(char *a, int i, int n,char *var)
-{
-   int j;
-   if (i == n) 
-	{
- 	  printf("%c%c%c%c%c%c%c%c%c%c%c :: %d\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9], a[10] ,counter_num );
-	// char e[] = "+-*/^+"; 
-	// permute_sign(e, 0, NUMVAR-1,a);
- 	  counter_num++;
-	}
-  
-   else
-   {
-        for (j = i; j <= n; j++)
-       {
-          swap_num((a+i), (a+j));
-          permute_number(a, i+1, n,var);
-          swap_num((a+i), (a+j)); 
-       }
-   }
-}
+ 
  int  bufff1[1000];
  int  bufff2[1000];
  int  bufff3[1000];
  int  bufff4[1000];
  int  bufff5[1000];
  int  bufff6[1000];
-char * permute_number_rubics(char *a, int i, int n,char *var, int what)
-{
-   int j;
-   if (i == n) 
-	{
- 	 // printf("%s\n",a );
-	 //char *buf = malloc(100);
-	if(what == 0)
-	 memcpy(bufff1,a,strlen(a));
-	if(what == 1)
-	memcpy(bufff2,a,strlen(a));	
-	if(what == 2)
-	memcpy(bufff3,a,strlen(a));
-	if(what == 3)
-	memcpy(bufff4,a,strlen(a));
-	if(what == 4)
-	memcpy(bufff5,a,strlen(a));
-	if(what == 5)
-	memcpy(bufff6,a,strlen(a));
-	return;
-	// return bufff;
  
-	}
-  
-   else
-   {
-        for (j = i; j <= n; j++)
-       {
-          swap_num((a+i), (a+j));
-          permute_number_rubics(a, i+1, n,var,what);
-          swap_num((a+i), (a+j)); 
-       }
-   }
-}
-
-
-void permute_sign(char *a, int i, int n,char *var)
-{
-   int j;
-   if (i == n) 
-	{
- 	  //printf("%c%c%c%c%c%c%c%c%c%c\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]);
- 	  matching_parenthesis_pairs(0, 0,a,var);
-	}
-   else
-   {
-        for (j = i; j <= n; j++)
-       {
-          swap_sign((a+i), (a+j));
-          permute_sign(a, i+1, n,var);
-          swap_sign((a+i), (a+j));  
-       }
-   }
-}
+ 
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -426,11 +350,8 @@ int showrubics(int *a, int len,int *e, int what)
 int perm1_rubics(int *x, int n, int callback(int *, int, int *,int),int *e, int what )
 {
 	  next_lex_perm(x, n) ;
-		if (callback) callback(x, n,e,what);
-	
+		if (callback) callback(x, n,e,what);	
 }
-
-
 
 int test()
 {
@@ -578,12 +499,11 @@ void draw_func(void)
 	{
 	for(int bb = 0; bb < NUMEQ; bb++)
 	{
-	 	if(bb != aa)
-			earth_i[aa][bb] = solution[aa]/solution[bb];
+ 	if(bb != aa)
+		earth_i[aa][bb] = solution[aa]/solution[bb];
 	//printf("aa =%d \n", aa);	
 	} 
 	}
-
 /*
 	char a1[] =    "11122222"; 
 	char a2[] =    "11222222";  
@@ -633,7 +553,7 @@ if(line_count > 0)
 	int xxxc = -1;
        	for(int llll = 0; llll < 1000           ; llll++)
 	{ 
-		//char * BUFF;
+ 
 if(once_perm == 0)
 {
 		 	int i; 
@@ -677,40 +597,28 @@ else
 			perm1_rubics(x, N, showrubics,NULL,5); 
 
 }		 
-  double slump1  = 0.00001 ;	
+ 		 double slump1  = 0.00001 ;	
 		//a[0] = 0.000001;
 		for(int kkk = 0; kkk < NUMVAR; kkk++)
 		{ 
-		   
-		// int x = -1; if (isdigit(bufff1[kkk])) { x = bufff1[kkk] - 48; }
-
-		
 		  VARA1[0][kkk] =(double)bufff1[kkk] ;
-		 // a1[kkk] = fabs(48 - VARA1[0][kkk] - '\0');
-		 VARA1[0][kkk] = VARA1[0][kkk] + slump1;	
-		  
-	 		
+		  VARA1[0][kkk] = VARA1[0][kkk] + slump1;	
+		  	 		
 		  VARA1[1][kkk] = bufff2[kkk]  ;
-		 // a2[kkk] = fabs(48 - VARA1[1][kkk] - '\0');
 		  VARA1[1][kkk] = VARA1[1][kkk] + slump1;	
 		  
-
 		  VARA1[2][kkk] = bufff3[kkk]  ;
-		//  a3[kkk] = fabs(48 - VARA1[2][kkk] - '\0');
 		  VARA1[2][kkk] = VARA1[2][kkk] + slump1;
 
 		  VARA1[3][kkk] = bufff4[kkk]  ;
-		 //  a4[kkk] = fabs(48 - VARA1[3][kkk] - '\0');
-		 VARA1[3][kkk] = VARA1[3][kkk] + slump1;
+		  VARA1[3][kkk] = VARA1[3][kkk] + slump1;
 
 		  VARA1[4][kkk] = bufff5[kkk] ;
-		 // a5[kkk] = fabs(48 - VARA1[4][kkk] - '\0');
-		 VARA1[4][kkk] = VARA1[4][kkk] + slump1;
+		  VARA1[4][kkk] = VARA1[4][kkk] + slump1;
 
-		  VARA1[5][kkk] = bufff6[kkk]  ;
-		  //a6[kkk] = fabs(48 - VARA1[5][kkk] - '\0');
-		 VARA1[5][kkk] = VARA1[5][kkk] + slump1;	
-		 slump1 = slump1 - 0.00001;
+		  VARA1[5][kkk] = bufff6[kkk];
+		  VARA1[5][kkk] = VARA1[5][kkk] + slump1;	
+		  slump1 = slump1 - 0.00001;
 		// printf("%d", bufff1[kkk]);
 		/* VARA1[7][kkk] =a7[slump1];
 		 VARA1[8][kkk] =a8[slump1];
@@ -719,11 +627,11 @@ else
  		 VARA1[11][kkk] =a11[slump1];
 		 VARA1[12][kkk] =a12[slump1]; */
 		}
-//printf("\n");
-	 //	printf("\n");
+ 
+	 	//printf("\n");
 		if(newloopnew == 1)
 		break;			 
-	 //	for(int kkk = 0; kkk < 1; kkk++)
+	 	//for(int kkk = 0; kkk < 1; kkk++)
 		// { 
 		for(int oooo = 0; oooo < NUMEQ; oooo++)
 		{
@@ -810,14 +718,7 @@ for(int oooo = 0; oooo < NUMEQ; oooo++)
 		break;	
 
 }
- }	
-
-}
-
-int mainold(int argc, char **argv)
-{
-main_cube(argc,argv);
-							
+}	
 }
 	for(int i = 0; i < 25; i++)
 	{
@@ -825,13 +726,13 @@ main_cube(argc,argv);
 		//printf("%s\n", BIGBUF2[i][1]);
 		//printf("%s\n", BIGBUF3[i][2]);
 	}
-  //fclose(fp5);
+   //fclose(fp5);
 
     return 0;
 }
 
 void check_eq(int oooo,int kkk, char **resultstr,int eqline_)
-{	
+{
 	 //for(int oooo = 0; oooo < NUMEQ; oooo++)
 	 //printf("\neqline: %d eq: ="CYN" %s"RESET" "WHT" solution: "YEL" %f"RESET" "WHT" EQ linenr: "CYN" %d"RESET" "WHT" "RESET"",eqline,resultstr[oooo] , result[oooo][kkk],randme); 	
  	   if((result[0][kkk]) < solution[0]*1.02&& ((result[0][kkk])) > solution[0]*0.98)  
@@ -845,13 +746,10 @@ eqline++;
    int x = -cube_size, y = -cube_size, z = -cube_size;
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   // reset transformations
   glLoadIdentity();
-
   // set camera position
   set_camera();
-
   // apply visualization transformations
   glRotatef(rot_x, 1.0, 0.0, 0.0); // rotate in y axis
   glRotatef(rot_y, 0.0, 1.0, 0.0); // rotate in x axis
@@ -864,7 +762,6 @@ eqline++;
 	draw_cube(i, j, k);
 
       }
-
   // flush opengl commands
   glutSwapBuffers();	
 	printf("\n\n");
