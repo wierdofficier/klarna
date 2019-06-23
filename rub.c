@@ -18,7 +18,7 @@ int show(int *x, int len);
 #define N 8
 #define MAXALLOCSIZE 10000
 #define LINENUMBERSTOTAL 600000000
-#define NUMVAR 8
+#define NUMVAR 16
 #define MAXBUFLEN 44*20000000
 #define NUM_THREADS 3
 #define MAX_PAIRS   16
@@ -34,11 +34,11 @@ char search[1000][1000] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","
 double solutionkk[] ={160.72,79.99,110.35,337.10,13.21,0.44};
 double solution2[] = {30.0,10.0,20.0,60.0,1.0,25.0};
 double solution3[] = {2, 1  ,  3,1.5,4.2,1.4 };
-double solutiong[] = {9.8,3.7,8.89,24.79,0.62,8.69};
+double solution[] = {9.8,3.7,8.89,24.79,0.62,3.7};
 double solution66[] = {2.0,9.0,1.0,5.0,5.0,8.0,9.0,1.0,1.0,1.0,8.0,5.0,4.0,5.0,7.0,6.0,8.0,2.0,3.0,1.0,6.0,6.0,6.0 ,5.0,1.0,7.0 };
 double solutionk[] = {1,4,27};
 double solutionm[] = {9,9,6,6,8,6,9,5};
-double solution[] = {1,1 ,1,1,1 ,1};
+double solutiont[] = {1,1 ,1,1,1 ,1};
 double a[NUMEQ+1];
 #define AMP 10 
 int bufcnt = 0;
@@ -116,12 +116,12 @@ char eq_[1000];
 {
 	if(onceopen == 1)
 	{	     
-	   fp = fopen ("data8ny.txt","w");
+	   fp = fopen ("data16ny.txt","w");
 	   onceopen =0;
 	}
  	 int i; 
 	 int x[N];	
-	 char array[] =  { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' }; 
+	 char array[] =  { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h','i', 'j', 'k', 'l', 'm', 'n', 'o', 'p' }; 
 	 for (i = 0; i < N; i++) x[i] = array[i];
  
 	 /* three different methods */
@@ -241,7 +241,7 @@ int show(int *x, int len)
 	//	printf("%d%c", x[i], i == len - 1 ? '\n' : ' ');
 
 	int e[N];	
-	char array[] =  { '+', '-', '*', '/', '^', '+', '-', '*' }; 
+	char array[] =  { '+', '-', '*', '/', '^', '+', '-', '*', '/', '^', '+', '-', '*' , '/', '^','+' }; 
 	for (i = 0; i < N; i++) e[i] = array[i];
   
 	perm1(e, N, show2,x);
@@ -439,18 +439,19 @@ int newloopnew = 0;
 int eqline;
 extern GLfloat angle, fAspect, cube_size;
 extern  GLint rot_x, rot_y, crement, x_0, x_k, y_0, y_k, z_0, z_k, gap, gap_crement;
-
+int countperm = 0;
  int once_perm = 0;
 // draw function
+
 void draw_func(void)
 {
         printf("Number of parenthesis pairs (max %d): ", MAX_PAIRS);
         scanf("%d", &n);
 	ind = 1;
         srand(time(NULL));
-	//multitasks();
+	// multitasks();
  
-	//for(;;);
+	// for(;;);
 	FILE *fp5;	
         char* filename = "data8ny.txt";
         fp5 = fopen(filename, "r");
@@ -517,13 +518,7 @@ void draw_func(void)
 	while(line_size >= 0 && line_count < LINENUMBERSTOTAL)
 	{
 //printf("done\n");
- 	/* 
-	double a1[]  =  {6371000.0 ,  6371000.0 ,     6371000,   6371000.0 ,     6371000,   6371000.0,     6371000.0 ,  6371000.0,  6371000.0 ,     6371000,   6371000.0,     6371000.0 ,  6371000.0,  6371000.0 ,     6371000.0 ,  6371000.0,   };
-	double a2[] =   {3389500.0 ,  3389500.0 ,     3389500,   3389500.0,       3389500,    3389500,   3389500.0,   3389500.0 ,  3389500.0 ,       3389500,    3389500,   3389500.0,   3389500.0 ,  3389500.0 ,   3389500.0,   3389500.0  };	 
-	double a3[]  =  {6048800.0 ,  6048800.0 ,    6048800,   6048800.0,       6048800 ,   6048800.0,     6048800.0 ,  6048800.0, 6048800.0  ,      6048800 ,   6048800.0,     6048800.0 ,  6048800.0, 6048800.0 ,     6048800.0 ,  6048800.0     };
-	double a6[] =   {2439700.0 ,  2439700,     2439700,   2439700.0,       2439700.0,   2439700.0,     2439700.0,   2439700.0 , 2439700.0 ,       2439700.0,  2439700.0,     2439700.0,   2439700.0 , 1.0,     2439700.0,   2439700.0  };	 
-	double a4[]  =  {25362000.0 ,25362000,    25362000,   25362000.0 ,     25362000.0,    25362000.0 ,    25362000.0 ,  25362000.0,   25362000.0 ,   25362000.0,   25362000.0 ,    25362000.0 ,  25362000.0,   25362000.0,    25362000.0 ,  25362000.0   };
-	double a5[] =   {1188300.0 ,  1188300 ,     1188300,   1188300.0,       1188300.0,   1188300.0,     1188300.0,   1188300.0 ,  1188300.0 ,       1188300.0,   1188300.0,     1188300.0,   1188300.0 ,  1188300.0 ,     1188300.0,   1188300.0  };	*/
+  
 //             dt,lt,ht,d1,d2,lt1,lt2,lt3,ht1,ht2,h3
 //printf("done\n");
 /*double a1[] = {1,2,2,1,1,2,2,2};  
@@ -551,20 +546,34 @@ if(line_count > 0)
 {
 	eqline = 0;
 	int xxxc = -1;
-       	for(int llll = 0; llll < 1000           ; llll++)
+       	for(int llll = 0; llll < 3360          ; llll++)
 	{ 
- 
+ countperm++;
 if(once_perm == 0)
 {
 		 	int i; 
 			int x[N];	
-	        	int a1[] =   {1,1,1,2,2,2,2,2}; 
+	        	/*int a1[] =   {1,1,1,2,2,2,2,2}; 
 			int a2[] =   {1,1,2,2,2,2,2,2};  
 			int a3[] =   {1,1,1,1,1,1,2,2}; 
 			int a4[] =  {1,1,1,2,2,2,2,2}; 
 			int a5[] =  {0,1,1,2,2,2,2,2}; 
-			int a6[] =  {1,1,1,1,2,2,2,2}; 
+			int a6[] =  {1,1,1,1,2,2,2,2}; */
+ 
+	/*int a1[]  =  {1 ,  1 ,1 ,  2 ,    3,   4, 5, 6,  7 ,      8,          9 ,  6371000 ,      6371000,          6371000 , abs(pow(6371000/1000,2)),abs(pow(6371000/1000,2))  };
+	int a2[] =   {1 ,  1 ,1 ,  2 ,    3,   4, 5, 6,  7 ,      8,          9 ,  3389500 ,      3389500,          3389500 , abs(pow(3389500/1000,2)),abs(pow(3389500/1000,2))  };
+	int a3[]  =   {1 ,  1 ,1 ,  2 ,    3,   4, 5, 6,  7 ,      8,          9 ,  6048800 ,      6048800,          6048800 , abs(pow(6048800/1000,2)),abs(pow(6048800/1000,2))  };
+	int a4[] =  {1 ,  1 ,1 ,  2 ,    3,   4, 5, 6,  7 ,      8,          9 ,  25362000 ,      25362000,          25362000 , abs(pow(25362000/1000,2)),abs(pow(25362000/1000,2))  }; 
+	int a5[]  =   {1 ,  1 ,1 ,  2 ,    3,   4, 5, 6,  7 ,      8,          9 ,  1188300 ,      1188300,          1188300 , abs(pow(1188300/1000,2)),abs(pow(1188300/1000,2))  };
+	int a6[] =   {1 ,  1 ,1 ,  2 ,    3,   4, 5, 6,  7 ,      8,          9 ,  2439700 ,      2439700,          2439700 , abs(pow(2439700/1000,2)),abs(pow(2439700/1000,2))  };
+*/
 
+	int a1[]  =  {1 ,  1 ,   2,  abs(sqrt(6371000)),   6371000 ,      6371000,          6371000 ,   abs(pow(6371000/1000,2))   };
+	int a2[] =   {1 ,  1 ,   2,  abs(sqrt(3389500)),   3389500,       3389500,         3389500,     abs(pow(3389500/1000,2))   };	 
+	int a3[]  =  {1 ,  1 ,   2,  abs(sqrt(6048800)),   6048800,       6048800 ,         6048800,    abs(pow(6048800/1000,2))   };
+	int a6[] =   {1 ,  1,    2, abs(sqrt(25362000)),  25362000,     25362000,        25362000,     abs(pow(25362000/1000,2))  };	 
+	int a4[]  =  {1 ,  1,    2,  abs(sqrt(1188300)),   1188300 ,      1188300,        1188300 ,   abs(pow(1188300/1000,2))   };
+	int a5[] =   {1 ,  1 ,   2,  abs(sqrt(2439700)),   2439700,       2439700,       2439700,     abs(pow(2439700/1000,2))   };
 			for (i = 0; i < N; i++) x[i] = a1[i];
 		        perm1_rubics(x, N, showrubics,NULL,0);
 			for (i = 0; i < N; i++) x[i] = a2[i];
@@ -598,7 +607,7 @@ else
 
 }		 
  		 double slump1  = 0.00001 ;	
-		//a[0] = 0.000001;
+		 a[0] = 0.000001;
 		for(int kkk = 0; kkk < NUMVAR; kkk++)
 		{ 
 		  VARA1[0][kkk] =(double)bufff1[kkk] ;
@@ -629,14 +638,19 @@ else
 		}
  
 	 	//printf("\n");
-		if(newloopnew == 1)
-		break;			 
-	 	//for(int kkk = 0; kkk < 1; kkk++)
-		// { 
+		//if(newloopnew == 1)
+		//break;
+newloopnew = 0;
+for(int xxxx = 0; xxxx < 1000          ; xxxx++)
+	{ 			 
+	 	 for(int kkk = 0; kkk < NUMVAR; kkk++)
+		  { 
+
+   	
 		for(int oooo = 0; oooo < NUMEQ; oooo++)
 		{
-		//a[oooo] =  a[oooo] + 0.000001;		
-		//VARA1[oooo][kkk] += a[oooo]; 
+		 a[oooo] =  a[oooo] + 0.000001;		
+		 VARA1[oooo][kkk] += a[oooo]; 
 		new_str  = fill_equation(line_buf,VARA1 ,oooo,new_str,strnew);
 		strcpy(NEWSTR[oooo],new_str);
 		
@@ -644,7 +658,7 @@ else
 
 		xxxc++;
 
-		/* if(kkk != xxxc)
+		  if(kkk != xxxc)
 		{							
 		int cc = 0;
  
@@ -670,19 +684,19 @@ else
 			cc++;		
 			}				 
 			 cc = 0;
-		} */
+		}  
 
 }
 for(int oooo = 0; oooo < NUMEQ; oooo++)
 		{
-		if(newloop == 0  || isnan(result[oooo][0]) == 0  &&  (result[oooo][0] < 3.0) && result[oooo][0] > -1.0 && result[oooo][0] != INFINITY && result[oooo][0] != NAN && result[oooo][0] != -NAN)
+		if(newloop == 0  || isnan(result[oooo][kkk]) == 0  &&  (result[oooo][kkk] < 25.0) && result[oooo][kkk] > 0.4 && result[oooo][kkk] != INFINITY && result[oooo][kkk] != NAN && result[oooo][kkk] != -NAN)
 		{
-		if(isnan(result[oooo][0]) == 0) 
+		if(isnan(result[oooo][kkk]) == 0) 
 		{
-		if(result[oooo][0] != INFINITY && result[oooo][0] > -1.0 && result[oooo][0])
+		if(result[oooo][kkk] != INFINITY && result[oooo][kkk] > 0.4 && result[oooo][kkk])
 		{
-			if(result[oooo][0] > -1.0)
-			if(result[oooo][0] < 3.0)
+			if(result[oooo][kkk] > 0.4)
+			if(result[oooo][kkk] < 25.0)
 				check_eq(oooo,0,NEWSTR ,eqline);
 			else
 			{
@@ -713,10 +727,10 @@ for(int oooo = 0; oooo < NUMEQ; oooo++)
 	if(xxxc >NUMVAR)
 		xxxc = -1;		
 	 } 
-//}
- if(newloopnew == 1)
-		break;	
-
+ }
+  if(newloopnew == 1)
+ 		break;	
+}
 }
 }	
 }
@@ -733,14 +747,17 @@ for(int oooo = 0; oooo < NUMEQ; oooo++)
 
 void check_eq(int oooo,int kkk, char **resultstr,int eqline_)
 {
-	 //for(int oooo = 0; oooo < NUMEQ; oooo++)
-	 //printf("\neqline: %d eq: ="CYN" %s"RESET" "WHT" solution: "YEL" %f"RESET" "WHT" EQ linenr: "CYN" %d"RESET" "WHT" "RESET"",eqline,resultstr[oooo] , result[oooo][kkk],randme); 	
+
+ //if(countperm % 1000 == 0)
+	  for(int oooo = 0; oooo < NUMEQ; oooo++)
+	   printf("\ncountperm: %d eq: ="CYN" %s"RESET" "WHT" solution: "YEL" %f"RESET" "WHT" EQ linenr: "CYN" %d"RESET" "WHT" "RESET"",countperm,resultstr[oooo] , result[oooo][kkk],randme); 	
+//printf("\n");
  	   if((result[0][kkk]) < solution[0]*1.02&& ((result[0][kkk])) > solution[0]*0.98)  
 	   if((result[1][kkk]) < solution[1]*1.02&& ((result[1][kkk])) > solution[1]*0.98)
-	   if((result[2][kkk]) < solution[2]*1.02&& ((result[2][kkk])) > solution[2]*0.98) 
+	    if((result[2][kkk]) < solution[2]*1.02&& ((result[2][kkk])) > solution[2]*0.98) 
  	   if((result[3][kkk]) < solution[3]*1.02&& ((result[3][kkk])) > solution[3]*0.98)  
-	   if((result[4][kkk]) < solution[4]*1.02&& ((result[4][kkk])) > solution[4]*0.98)
- 	   if((result[5][kkk]) < solution[5]*1.02&& ((result[5][kkk])) > solution[5]*0.98)    
+	 //  if((result[4][kkk]) < solution[4]*1.02&& ((result[4][kkk])) > solution[4]*0.98)
+ 	 // if((result[5][kkk]) < solution[5]*1.02&& ((result[5][kkk])) > solution[5]*0.98)    
 {
 eqline++;
    int x = -cube_size, y = -cube_size, z = -cube_size;
@@ -767,7 +784,7 @@ eqline++;
 	printf("\n\n");
 for(int oooo = 0; oooo < NUMEQ; oooo++)
 	 printf("\neqline: %d eq: ="CYN" %s"RESET" "WHT" solution: "YEL" %f"RESET" "WHT" EQ linenr: "CYN" %d"RESET" "WHT" "RESET"",eqline,resultstr[oooo] , result[oooo][kkk],randme);							 
+for(;;);
 
- for(;;);
 	}
 }
