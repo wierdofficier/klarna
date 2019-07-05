@@ -7,7 +7,7 @@
 #include <pthread.h>
 #include <complex.h>
 #include <stdio.h>
-#define NUMEQ   5
+#define NUMEQ   6
 double a[NUMEQ+1];
 #define MAXBUFLEN 44*20000000
 #define NUM_THREADS 3
@@ -607,7 +607,7 @@ double **VARA12;
 
 
 		double earth_i[100][100];
-		for(int aa = 0; aa <= NUMEQ; aa++)
+		for(int aa = 0; aa <  NUMEQ; aa++)
 		{
 		for(int bb = 0; bb < NUMEQ; bb++)
 		{
@@ -615,28 +615,30 @@ double **VARA12;
 				earth_i[aa][bb] = solution[aa]/solution[bb];	
 		} 
 		}
-	       	for(int llll = 0; llll < 100  ; llll++)
+	       	for(int llll = 0; llll < 10000  ; llll++)
 		{ 
 		if(newloop == 1)
 		break; 
 	 		for(int oooo = 0; oooo < NUMEQ; oooo++)
 			{ 				 
-				for(int kkk = 0; kkk < 12; kkk++)
+				for(int kkk = 0; kkk < 9; kkk++)
 				{ 
-					for(int lll = 1; lll < 12; lll++)
+					 
+					a[oooo] = a[oooo] + 0.000001; 
+					for(int lll = 1; lll < 9; lll++)
 					{ 
 						if(kkk != lll)
 						{				
 							if( (result[oooo][kkk]) >  (result[oooo][lll]))
 							{	
-								 if(kkk > 4)			
-								VARA1[oooo][kkk] -= a[oooo];								 	
+							 	 if(kkk > 4)			
+									VARA1[oooo][kkk] -= a[oooo];								 	
 							}		
 							else
 							{				 
 								//printf("kkk = %d ::: oooo = %d\n",  kkk,oooo);						
-								 if(kkk > 4)
-								VARA1[oooo][kkk] += a[oooo];		 	 	 	
+								  if(kkk > 4)
+									VARA1[oooo][kkk] += a[oooo];		 	 	 	
 					 		}
  
 							new_str = fill_equation(line_buf,VARA1 ,0,new_str,strnew);
@@ -676,12 +678,12 @@ double **VARA12;
 
 						 	 
 		 					
-							int cc = 0;
+						 
 							int xxxc = 0;	
  
-							cc = 0;
+							 
  
-								if(kkk != xxxc)
+								//if(kkk != xxxc)
 				{							
 				int cc = 0;
 		 
@@ -695,13 +697,13 @@ double **VARA12;
 						//printf("ratio = %f diff = %f \n", ratio,diff);		 		
 						if(diff > (ratio))	
 						{
-							if(kkk > 4)
+							 if(kkk > 4)
 							VARA1[llllll][kkk]  += a[oooo];	
 								
 						}
 						else
 						{
-							if(kkk > 4)
+							 if(kkk > 4)
 							VARA1[llllll][kkk]  -= a[oooo];
 							 									
 						}					
@@ -710,10 +712,10 @@ double **VARA12;
 					}				 
 					 cc = 0;
 				}
-	if(xxxc >12)
+	if(xxxc >11)
 		xxxc = -1;		
  
- 						 if(kkk > 4)
+ 						  if(kkk > 4)
 						{
 						 	VARA1[0][kkk] += a[oooo];
 							VARA1[1][kkk] += a[oooo];
@@ -742,7 +744,7 @@ double **VARA12;
 						{
 						if(result[oooo][kkk] != -INFINITY)
 						{
- 						if(result[oooo][kkk] < 0.3)
+ 						if(result[oooo][kkk] < 0.23)
 						{
 						if(result[oooo][kkk] > 0.0)
 						{
@@ -788,7 +790,7 @@ double **VARA12;
 								break;
 
 				}
-				for(int kkk = 0; kkk < 12; kkk++)
+				for(int kkk = 0; kkk < 9; kkk++)
 				{ 
 					for(int oooo = 0; oooo < NUMEQ; oooo++)
 					{ 						
@@ -831,7 +833,6 @@ void check_eq(int oooo,int kkk, char *resultstr,char *resultstr2,char *resultstr
 {
 
 
-
 	if((result[0][kkk]) < solution[0]*1.05  && ((result[0][kkk])) > solution[0]*0.95)
 		{
 
@@ -839,9 +840,9 @@ void check_eq(int oooo,int kkk, char *resultstr,char *resultstr2,char *resultstr
 		{
 	
 
+
 			if((result[2][kkk]) < solution[2]*1.05  && ((result[2][kkk])) > solution[2]*0.95)
 			{
-
  	  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr, result[0][kkk],randme);
 		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr2, result[1][kkk],randme);
@@ -850,6 +851,7 @@ void check_eq(int oooo,int kkk, char *resultstr,char *resultstr2,char *resultstr
 		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr5, result[4][kkk],randme);
 		printf("\neq: ="CYN" %s\n"RESET" "WHT" solution: "YEL" %f\n"RESET" "WHT" EQ linenr: "CYN" %d\n"RESET" "WHT" "RESET"\n\n",resultstr6, result[5][kkk],randme);
 		printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
 				if((result[3][kkk]) < solution[3]*1.05 && ((result[3][kkk])) > solution[3]*0.95)
 				{
 	
