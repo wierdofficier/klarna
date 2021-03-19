@@ -17,20 +17,20 @@ int INDEX_NR1;
 int INDEX_NR2;
 int INDEX_NRmore;
 int playsound(double length);
-extern int KvvVENTAL ;
+ 
 float springlength =  0.004 ;
 float dNear = 100;
 float dFar = 2000;
 double gravity[40] = {0,0 ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ,0,0 ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-struct state_vector       worm_ventral(struct state_vector       next_state, int num );
+struct state_vector       worm_ventral(struct state_vector       next_state, int num,int kkkk );
 #define HOW_MANY_FLUIDS 4
 #define HOWMANY HOW_MANY_FLUIDS
-double F_total[3][10000*2][HOW_MANY_FLUIDS][32] ;
-int totalneigbours[10000*2][HOW_MANY_FLUIDS] ;
-extern struct state_vector  *  springVector;
-struct state_vector    springharmony_status_link[  83333][32][1]; 
+double F_total[3][10000][HOW_MANY_FLUIDS][15][2] ;
+int totalneigbours[10000][HOW_MANY_FLUIDS][2] ;
+  struct state_vector  *  springVector;
+struct state_vector    springharmony_status_link[  8333][32][1]; 
 struct state_vector *** reall;
-struct state_vector     springharmony_status_link_[   83333][32][1]; 
+struct state_vector     springharmony_status_link_[   8333][32][1]; 
 int llll = 0;
  
 int feather_once = 1;
@@ -54,9 +54,9 @@ float rotationY=0.0;
  
 void rates_dorsal ( double *t, double *f, double result[]   );
 void key(unsigned char key, int x, int y);
-int findnearestpoint(int points,struct state_vector ** worm , int num,int howmany, int whantindex,double length) ;
+int findnearestpoint(int points,struct state_vector ** worm , int num,int howmany, int whantindex,double length,int kkkk) ;
  
-double length (struct state_vector a,struct state_vector b ) { return sqrtf ( b.pos_new_x*a.pos_new_x + b.pos_new_y*a.pos_new_y + b.pos_new_z*a.pos_new_z); }
+double length (struct state_vector a,struct state_vector b ,int kkkk) { return sqrtf ( b.pos_new_x[kkkk]*a.pos_new_x[kkkk] + b.pos_new_y[kkkk]*a.pos_new_y[kkkk] + b.pos_new_z[kkkk]*a.pos_new_z[kkkk]); }
 static double dist_sq( double *a1, double *a2, int dims ) {
   double dist_sq = 0, diff;
   while( --dims >= 0 ) {
@@ -81,146 +81,146 @@ void mouseMotion(int x, int y){
  
 int k_flappers = 0;
 int whatNET = 0;
- 
-void springharmony( int kkkkkkkk, int xxx , int whatnet)
+ int kkkk_ = 0;
+void springharmony( int kkkkkkkk, int xxx , int whatnet, int kkkk)
 {
 	 llll = kkkkkkkk;
 	 k_flappers = xxx;
 	 whatNET = whatnet;
 	 int k = xxx;
- 	
+ 	kkkk_ = kkkk;
 	 springConstant =   100.1233 ;
 	 frictionConstant =  2.2;
 
-	 INDEX_NR =   springharmony_status_link[llll][k][whatnet].INDEX_NR ;
+	 INDEX_NR =   springharmony_status_link[llll][k][whatnet].INDEX_NR[kkkk] ;
  
  
-				 if(fabs(F_total[0][INDEX_NR][whatnet][k]) > 21.1233 )
-	 				 	  F_total[0][INDEX_NR][whatnet][k] =0;
-		 		 if(fabs(F_total[1][INDEX_NR][whatnet][k])  > 21.1233)
-						F_total[1][INDEX_NR][whatnet][k] =0;
-			 	 if(fabs(F_total[2][INDEX_NR][whatnet][k])  > 21.1233)
-						F_total[2][INDEX_NR][whatnet][k] =0;
+				 if(fabs(F_total[0][INDEX_NR][whatnet][k][kkkk]) > 21.1233 )
+	 				 	  F_total[0][INDEX_NR][whatnet][k][kkkk] =0;
+		 		 if(fabs(F_total[1][INDEX_NR][whatnet][k][kkkk])  > 21.1233)
+						F_total[1][INDEX_NR][whatnet][k][kkkk] =0;
+			 	 if(fabs(F_total[2][INDEX_NR][whatnet][k][kkkk])  > 21.1233)
+						F_total[2][INDEX_NR][whatnet][k][kkkk] =0;
  			 
  			 
- 			 	 if(fabs(F_total[0][llll][whatnet][k]) > 21.1233 )
-	 				 F_total[0][llll][whatnet][k] =0;
-		 		 if(fabs(F_total[1][llll][whatnet][k])  > 21.1233)
-					 F_total[1][llll][whatnet][k] =0;
-			 	 if(fabs(F_total[2][llll][whatnet][k])  > 21.1233)
-					 F_total[2][llll][whatnet][k] =0;
+ 			 	 if(fabs(F_total[0][llll][whatnet][k][kkkk]) > 21.1233 )
+	 				 F_total[0][llll][whatnet][k][kkkk] =0;
+		 		 if(fabs(F_total[1][llll][whatnet][k][kkkk])  > 21.1233)
+					 F_total[1][llll][whatnet][k][kkkk] =0;
+			 	 if(fabs(F_total[2][llll][whatnet][k][kkkk])  > 21.1233)
+					 F_total[2][llll][whatnet][k][kkkk] =0;
 					 
 					 
-springVector->pos_new_x = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_x - springharmony_status_link_[llll][k][whatnet].pos_new_x;
-springVector->pos_new_y = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_y - springharmony_status_link_[llll][k][whatnet].pos_new_y;
-springVector->pos_new_z = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_z - springharmony_status_link_[llll][k][whatnet].pos_new_z;
+springVector->pos_new_x[kkkk] = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_x[kkkk] - springharmony_status_link_[llll][k][whatnet].pos_new_x[kkkk];
+springVector->pos_new_y[kkkk] = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_y[kkkk] - springharmony_status_link_[llll][k][whatnet].pos_new_y[kkkk];
+springVector->pos_new_z[kkkk] = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_z[kkkk] - springharmony_status_link_[llll][k][whatnet].pos_new_z[kkkk];
  
-				float r = length(springharmony_status_link_[INDEX_NR][k][whatnet],springharmony_status_link_[llll][k][whatnet]);
-
+				float r = length(springharmony_status_link_[INDEX_NR][k][whatnet],springharmony_status_link_[llll][k][whatnet],kkkk);
+//printf("r=%f \n", r);
 		if ( r != 0  &&    (r) < 40.152343433&&   (r) > -40.152343433)
 		{	
 springharmony_status_link_[INDEX_NR][k][whatnet].length = r ;
 springharmony_status_link_[llll][k][whatnet].length = r ;
-F_total[0][INDEX_NR][whatnet][k] +=( springVector->pos_new_x  /  r ) * ( r - springlength ) * ( -springConstant );
-F_total[1][INDEX_NR][whatnet][k] += ( springVector->pos_new_y /  r ) * ( r - springlength ) * ( -springConstant );
-F_total[2][INDEX_NR][whatnet][k] +=( springVector->pos_new_z  /  r ) * ( r - springlength ) * ( -springConstant );
+F_total[0][INDEX_NR][whatnet][k][kkkk] +=( springVector->pos_new_x[kkkk]  /  r ) * ( r - springlength ) * ( -springConstant );
+F_total[1][INDEX_NR][whatnet][k][kkkk] += ( springVector->pos_new_y[kkkk] /  r ) * ( r - springlength ) * ( -springConstant );
+F_total[2][INDEX_NR][whatnet][k][kkkk] +=( springVector->pos_new_z[kkkk]  /  r ) * ( r - springlength ) * ( -springConstant );
 
-F_total[0][llll][whatnet][k] +=( springVector->pos_new_x  / r ) * ( r - springlength ) * ( -springConstant );
-F_total[1][llll][whatnet][k] += ( springVector->pos_new_y  / r ) * ( r - springlength) * ( -springConstant );
-F_total[2][llll][whatnet][k] +=( springVector->pos_new_z  / r ) * ( r - springlength ) * ( -springConstant );
+F_total[0][llll][whatnet][k][kkkk] +=( springVector->pos_new_x[kkkk]  / r ) * ( r - springlength ) * ( -springConstant );
+F_total[1][llll][whatnet][k][kkkk] += ( springVector->pos_new_y[kkkk]  / r ) * ( r - springlength) * ( -springConstant );
+F_total[2][llll][whatnet][k][kkkk] +=( springVector->pos_new_z[kkkk]  / r ) * ( r - springlength ) * ( -springConstant );
 
-F_total[0][INDEX_NR][whatnet][k] +=-(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x - springharmony_status_link_[llll][k][whatnet].vel_new_x ) * frictionConstant;
-F_total[1][INDEX_NR][whatnet][k] += -( springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y- springharmony_status_link_[llll][k][whatnet].vel_new_y ) * frictionConstant;
-F_total[2][INDEX_NR][whatnet][k] += -(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z - springharmony_status_link_[llll ][k][whatnet].vel_new_z ) * frictionConstant;
+F_total[0][INDEX_NR][whatnet][k][kkkk] +=-(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x[kkkk] - springharmony_status_link_[llll][k][whatnet].vel_new_x[kkkk] ) * frictionConstant;
+F_total[1][INDEX_NR][whatnet][k][kkkk] += -( springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y[kkkk]- springharmony_status_link_[llll][k][whatnet].vel_new_y[kkkk] ) * frictionConstant;
+F_total[2][INDEX_NR][whatnet][k][kkkk] += -(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z[kkkk] - springharmony_status_link_[llll ][k][whatnet].vel_new_z[kkkk] ) * frictionConstant;
 
 
-F_total[0][llll][whatnet][k] +=-(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x - springharmony_status_link_[llll][k][whatnet].vel_new_x ) * frictionConstant;
-F_total[1][llll][whatnet][k] += -( springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y- springharmony_status_link_[llll][k][whatnet].vel_new_y ) * frictionConstant;
-F_total[2][llll][whatnet][k] += -(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z - springharmony_status_link_[llll ][k][whatnet].vel_new_z ) * frictionConstant;
+F_total[0][llll][whatnet][k][kkkk] +=-(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x[kkkk] - springharmony_status_link_[llll][k][whatnet].vel_new_x[kkkk] ) * frictionConstant;
+F_total[1][llll][whatnet][k][kkkk] += -( springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y[kkkk]- springharmony_status_link_[llll][k][whatnet].vel_new_y[kkkk] ) * frictionConstant;
+F_total[2][llll][whatnet][k][kkkk] += -(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z[kkkk] - springharmony_status_link_[llll ][k][whatnet].vel_new_z[kkkk] ) * frictionConstant;
 
-springharmony_status_link_[llll][k][whatnet].vel_new_x = springharmony_status_link_[llll][k][whatnet].vel_new_x*0.95 ;
-springharmony_status_link_[llll][k][whatnet].vel_new_y = springharmony_status_link_[llll][k][whatnet].vel_new_y*0.95 ;
-springharmony_status_link_[llll][k][whatnet].vel_new_z = springharmony_status_link_[llll][k][whatnet].vel_new_z*0.95 ;
-springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x = springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x*0.95 ;
-springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y = springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y*0.95 ; 
-springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z= springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z*0.95 ;
+springharmony_status_link_[llll][k][whatnet].vel_new_x[kkkk] = springharmony_status_link_[llll][k][whatnet].vel_new_x[kkkk]*0.95 ;
+springharmony_status_link_[llll][k][whatnet].vel_new_y[kkkk] = springharmony_status_link_[llll][k][whatnet].vel_new_y[kkkk]*0.95 ;
+springharmony_status_link_[llll][k][whatnet].vel_new_z[kkkk] = springharmony_status_link_[llll][k][whatnet].vel_new_z[kkkk]*0.95 ;
+springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x[kkkk]= springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x[kkkk]*0.95 ;
+springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y[kkkk] = springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y[kkkk]*0.95 ; 
+springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z[kkkk]= springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z[kkkk]*0.95 ;
 		}
 
 
 		k_flappers = k;
 	 	whatNET = whatnet;
 
-		springharmony_status_link_[INDEX_NR][k][whatnet].force_sign =  -1;
-		springharmony_status_link_[INDEX_NR][k][whatnet]    =  worm_ventral(   springharmony_status_link_[INDEX_NR][k][whatnet] ,1) ;
-springharmony_status_link_[INDEX_NR][k][whatnet].force_sign =  97;
-		springharmony_status_link_[llll][k][whatnet].force_sign =   1;   
-		springharmony_status_link_[llll][k][whatnet]    =  worm_ventral(   springharmony_status_link_[llll][k][whatnet] ,1);
+		springharmony_status_link_[INDEX_NR][k][whatnet].force_sign[kkkk] =  -1;
+		springharmony_status_link_[INDEX_NR][k][whatnet]    =  worm_ventral(   springharmony_status_link_[INDEX_NR][k][whatnet] ,1,kkkk) ;
+springharmony_status_link_[INDEX_NR][k][whatnet].force_sign[kkkk] =  97;
+		springharmony_status_link_[llll][k][whatnet].force_sign[kkkk] =   1;   
+		springharmony_status_link_[llll][k][whatnet]    =  worm_ventral(   springharmony_status_link_[llll][k][whatnet] ,1,kkkk);
   
-	for(int d = 0; d <= totalneigbours[llll][whatnet]; d++)
+	for(int d = 0; d <= totalneigbours[llll][whatnet][kkkk]; d++)
 	{	 
 	 
  
-  		INDEX_NRmore = springharmony_status_link[llll][d][whatnet].INDEX_NR;
+  		INDEX_NRmore = springharmony_status_link[llll][d][whatnet].INDEX_NR[kkkk];
   
-		if(fabs(F_total[0][INDEX_NRmore][whatnet][k]) > 21.1233 )
-	 				  F_total[0][INDEX_NRmore][whatnet][k] =0;
-		if(fabs(F_total[1][INDEX_NRmore][whatnet][k])  > 21.1233)
-					  F_total[1][INDEX_NRmore][whatnet][k] =0;
-		if(fabs(F_total[2][INDEX_NRmore][whatnet][k])  > 21.1233)
-					  F_total[2][INDEX_NRmore][whatnet][k] =0;
+		if(fabs(F_total[0][INDEX_NRmore][whatnet][k][kkkk]) > 21.1233 )
+	 				  F_total[0][INDEX_NRmore][whatnet][k][kkkk] =0;
+		if(fabs(F_total[1][INDEX_NRmore][whatnet][k][kkkk])  > 21.1233)
+					  F_total[1][INDEX_NRmore][whatnet][k][kkkk] =0;
+		if(fabs(F_total[2][INDEX_NRmore][whatnet][k][kkkk])  > 21.1233)
+					  F_total[2][INDEX_NRmore][whatnet][k][kkkk] =0;
 			
 
- 		if(fabs(F_total[0][INDEX_NR][whatnet][k]) > 21.1233 )
-	 				  F_total[0][INDEX_NR][whatnet][k] =0;
-		if(fabs(F_total[1][INDEX_NR][whatnet][k])  > 21.1233)
-					  F_total[1][INDEX_NR][whatnet][k] =0;
-		if(fabs(F_total[2][INDEX_NR][whatnet][k])  > 21.1233)
-					  F_total[2][INDEX_NR][whatnet][k] =0;
+ 		if(fabs(F_total[0][INDEX_NR][whatnet][k][kkkk]) > 21.1233 )
+	 				  F_total[0][INDEX_NR][whatnet][k][kkkk] =0;
+		if(fabs(F_total[1][INDEX_NR][whatnet][k][kkkk])  > 21.1233)
+					  F_total[1][INDEX_NR][whatnet][k][kkkk] =0;
+		if(fabs(F_total[2][INDEX_NR][whatnet][k][kkkk])  > 21.1233)
+					  F_total[2][INDEX_NR][whatnet][k][kkkk] =0;
 			
-springVector->pos_new_x = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_x - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_x;
-springVector->pos_new_y = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_y - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_y;
-springVector->pos_new_z = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_z - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_z;
+springVector->pos_new_x[kkkk] = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_x[kkkk]- springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_x[kkkk];
+springVector->pos_new_y[kkkk] = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_y[kkkk] - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_y[kkkk];
+springVector->pos_new_z[kkkk] = springharmony_status_link_[INDEX_NR][k][whatnet].pos_new_z[kkkk] - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_z[kkkk];
  			
-		float r = length(springharmony_status_link_[INDEX_NR][k][whatnet],springharmony_status_link_[INDEX_NRmore][k][whatnet]);
+		float r = length(springharmony_status_link_[INDEX_NR][k][whatnet],springharmony_status_link_[INDEX_NRmore][k][whatnet],kkkk);
 
 		if ( r != 0  &&   (r) <  40.152343433 &&   (r) > -40.152343433)
 		{	
  springharmony_status_link_[INDEX_NR][k][whatnet].length = r ;
 springharmony_status_link_[INDEX_NRmore][k][whatnet].length = r ;
-			F_total[0][INDEX_NR][whatnet][k] +=( springVector->pos_new_x  /  r ) * ( r - springlength ) * ( -springConstant );
-			F_total[1][INDEX_NR][whatnet][k] += ( springVector->pos_new_y /  r ) * ( r - springlength ) * ( -springConstant );
-			F_total[2][INDEX_NR][whatnet][k] +=( springVector->pos_new_z  /  r ) * ( r - springlength ) * ( -springConstant );
+			F_total[0][INDEX_NR][whatnet][k][kkkk]+=( springVector->pos_new_x[kkkk]  /  r ) * ( r - springlength ) * ( -springConstant );
+			F_total[1][INDEX_NR][whatnet][k][kkkk]+= ( springVector->pos_new_y[kkkk] /  r ) * ( r - springlength ) * ( -springConstant );
+			F_total[2][INDEX_NR][whatnet][k][kkkk]+=( springVector->pos_new_z[kkkk]  /  r ) * ( r - springlength ) * ( -springConstant );
 
-			F_total[0][INDEX_NRmore][whatnet][k] +=( springVector->pos_new_x  / r ) * ( r - springlength ) * ( -springConstant );
-			F_total[1][INDEX_NRmore][whatnet][k] += ( springVector->pos_new_y  / r ) * ( r - springlength) * ( -springConstant );
-			F_total[2][INDEX_NRmore][whatnet][k] +=( springVector->pos_new_z  / r ) * ( r - springlength ) * ( -springConstant );
+			F_total[0][INDEX_NRmore][whatnet][k][kkkk]+=( springVector->pos_new_x[kkkk]  / r ) * ( r - springlength ) * ( -springConstant );
+			F_total[1][INDEX_NRmore][whatnet][k][kkkk]+= ( springVector->pos_new_y[kkkk]  / r ) * ( r - springlength) * ( -springConstant );
+			F_total[2][INDEX_NRmore][whatnet][k][kkkk]+=( springVector->pos_new_z[kkkk]  / r ) * ( r - springlength ) * ( -springConstant );
 
-			F_total[0][INDEX_NR][whatnet][k] +=-(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x - springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x ) * frictionConstant;
- 			F_total[1][INDEX_NR][whatnet][k] += -( springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y- springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y ) * frictionConstant;
- 			F_total[2][INDEX_NR][whatnet][k] += -(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z - springharmony_status_link_[INDEX_NRmore ][k][whatnet].vel_new_z ) * frictionConstant;
+			F_total[0][INDEX_NR][whatnet][k][kkkk]+=-(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x[kkkk] - springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x[kkkk]) * frictionConstant;
+ 			F_total[1][INDEX_NR][whatnet][k][kkkk]+= -( springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y[kkkk]- springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y[kkkk] ) * frictionConstant;
+ 			F_total[2][INDEX_NR][whatnet][k][kkkk]+= -(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z[kkkk] - springharmony_status_link_[INDEX_NRmore ][k][whatnet].vel_new_z[kkkk] ) * frictionConstant;
 
 
-			F_total[0][INDEX_NRmore][whatnet][k] +=-(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x - springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x ) * frictionConstant;
- 			F_total[1][INDEX_NRmore][whatnet][k] += -( springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y- springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y ) * frictionConstant;
- 			F_total[2][INDEX_NRmore][whatnet][k] += -(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z - springharmony_status_link_[INDEX_NRmore ][k][whatnet].vel_new_z ) * frictionConstant;
+			F_total[0][INDEX_NRmore][whatnet][k][kkkk]+=-(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x[kkkk] - springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x[kkkk] ) * frictionConstant;
+ 			F_total[1][INDEX_NRmore][whatnet][k][kkkk]+= -( springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y[kkkk]- springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y[kkkk] ) * frictionConstant;
+ 			F_total[2][INDEX_NRmore][whatnet][k][kkkk]+= -(  springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z[kkkk] - springharmony_status_link_[INDEX_NRmore ][k][whatnet].vel_new_z[kkkk] ) * frictionConstant;
 
-		  springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x*0.95 ;
+		  springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x[kkkk] = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x[kkkk]*0.95 ;
 		
-		springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y*0.95 ;
-		springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_z = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_z*0.95 ;
-		springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x = springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x*0.95 ;
+		springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y[kkkk] = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y[kkkk]*0.95 ;
+		springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_z[kkkk] = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_z[kkkk]*0.95 ;
+		springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x[kkkk] = springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_x[kkkk]*0.95 ;
 		
-		springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y = springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y*0.95 ;
-		springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z = springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z*0.95 ;  
+		springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y[kkkk] = springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_y[kkkk]*0.95 ;
+		springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z[kkkk] = springharmony_status_link_[INDEX_NR][k][whatnet].vel_new_z[kkkk]*0.95 ;  
 		}
 		k_flappers = k;
 		whatNET = whatnet;
-		springharmony_status_link_[INDEX_NR][k][whatnet].force_sign =  -1;
-		springharmony_status_link_[INDEX_NR][k][whatnet]    =  worm_ventral(   springharmony_status_link_[INDEX_NR][k][whatnet] ,1) ;
-springharmony_status_link_[INDEX_NR][k][whatnet].force_sign =  99;
-		springharmony_status_link_[INDEX_NRmore][k][whatnet].force_sign =   -1;  
-		springharmony_status_link_[INDEX_NRmore][k][whatnet]    =  worm_ventral(   springharmony_status_link_[INDEX_NRmore][k][whatnet] ,1);
-		springharmony_status_link_[INDEX_NRmore][k][whatnet].force_sign =   98;   
+		springharmony_status_link_[INDEX_NR][k][whatnet].force_sign[kkkk] =  -1;
+		springharmony_status_link_[INDEX_NR][k][whatnet]    =  worm_ventral(   springharmony_status_link_[INDEX_NR][k][whatnet] ,1,kkkk) ;
+springharmony_status_link_[INDEX_NR][k][whatnet].force_sign[kkkk] =  99;
+		springharmony_status_link_[INDEX_NRmore][k][whatnet].force_sign[kkkk]=   -1;  
+		springharmony_status_link_[INDEX_NRmore][k][whatnet]    =  worm_ventral(   springharmony_status_link_[INDEX_NRmore][k][whatnet] ,1,kkkk);
+		springharmony_status_link_[INDEX_NRmore][k][whatnet].force_sign[kkkk] =   98;   
  	 		 
  	 	
 	}	 
@@ -228,10 +228,10 @@ springharmony_status_link_[INDEX_NR][k][whatnet].force_sign =  99;
 			
 }
 
-void springharmony_netonnet( int kkkkkkkk, int xxx , int whatnet, int whatnet2)
+void springharmony_netonnet( int kkkkkkkk, int xxx , int whatnet, int whatnet2,int kkkk)
 {
 	llll = kkkkkkkk;
- 
+  	kkkk_ = kkkk;
 	 k_flappers = xxx;
 	 whatNET = whatnet;
 	 int k = xxx;
@@ -240,167 +240,167 @@ void springharmony_netonnet( int kkkkkkkk, int xxx , int whatnet, int whatnet2)
 	 springConstant =   100.1233  ;
 	 frictionConstant =  2.2;
  
-	INDEX_NR1 =   springharmony_status_link[llll][k][whatnet].INDEX_NR ;
-	INDEX_NR2 =   springharmony_status_link[llll][g][whatnet2].INDEX_NR ;
+	INDEX_NR1 =   springharmony_status_link[llll][k][whatnet].INDEX_NR[kkkk] ;
+	INDEX_NR2 =   springharmony_status_link[llll][g][whatnet2].INDEX_NR[kkkk] ;
 
  	
-				 if(fabs(F_total[0][INDEX_NR1][whatnet][k]) > 21.1233 )
-	 				 	  F_total[0][INDEX_NR1][whatnet][k] =0;
+				 if(fabs(F_total[0][INDEX_NR1][whatnet][k][kkkk]) > 21.1233 )
+	 				 	  F_total[0][INDEX_NR1][whatnet][k][kkkk]=0;
  
-		 		 if(fabs(F_total[1][INDEX_NR1][whatnet][k])  > 21.1233)
-						F_total[1][INDEX_NR1][whatnet][k] =0;
+		 		 if(fabs(F_total[1][INDEX_NR1][whatnet][k][kkkk])  > 21.1233)
+						F_total[1][INDEX_NR1][whatnet][k][kkkk]=0;
 
-			 	 if(fabs(F_total[2][INDEX_NR1][whatnet][k])  > 21.1233)
-						F_total[2][INDEX_NR1][whatnet][k] =0;
+			 	 if(fabs(F_total[2][INDEX_NR1][whatnet][k][kkkk])  > 21.1233)
+						F_total[2][INDEX_NR1][whatnet][k][kkkk]=0;
 
 
 
-				 if(fabs(F_total[0][INDEX_NR2][whatnet2][g]) > 21.1233 )
-	 				 	  F_total[0][INDEX_NR2][whatnet2][g] =0;
+				 if(fabs(F_total[0][INDEX_NR2][whatnet2][g][kkkk]) > 21.1233 )
+	 				 	  F_total[0][INDEX_NR2][whatnet2][g][kkkk]=0;
  
-		 		 if(fabs(F_total[1][INDEX_NR2][whatnet2][g])  > 21.1233)
-						F_total[1][INDEX_NR2][whatnet2][g] =0;
+		 		 if(fabs(F_total[1][INDEX_NR2][whatnet2][g][kkkk])  > 21.1233)
+						F_total[1][INDEX_NR2][whatnet2][g][kkkk]=0;
 
-			 	 if(fabs(F_total[2][INDEX_NR2][whatnet2][g])  > 21.1233)
-						F_total[2][INDEX_NR2][whatnet2][g] =0;
+			 	 if(fabs(F_total[2][INDEX_NR2][whatnet2][g][kkkk])  > 21.1233)
+						F_total[2][INDEX_NR2][whatnet2][g][kkkk]=0;
  			 
-springVector->pos_new_x = springharmony_status_link_[INDEX_NR1][k][whatnet].pos_new_x - springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_x;
-springVector->pos_new_y = springharmony_status_link_[INDEX_NR1][k][whatnet].pos_new_y - springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_y;
-springVector->pos_new_z = springharmony_status_link_[INDEX_NR1][k][whatnet].pos_new_z - springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_z;
+springVector->pos_new_x[kkkk] = springharmony_status_link_[INDEX_NR1][k][whatnet].pos_new_x[kkkk]- springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_x[kkkk];
+springVector->pos_new_y[kkkk] = springharmony_status_link_[INDEX_NR1][k][whatnet].pos_new_y[kkkk] - springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_y[kkkk];
+springVector->pos_new_z[kkkk] = springharmony_status_link_[INDEX_NR1][k][whatnet].pos_new_z[kkkk] - springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_z[kkkk];
  
-float r = length(springharmony_status_link_[INDEX_NR1][k][whatnet],springharmony_status_link_[INDEX_NR2][g][whatnet2]);
+float r = length(springharmony_status_link_[INDEX_NR1][k][whatnet],springharmony_status_link_[INDEX_NR2][g][whatnet2],kkkk);
 
 if ( r != 0  &&    (r) < 40.152343433&&   (r) > -40.152343433)
 {	
  springharmony_status_link_[INDEX_NR1][k][whatnet].length = r ;
 springharmony_status_link_[INDEX_NR2][k][whatnet2].length = r ;
-	F_total[0][INDEX_NR1][whatnet][k] +=( springVector->pos_new_x  /  r ) * ( r - springlength ) * ( -springConstant );
-	F_total[1][INDEX_NR1][whatnet][k] += ( springVector->pos_new_y /  r ) * ( r - springlength ) * ( -springConstant );
-	F_total[2][INDEX_NR1][whatnet][k] +=( springVector->pos_new_z  /  r ) * ( r - springlength ) * ( -springConstant );
+	F_total[0][INDEX_NR1][whatnet][k][kkkk]+=( springVector->pos_new_x[kkkk]  /  r ) * ( r - springlength ) * ( -springConstant );
+	F_total[1][INDEX_NR1][whatnet][k][kkkk]+= ( springVector->pos_new_y[kkkk] /  r ) * ( r - springlength ) * ( -springConstant );
+	F_total[2][INDEX_NR1][whatnet][k][kkkk]+=( springVector->pos_new_z[kkkk]  /  r ) * ( r - springlength ) * ( -springConstant );
 
-	F_total[0][INDEX_NR2][whatnet2][g] +=( springVector->pos_new_x  / r ) * ( r - springlength ) * ( -springConstant );
-	F_total[1][INDEX_NR2][whatnet2][g] += ( springVector->pos_new_y  / r ) * ( r - springlength) * ( -springConstant );
-	F_total[2][INDEX_NR2][whatnet2][g] +=( springVector->pos_new_z  / r ) * ( r - springlength ) * ( -springConstant );
+	F_total[0][INDEX_NR2][whatnet2][g][kkkk]+=( springVector->pos_new_x[kkkk]  / r ) * ( r - springlength ) * ( -springConstant );
+	F_total[1][INDEX_NR2][whatnet2][g][kkkk]+= ( springVector->pos_new_y[kkkk]  / r ) * ( r - springlength) * ( -springConstant );
+	F_total[2][INDEX_NR2][whatnet2][g][kkkk]+=( springVector->pos_new_z[kkkk]  / r ) * ( r - springlength ) * ( -springConstant );
 
-	F_total[0][INDEX_NR1][whatnet][k] +=-(  springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_x - springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x ) * frictionConstant;
- 	F_total[1][INDEX_NR1][whatnet][k] += -( springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_y- springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y ) * frictionConstant;
- 	F_total[2][INDEX_NR1][whatnet][k] += -(  springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_z - springharmony_status_link_[INDEX_NR2 ][k][whatnet2].vel_new_z ) * frictionConstant;
+	F_total[0][INDEX_NR1][whatnet][k][kkkk]+=-(  springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_x[kkkk] - springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x[kkkk] ) * frictionConstant;
+ 	F_total[1][INDEX_NR1][whatnet][k][kkkk]+= -( springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_y[kkkk]- springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y[kkkk] ) * frictionConstant;
+ 	F_total[2][INDEX_NR1][whatnet][k][kkkk]+= -(  springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_z[kkkk] - springharmony_status_link_[INDEX_NR2 ][k][whatnet2].vel_new_z[kkkk] ) * frictionConstant;
 
 
-	F_total[0][INDEX_NR2][whatnet2][g] +=-(  springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_x - springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x ) * frictionConstant;
- 	F_total[1][INDEX_NR2][whatnet2][g] += -( springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_y- springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y ) * frictionConstant;
- 	F_total[2][INDEX_NR2][whatnet2][g] += -(  springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_z - springharmony_status_link_[INDEX_NR2 ][k][whatnet2].vel_new_z ) * frictionConstant;
-springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x*0.95 ;		
-springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y*0.95 ;
-springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z*0.95 ;
-springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_x = springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_x*0.95 ;
-springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_y = springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_y*0.95 ; 
-springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_z= springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_z*0.95 ; 
+	F_total[0][INDEX_NR2][whatnet2][g][kkkk]+=-(  springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_x[kkkk] - springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x[kkkk] ) * frictionConstant;
+ 	F_total[1][INDEX_NR2][whatnet2][g][kkkk]+= -( springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_y[kkkk]- springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y[kkkk] ) * frictionConstant;
+ 	F_total[2][INDEX_NR2][whatnet2][g][kkkk]+= -(  springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_z[kkkk] - springharmony_status_link_[INDEX_NR2 ][k][whatnet2].vel_new_z[kkkk] ) * frictionConstant;
+springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x[kkkk] = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x[kkkk]*0.95 ;		
+springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y[kkkk] = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y[kkkk]*0.95 ;
+springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z[kkkk] = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z[kkkk]*0.95 ;
+springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_x[kkkk] = springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_x[kkkk]*0.95 ;
+springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_y[kkkk] = springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_y[kkkk]*0.95 ; 
+springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_z[kkkk]= springharmony_status_link_[INDEX_NR1][k][whatnet].vel_new_z[kkkk]*0.95 ; 
 }
 		 k_flappers = k;
 		 whatNET = whatnet;
 
-		springharmony_status_link_[INDEX_NR1][k][whatnet].force_sign =  -1;
-		springharmony_status_link_[INDEX_NR1][k][whatnet]    =  worm_ventral(   springharmony_status_link_[INDEX_NR1][k][whatnet] ,1) ;
-springharmony_status_link_[INDEX_NR1][k][whatnet].force_sign =  9911;
+		springharmony_status_link_[INDEX_NR1][k][whatnet].force_sign[kkkk] =  -1;
+		springharmony_status_link_[INDEX_NR1][k][whatnet]    =  worm_ventral(   springharmony_status_link_[INDEX_NR1][k][whatnet] ,1,kkkk) ;
+springharmony_status_link_[INDEX_NR1][k][whatnet].force_sign[kkkk] =  9911;
 
 	 k_flappers = g;
 whatNET = whatnet2;
-		springharmony_status_link_[INDEX_NR2][g][whatnet2].force_sign =   1;  
-		springharmony_status_link_[INDEX_NR2][g][whatnet2]    =  worm_ventral(   springharmony_status_link_[INDEX_NR2][g][whatnet2] ,1);
- springharmony_status_link_[INDEX_NR2][k][whatnet].force_sign =  1234;
-	for(int d = 0; d <= totalneigbours[INDEX_NR1][whatnet]; d++)
+		springharmony_status_link_[INDEX_NR2][g][whatnet2].force_sign[kkkk] =   1;  
+		springharmony_status_link_[INDEX_NR2][g][whatnet2]    =  worm_ventral(   springharmony_status_link_[INDEX_NR2][g][whatnet2] ,1,kkkk);
+ springharmony_status_link_[INDEX_NR2][k][whatnet].force_sign[kkkk] =  1234;
+	for(int d = 0; d <= totalneigbours[INDEX_NR1][whatnet][kkkk]; d++)
 	{	 
 		
  
  
-		INDEX_NRmore = springharmony_status_link[INDEX_NR1][d][whatnet].INDEX_NR;
+		INDEX_NRmore = springharmony_status_link[INDEX_NR1][d][whatnet].INDEX_NR[kkkk];
  
-		if(fabs(F_total[0][INDEX_NRmore][whatnet][k]) > 21.1233 )
-	 				  F_total[0][INDEX_NRmore][whatnet][k] =0;
-		if(fabs(F_total[1][INDEX_NRmore][whatnet][k])  > 21.1233)
-					  F_total[1][INDEX_NRmore][whatnet][k] =0;
-		if(fabs(F_total[2][INDEX_NRmore][whatnet][k])  > 21.1233)
-					  F_total[2][INDEX_NRmore][whatnet][k] =0;
+		if(fabs(F_total[0][INDEX_NRmore][whatnet][k][kkkk]) > 21.1233 )
+	 				  F_total[0][INDEX_NRmore][whatnet][k][kkkk]=0;
+		if(fabs(F_total[1][INDEX_NRmore][whatnet][k][kkkk])  > 21.1233)
+					  F_total[1][INDEX_NRmore][whatnet][k][kkkk]=0;
+		if(fabs(F_total[2][INDEX_NRmore][whatnet][k][kkkk])  > 21.1233)
+					  F_total[2][INDEX_NRmore][whatnet][k][kkkk]=0;
 			
 
- 		if(fabs(F_total[0][INDEX_NR2][whatnet][k]) > 21.1233 )
-	 				  F_total[0][INDEX_NR2][whatnet][k] =0;
-		if(fabs(F_total[1][INDEX_NR2][whatnet][k])  > 21.1233)
-					  F_total[1][INDEX_NR2][whatnet][k] =0;
-		if(fabs(F_total[2][INDEX_NR2][whatnet][k])  > 21.1233)
-					  F_total[2][INDEX_NR2][whatnet][k] =0;
+ 		if(fabs(F_total[0][INDEX_NR2][whatnet][k][kkkk]) > 21.1233 )
+	 				  F_total[0][INDEX_NR2][whatnet][k][kkkk]=0;
+		if(fabs(F_total[1][INDEX_NR2][whatnet][k][kkkk])  > 21.1233)
+					  F_total[1][INDEX_NR2][whatnet][k][kkkk]=0;
+		if(fabs(F_total[2][INDEX_NR2][whatnet][k][kkkk])  > 21.1233)
+					  F_total[2][INDEX_NR2][whatnet][k][kkkk]=0;
 			
-springVector->pos_new_x = springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_x - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_x;
-springVector->pos_new_y = springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_y - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_y;
-springVector->pos_new_z = springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_z - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_z;
+springVector->pos_new_x[kkkk] = springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_x[kkkk] - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_x[kkkk];
+springVector->pos_new_y[kkkk] = springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_y[kkkk] - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_y[kkkk];
+springVector->pos_new_z[kkkk] = springharmony_status_link_[INDEX_NR2][g][whatnet2].pos_new_z[kkkk] - springharmony_status_link_[INDEX_NRmore][k][whatnet].pos_new_z[kkkk];
  			
-float r = length(springharmony_status_link_[INDEX_NR2][g][whatnet2],springharmony_status_link_[INDEX_NRmore][k][whatnet]);
+float r = length(springharmony_status_link_[INDEX_NR2][g][whatnet2],springharmony_status_link_[INDEX_NRmore][k][whatnet],kkkk);
 
 if ( r != 0  &&   (r) <  40.152343433 &&   (r) > -40.152343433 )
 {	
  springharmony_status_link_[INDEX_NR2][k][whatnet2].length = r ;
 springharmony_status_link_[INDEX_NRmore][k][whatnet].length = r ;
-F_total[0][INDEX_NR2][whatnet2][g] +=( springVector->pos_new_x  /  r ) * ( r - springlength ) * ( -springConstant );
-F_total[1][INDEX_NR2][whatnet2][g] += ( springVector->pos_new_y /  r ) * ( r - springlength ) * ( -springConstant );
-F_total[2][INDEX_NR2][whatnet2][g] +=( springVector->pos_new_z  /  r ) * ( r - springlength ) * ( -springConstant );
+F_total[0][INDEX_NR2][whatnet2][g][kkkk]+=( springVector->pos_new_x[kkkk]  /  r ) * ( r - springlength ) * ( -springConstant );
+F_total[1][INDEX_NR2][whatnet2][g][kkkk]+= ( springVector->pos_new_y[kkkk] /  r ) * ( r - springlength ) * ( -springConstant );
+F_total[2][INDEX_NR2][whatnet2][g][kkkk]+=( springVector->pos_new_z[kkkk]  /  r ) * ( r - springlength ) * ( -springConstant );
 
-F_total[0][INDEX_NRmore][whatnet][k] +=( springVector->pos_new_x  / r ) * ( r - springlength ) * ( -springConstant );
-F_total[1][INDEX_NRmore][whatnet][k] += ( springVector->pos_new_y  / r ) * ( r - springlength) * ( -springConstant );
-F_total[2][INDEX_NRmore][whatnet][k] +=( springVector->pos_new_z  / r ) * ( r - springlength ) * ( -springConstant );
+F_total[0][INDEX_NRmore][whatnet][k][kkkk]+=( springVector->pos_new_x[kkkk]  / r ) * ( r - springlength ) * ( -springConstant );
+F_total[1][INDEX_NRmore][whatnet][k][kkkk]+= ( springVector->pos_new_y[kkkk]  / r ) * ( r - springlength) * ( -springConstant );
+F_total[2][INDEX_NRmore][whatnet][k][kkkk]+=( springVector->pos_new_z[kkkk]  / r ) * ( r - springlength ) * ( -springConstant );
 
-F_total[0][INDEX_NR2][whatnet2][g] +=-(  springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x - springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x ) * frictionConstant;
-F_total[1][INDEX_NR2][whatnet2][g] += -( springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y- springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y ) * frictionConstant;
-F_total[2][INDEX_NR2][whatnet2][g] += -(  springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z - springharmony_status_link_[INDEX_NRmore ][k][whatnet].vel_new_z ) * frictionConstant;
+F_total[0][INDEX_NR2][whatnet2][g][kkkk]+=-(  springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x[kkkk] - springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x[kkkk] ) * frictionConstant;
+F_total[1][INDEX_NR2][whatnet2][g][kkkk]+= -( springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y[kkkk]- springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y[kkkk] ) * frictionConstant;
+F_total[2][INDEX_NR2][whatnet2][g][kkkk]+= -(  springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z[kkkk] - springharmony_status_link_[INDEX_NRmore ][k][whatnet].vel_new_z[kkkk] ) * frictionConstant;
 
 
-F_total[0][INDEX_NRmore][whatnet][k] +=-(  springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x - springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x ) * frictionConstant;
-F_total[1][INDEX_NRmore][whatnet][k] += -( springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y- springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y ) * frictionConstant;
-F_total[2][INDEX_NRmore][whatnet][k] += -(  springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z - springharmony_status_link_[INDEX_NRmore ][k][whatnet].vel_new_z ) * frictionConstant;
+F_total[0][INDEX_NRmore][whatnet][k][kkkk]+=-(  springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x[kkkk] - springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x[kkkk] ) * frictionConstant;
+F_total[1][INDEX_NRmore][whatnet][k][kkkk]+= -( springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y[kkkk]- springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y[kkkk] ) * frictionConstant;
+F_total[2][INDEX_NRmore][whatnet][k][kkkk]+= -(  springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z[kkkk] - springharmony_status_link_[INDEX_NRmore ][k][whatnet].vel_new_z[kkkk] ) * frictionConstant;
 
-springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x*0.95 ;	
-springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y*0.95 ;
-springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_z = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_z*0.95 ;
-springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x*0.95 ;	
-springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y*0.95 ;
-springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z*0.95 ;  
+springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x[kkkk] = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_x[kkkk]*0.95 ;	
+springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y[kkkk] = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_y[kkkk]*0.95 ;
+springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_z[kkkk] = springharmony_status_link_[INDEX_NRmore][k][whatnet].vel_new_z[kkkk]*0.95 ;
+springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x[kkkk] = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_x[kkkk]*0.95 ;	
+springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y[kkkk] = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_y[kkkk]*0.95 ;
+springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z[kkkk] = springharmony_status_link_[INDEX_NR2][g][whatnet2].vel_new_z[kkkk]*0.95 ;  
 		}
  	k_flappers = g;
 	whatNET = whatnet2;
 	
-springharmony_status_link_[INDEX_NR2][g][whatnet2].force_sign =   1;
-springharmony_status_link_[INDEX_NR2][g][whatnet2]   =  worm_ventral(   springharmony_status_link_[INDEX_NR2][g][whatnet2] ,1) ;
- springharmony_status_link_[INDEX_NR2][k][whatnet].force_sign =  1234;
+springharmony_status_link_[INDEX_NR2][g][whatnet2].force_sign[kkkk] =   1;
+springharmony_status_link_[INDEX_NR2][g][whatnet2]   =  worm_ventral(   springharmony_status_link_[INDEX_NR2][g][whatnet2] ,1,kkkk) ;
+ springharmony_status_link_[INDEX_NR2][k][whatnet].force_sign[kkkk] =  1234;
 k_flappers = k;
 whatNET = whatnet;
-springharmony_status_link_[INDEX_NRmore][k][whatnet].force_sign =   -1;  
-springharmony_status_link_[INDEX_NRmore][k][whatnet]  =  worm_ventral(   springharmony_status_link_[INDEX_NRmore][k][whatnet] ,1);
- springharmony_status_link_[INDEX_NRmore][k][whatnet].force_sign =  4321;
+springharmony_status_link_[INDEX_NRmore][k][whatnet].force_sign[kkkk] =   -1;  
+springharmony_status_link_[INDEX_NRmore][k][whatnet]  =  worm_ventral(   springharmony_status_link_[INDEX_NRmore][k][whatnet] ,1,kkkk);
+ springharmony_status_link_[INDEX_NRmore][k][whatnet].force_sign[kkkk] =  4321;
   }
  	 
  	
  
-				 if(fabs(F_total[0][INDEX_NR1][whatnet][k]) > 21.1233 )
-	 				 	  F_total[0][INDEX_NR1][whatnet][k] =0;
-		 		 if(fabs(F_total[1][INDEX_NR1][whatnet][k])  > 21.1233)
-						F_total[1][INDEX_NR1][whatnet][k] =0;
-			 	 if(fabs(F_total[2][INDEX_NR1][whatnet][k])  > 21.1233)
-						F_total[2][INDEX_NR1][whatnet][k] =0;
+				 if(fabs(F_total[0][INDEX_NR1][whatnet][k][kkkk]) > 21.1233 )
+	 				 	  F_total[0][INDEX_NR1][whatnet][k][kkkk]=0;
+		 		 if(fabs(F_total[1][INDEX_NR1][whatnet][k][kkkk])  > 21.1233)
+						F_total[1][INDEX_NR1][whatnet][k][kkkk]=0;
+			 	 if(fabs(F_total[2][INDEX_NR1][whatnet][k][kkkk])  > 21.1233)
+						F_total[2][INDEX_NR1][whatnet][k][kkkk]=0;
 
-				 if(fabs(F_total[0][INDEX_NR2][whatnet2][g]) > 21.1233 )
-	 				 	  F_total[0][INDEX_NR2][whatnet2][g] =0;
-		 		 if(fabs(F_total[1][INDEX_NR2][whatnet2][g])  > 21.1233)
-						F_total[1][INDEX_NR2][whatnet2][g] =0;
-			 	 if(fabs(F_total[2][INDEX_NR2][whatnet2][g])  > 21.1233)
-						F_total[2][INDEX_NR2][whatnet2][g] =0;
+				 if(fabs(F_total[0][INDEX_NR2][whatnet2][g][kkkk]) > 21.1233 )
+	 				 	  F_total[0][INDEX_NR2][whatnet2][g][kkkk]=0;
+		 		 if(fabs(F_total[1][INDEX_NR2][whatnet2][g][kkkk])  > 21.1233)
+						F_total[1][INDEX_NR2][whatnet2][g][kkkk]=0;
+			 	 if(fabs(F_total[2][INDEX_NR2][whatnet2][g][kkkk])  > 21.1233)
+						F_total[2][INDEX_NR2][whatnet2][g][kkkk]=0;
  
 }
-int find_index_____(int NUM, struct state_vector   real[  83333][32][1],int num,int k,int what )
+int find_index_____(int NUM, struct state_vector   real[  83333][32][1],int num,int k,int what,int kkkk )
 {
 int ll = 0;
  	while(ll < NUM)
 	{
-	if(springharmony_status_link[num][k][what].pos_new_x ==real[ll][what]->pos_new_x && springharmony_status_link[num][k][what].pos_new_y ==real[ll][what]->pos_new_y && springharmony_status_link[num][k][what].pos_new_z ==real[ll][what]->pos_new_z)
+	if(springharmony_status_link[num][k][what].pos_new_x[kkkk] ==real[ll][what]->pos_new_x[kkkk] && springharmony_status_link[num][k][what].pos_new_y[kkkk] ==real[ll][what]->pos_new_y[kkkk] && springharmony_status_link[num][k][what].pos_new_z[kkkk] ==real[ll][what]->pos_new_z[kkkk])
 		{
 			//printf("found index_____ @ %d \n", ll);
 			return ll;
@@ -409,44 +409,44 @@ int ll = 0;
 	}
 }
 
-void *ptree[100];
-  
-int ptreeonce[215] = {1,1 ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-int findnearestpoint(int points,struct state_vector ** worm , int num,int howmany, int whantindex,double length)  {
+
+   void *ptree[10000][100];
+int ptreeonce[215][10] = {1,1 ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+int findnearestpoint(int points,struct state_vector ** worm , int num,int howmany, int whantindex,double length,int kkkk)  {
 int i, num_pts = points;
 int INDEX;
- 
+
 struct kdres *presults;
 double pos[3], dist;
-double pt[3] = { springharmony_status_link_[num][0][whantindex].pos_new_x,springharmony_status_link_[num][0][whantindex].pos_new_y, springharmony_status_link_[num][0][whantindex].pos_new_z };
+double pt[3] = { springharmony_status_link_[num][0][whantindex].pos_new_x[kkkk],springharmony_status_link_[num][0][whantindex].pos_new_y[kkkk], springharmony_status_link_[num][0][whantindex].pos_new_z[kkkk] };
 double radius = length;
 num_pts =points;
 //srand( time(0) );
 
-if(ptreeonce[whantindex]  == 1  )
+ if(ptreeonce[whantindex][kkkk]  == 1  )
 {
-	ptree[whantindex] = kd_create( 3 );
+	ptree[whantindex][kkkk] = kd_create( 3 );
   	for( i=0; i<points; i++ ) {   
-    		assert( 0 == kd_insert3( ptree[whantindex], springharmony_status_link_[i][0][whantindex].pos_new_x, springharmony_status_link_[i][0][whantindex].pos_new_y, springharmony_status_link_[i][0][whantindex].pos_new_z, NULL ) );
+    		assert( 0 == kd_insert3( ptree[whantindex][kkkk], springharmony_status_link_[i][0][whantindex].pos_new_x[kkkk], springharmony_status_link_[i][0][whantindex].pos_new_y[kkkk], springharmony_status_link_[i][0][whantindex].pos_new_z[kkkk], NULL ) );
  	 }
 }
-ptreeonce[whantindex] = 0;
+ptreeonce[whantindex][kkkk] = 0;
 
-presults = kd_nearest_range( ptree[whantindex], pt, radius );
+presults = kd_nearest_range( ptree[whantindex][kkkk], pt, radius );
 springharmony_status_link[num][0][whantindex].totaln = kd_res_size(presults) ;
 int feather_count = 0;
-   	totalneigbours[num][whantindex] = springharmony_status_link[num][0][whantindex].totaln;
+   	totalneigbours[num][whantindex][kkkk] = springharmony_status_link[num][0][whantindex].totaln;
 while( !kd_res_end( presults ) ) {
 	(char*)kd_res_item( presults, pos ); 
     	dist = sqrt( dist_sq( pt, pos, 3 ) );
 
  
-	springharmony_status_link[num][feather_count][whantindex].pos_new_x = pos[0];
-	springharmony_status_link[num][feather_count][whantindex].pos_new_y = pos[1];
-	springharmony_status_link[num][feather_count][whantindex].pos_new_z = pos[2];
-  	INDEX = find_index_____(KvvVENTAL,springharmony_status_link_,num,feather_count,whantindex);
+	springharmony_status_link[num][feather_count][whantindex].pos_new_x[kkkk] = pos[0];
+	springharmony_status_link[num][feather_count][whantindex].pos_new_y[kkkk] = pos[1];
+	springharmony_status_link[num][feather_count][whantindex].pos_new_z[kkkk] = pos[2];
+  	INDEX = find_index_____(springharmony_status_link_[0][0][0].totnumpoints[kkkk],springharmony_status_link_,num,feather_count,whantindex,kkkk);
 
-  	springharmony_status_link[num][feather_count][whantindex].INDEX_NR = INDEX;
+  	springharmony_status_link[num][feather_count][whantindex].INDEX_NR[kkkk] = INDEX;
  	feather_count++;
    	kd_res_next( presults );
 	if(num % 1000 ==0)
@@ -454,7 +454,7 @@ while( !kd_res_end( presults ) ) {
 }
   feather_count = 0;
   kd_res_free( presults );
-  //kd_free( ptree );
+// kd_free( ptree[whantindex] );
   return 0;
 }
  
@@ -468,7 +468,7 @@ while( !kd_res_end( presults ) ) {
 extern float  **V ; 
 static struct editor *ed;
  
-struct state_vector       worm_ventral(struct state_vector        next_state, int num )
+struct state_vector       worm_ventral(struct state_vector        next_state, int num,int kkkk )
 {
 	double f0[6];
 	double f0_result[6];
@@ -478,29 +478,29 @@ struct state_vector       worm_ventral(struct state_vector        next_state, in
  	double tburn =  1.0;
 	double tf[6] = {tburn,tburn,tburn,tburn,tburn,tburn};
 
-	z[0] =  next_state.pos_new_x;
-	z[1] =  next_state.pos_new_y;
-	z[2] = next_state.pos_new_z;
-	z[3] =  next_state.vel_new_x;
-	z[4] =  next_state.vel_new_y;
-	z[5] = next_state.vel_new_z;
+	z[0] =  next_state.pos_new_x[kkkk];
+	z[1] =  next_state.pos_new_y[kkkk];
+	z[2] = next_state.pos_new_z[kkkk];
+	z[3] =  next_state.vel_new_x[kkkk];
+	z[4] =  next_state.vel_new_y[kkkk];
+	z[5] = next_state.vel_new_z[kkkk];
 
-	f0[0] = next_state.pos_new_x;
-	f0[1] =next_state.pos_new_y;
-	f0[2] =next_state.pos_new_z;
-	f0[3] =next_state.vel_new_x;
-	f0[4] =next_state.vel_new_y;
-	f0[5] = next_state.vel_new_z;
+	f0[0] = next_state.pos_new_x[kkkk];
+	f0[1] =next_state.pos_new_y[kkkk];
+	f0[2] =next_state.pos_new_z[kkkk];
+	f0[3] =next_state.vel_new_x[kkkk];
+	f0[4] =next_state.vel_new_y[kkkk];
+	f0[5] = next_state.vel_new_z[kkkk];
  
 	rk45(rates_dorsal, t0, f0,f0_result, tf,z,6, 1  );
 
-	next_state.pos_new_x = f0[0];
-	next_state.pos_new_y = f0[1];
-	next_state.pos_new_z = f0[2];
+	next_state.pos_new_x[kkkk] = f0[0];
+	next_state.pos_new_y[kkkk] = f0[1];
+	next_state.pos_new_z[kkkk] = f0[2];
 
-	next_state.vel_new_x = f0[3];
-	next_state.vel_new_y = f0[4];
-	next_state.vel_new_z = f0[5];
+	next_state.vel_new_x[kkkk] = f0[3];
+	next_state.vel_new_y[kkkk] = f0[4];
+	next_state.vel_new_z[kkkk] = f0[5];
 
 	return   next_state ;
 }
@@ -531,61 +531,61 @@ void key(unsigned char key, int x, int y)
 void rates_dorsal ( double *t, double *f, double result[]   )
 {
  
-if(springharmony_status_link_[llll][k_flappers][whatNET].force_sign == 1)
+if(springharmony_status_link_[llll][k_flappers][whatNET].force_sign[kkkk_] == 1)
 {
     	result[0] =             f[3]/1.00000123;
     	result[1] =             f[4]/1.00000123;
     	result[2] =             f[5]/1.00000123;
   
-	result[3] = (F_total[0][llll][whatNET][k_flappers])/(10000009.0123   );
-	result[4] = (F_total[1][llll][whatNET][k_flappers] -gravity[whatNET]  )/(10000009.0123   );
-	result[5] = (F_total[2][llll][whatNET][k_flappers] )/(10000009.0123); 
+	result[3] = (F_total[0][llll][whatNET][k_flappers][kkkk_])/(10000009.0123   );
+	result[4] = (F_total[1][llll][whatNET][k_flappers][kkkk_] -gravity[whatNET]  )/(10000009.0123   );
+	result[5] = (F_total[2][llll][whatNET][k_flappers][kkkk_] )/(10000009.0123); 
 }
-else if(springharmony_status_link_[INDEX_NR][k_flappers][whatNET].force_sign == -1)
+else if(springharmony_status_link_[INDEX_NR][k_flappers][whatNET].force_sign[kkkk_] == -1)
 {
     result[0] =             f[3]/1.00000123;
     result[1] =             f[4]/1.00000123;
     result[2] =             f[5]/1.00000123;
   
-    result[3] = -(F_total[0][INDEX_NR][whatNET][k_flappers])/(10000009.0123  );
-    result[4] = -(F_total[1][INDEX_NR][whatNET][k_flappers] -gravity[whatNET] ) /(10000009.0123) ;
-    result[5] = -(F_total[2][INDEX_NR][whatNET][k_flappers] )/(10000009.0123  ); //522
+    result[3] = -(F_total[0][INDEX_NR][whatNET][k_flappers][kkkk_])/(10000009.0123  );
+    result[4] = -(F_total[1][INDEX_NR][whatNET][k_flappers][kkkk_] -gravity[whatNET] ) /(10000009.0123) ;
+    result[5] = -(F_total[2][INDEX_NR][whatNET][k_flappers][kkkk_] )/(10000009.0123  ); //522
  
 
 }
-else if(springharmony_status_link_[INDEX_NRmore][k_flappers][whatNET].force_sign == -1)
+else if(springharmony_status_link_[INDEX_NRmore][k_flappers][whatNET].force_sign[kkkk_]== -1)
 {
     	result[0] =             f[3]/1.00000123;
     	result[1] =             f[4]/1.00000123;
     	result[2] =             f[5]/1.00000123;
   
-	result[3] = -(F_total[0][INDEX_NRmore][whatNET][k_flappers])/(10000009.0123   );
-	result[4] = -(F_total[1][INDEX_NRmore][whatNET][k_flappers] -gravity[whatNET]  )/(10000009.0123   );
-	result[5] = -(F_total[2][INDEX_NRmore][whatNET][k_flappers] )/(10000009.0123); 
+	result[3] = -(F_total[0][INDEX_NRmore][whatNET][k_flappers][kkkk_])/(10000009.0123   );
+	result[4] = -(F_total[1][INDEX_NRmore][whatNET][k_flappers][kkkk_] -gravity[whatNET]  )/(10000009.0123   );
+	result[5] = -(F_total[2][INDEX_NRmore][whatNET][k_flappers][kkkk_] )/(10000009.0123); 
 
  
 }
-else if(springharmony_status_link_[INDEX_NR1][k_flappers][whatNET].force_sign == -1)
+else if(springharmony_status_link_[INDEX_NR1][k_flappers][whatNET].force_sign[kkkk_] == -1)
 {
     	result[0] =             f[3]/1.00000123;
     	result[1] =             f[4]/1.00000123;
     	result[2] =             f[5]/1.00000123;
   
-	result[3] = -(F_total[0][INDEX_NR1][whatNET][k_flappers])/(10000009.0123   );
-	result[4] = -(F_total[1][INDEX_NR1][whatNET][k_flappers] -gravity[whatNET] )/(10000009.0123   );
-	result[5] = -(F_total[2][INDEX_NR1][whatNET][k_flappers] )/(10000009.0123); 
+	result[3] = -(F_total[0][INDEX_NR1][whatNET][k_flappers][kkkk_])/(10000009.0123   );
+	result[4] = -(F_total[1][INDEX_NR1][whatNET][k_flappers][kkkk_] -gravity[whatNET] )/(10000009.0123   );
+	result[5] = -(F_total[2][INDEX_NR1][whatNET][k_flappers][kkkk_] )/(10000009.0123); 
 
  
 }
-else if(springharmony_status_link_[INDEX_NR2][k_flappers][whatNET].force_sign ==  1)
+else if(springharmony_status_link_[INDEX_NR2][k_flappers][whatNET].force_sign[kkkk_] ==  1)
 {
     	result[0] =             f[3]/1.00000123;
     	result[1] =             f[4]/1.00000123;
     	result[2] =             f[5]/1.00000123;
   
-	result[3] = -(F_total[0][INDEX_NR2][whatNET][k_flappers])/(10000009.0123   );
-	result[4] = -(F_total[1][INDEX_NR2][whatNET][k_flappers]-gravity[whatNET]   )/(10000009.0123   );
-	result[5] = -(F_total[2][INDEX_NR2][whatNET][k_flappers] )/(10000009.0123);
+	result[3] = -(F_total[0][INDEX_NR2][whatNET][k_flappers][kkkk_])/(10000009.0123   );
+	result[4] = -(F_total[1][INDEX_NR2][whatNET][k_flappers][kkkk_]-gravity[whatNET]   )/(10000009.0123   );
+	result[5] = -(F_total[2][INDEX_NR2][whatNET][k_flappers][kkkk_] )/(10000009.0123);
 }
 }
  
@@ -599,7 +599,7 @@ else if(springharmony_status_link_[INDEX_NR2][k_flappers][whatNET].force_sign ==
 #include "catmull/editor.h"
 
 static struct editor *ed;
-
+static struct editor *ed2;
 static vector center = { 0.0, 0.0, 0.0 };
 static float focal_len = 5.0f;
 static float y_rot = 0.0f, x_rot = 0.0f;
@@ -611,11 +611,11 @@ static GLint width = 1920, height = 1080;
 static enum { NONE, ROTATING, PANNING, ZOOMING } cur_op = NONE;
 static int last_x, last_y;
 
-static void focus_camera(const struct mesh *mesh)
+static void focus_camera(const struct mesh *mesh, int nr)
 {
 	vector min, max;
 	/* FIXME */
-	mesh_calc_bounds(mesh, min, max);
+	mesh_calc_bounds(mesh, min, max,nr-1);
 	vec_add(center, min, max);
 	vec_mul(center, 0.5f, center);
 	focal_len = 2.0f * max[1];
@@ -691,47 +691,51 @@ double length__ =0;
 	get_camera(eye, at, up);
 	mat_lookat(m, eye, at, up);
 	glLoadMatrixf(m);
-	ed_render(ed);
+	  //ed_render(ed);
+	// ed_render(ed2);
 	//gl_draw_xyz();
  
 	 gl_begin_2d();
 	 gl_draw_fps(0.925f, 0.975f);
-	 ed_render_overlay(ed);
+	// ed_render_overlay(ed);
 	 gl_end_2d();
  //glScalef(0.2,0.2,0.2);
+ 
+ for(int kkkk =0; kkkk < 2 ; kkkk++)
+  {
  for(int kk = 0; kk < HOW_MANY_FLUIDS ; kk++)
   {
  
- for(int ll = 0; ll <  KvvVENTAL; ll++)  
+ for(int ll = 0; ll <  springharmony_status_link_[0][0][0].totnumpoints[kkkk]; ll++)  
   { 
    // findnearestpoint( KvvVENTAL-1  ,NULL,ll,0,kk , springharmony_status_link_[ll][0][kk].length);	  
 int lkl = 0; 
  //for(int lkl = 0; lkl <   totalneigbours[ll][kk]; lkl++)  
   { 
 
- INDEX_NR=    springharmony_status_link[ll][lkl][kk].INDEX_NR ; 	
- springharmony(ll,lkl,kk ); 
+ INDEX_NR=    springharmony_status_link[ll][lkl][kk].INDEX_NR[kkkk] ; 	
+ springharmony(ll,lkl,kk ,kkkk); 
  //playsound(springharmony_status_link_[ll][0][kk].length);
- 
+
   for(int nnn = 0; nnn < HOW_MANY_FLUIDS ; nnn++)
-   springharmony_netonnet(ll,lkl,kk,nnn );
+   springharmony_netonnet(ll,lkl,kk,nnn,kkkk );
 
 
  //for(int lkl = 0; lkl <   totalneigbours[ll][kk]; lkl++)  
   { 
- INDEX_NR=    springharmony_status_link[ll][lkl][kk].INDEX_NR ; 	
-if(  INDEX_NR > 0  && INDEX_NR < KvvVENTAL && INDEX_NR != ll)
+ INDEX_NR=    springharmony_status_link[ll][lkl][kk].INDEX_NR[kkkk] ; 	
+//if(  INDEX_NR > 0  && INDEX_NR < springharmony_status_link_[0][0][0].totnumpoints[kkkk] && INDEX_NR != ll)
 {
 glPushMatrix();
-  glTranslatef(springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_x, springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_y,springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_z);
+  glTranslatef(springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_x[kkkk], springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_y[kkkk],springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_z[kkkk]);
 
  
-   glColor3f(springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_x, springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_y,springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_z); 
+   glColor3f(springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_x[kkkk], springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_y[kkkk],springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_z[kkkk]); 
  
 length__  = springharmony_status_link_[ll][0][kk].length;
 
-
-glutWireSphere(0.01  ,11 +(kk+1),22+(kk+1)  );
+//printf("pos=%f %f %f \n", springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_x[kkkk], springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_y[kkkk],springharmony_status_link_[INDEX_NR][lkl][kk].pos_new_z[kkkk]);
+glutWireSphere(0.02  ,11 +(kk+1),22+(kk+1)  );
  glPopMatrix();
 }
 }
@@ -739,7 +743,7 @@ glutWireSphere(0.01  ,11 +(kk+1),22+(kk+1)  );
 }
 
 	 }
-
+}
 } 
 
    display_mpeg();
@@ -760,6 +764,7 @@ static void reshape(int w, int h)
 
 static void keyboard(unsigned char key, int x, int y)
 {
+#if 0
 	switch (key) {
 	case 27: case 17:	/* Esc or Ctrl-Q */
 		exit(0);
@@ -815,11 +820,11 @@ static void keyboard(unsigned char key, int x, int y)
 		switch (key) {
 		case ' ':
 			ed_next_obj(ed);
-			focus_camera(ed_cur_obj(ed));
+			//focus_camera(ed_cur_obj(ed));
 			break;
 		case 8:	case 127:	/* Backspace or Delete */
 			ed_prev_obj(ed);
-			focus_camera(ed_cur_obj(ed));
+			//focus_camera(ed_cur_obj(ed));
 			break;
 		//case 'w': case 'W':
 		//	ed_toggle_wireframe(ed);
@@ -832,6 +837,7 @@ static void keyboard(unsigned char key, int x, int y)
 			break;
 		}
 	}
+	#endif
 }
 
 static void special(int key, int x, int y)
@@ -842,11 +848,11 @@ static void special(int key, int x, int y)
 	switch (key) {
 	case GLUT_KEY_RIGHT:
 		ed_next_obj(ed);
-		focus_camera(ed_cur_obj(ed));
+		//focus_camera(ed_cur_obj(ed));
 		break;
 	case GLUT_KEY_LEFT:
 		ed_prev_obj(ed);
-		focus_camera(ed_cur_obj(ed));
+		//focus_camera(ed_cur_obj(ed));
 		break;
 	case GLUT_KEY_UP:
 		ed_next_level(ed);
@@ -924,7 +930,7 @@ int main (int argc, char **argv)
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(width, height);
 	glutCreateWindow("catmull-clark");
-
+  	springVector = malloc( 11121);
 	 glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
@@ -950,13 +956,16 @@ int main (int argc, char **argv)
 	glEnable(GL_COLOR_MATERIAL);
  
 	printf("Loading... "); fflush(stdout);
-	ed = ed_create();
- 
-	ed_add_obj(ed, "s3.obj", 1);
+	  ed = ed_create();
+  	ed2 = ed_create();
+	  ed_add_obj(ed, "monkey.obj", 1,0);
+	
+	 ed_add_obj(ed2, "s3.obj", 2,1);
 	printf("done.\n");
  
-	focus_camera(ed_cur_obj(ed));
-
+	 focus_camera(ed_cur_obj(ed),1);
+	   focus_camera(ed_cur_obj(ed2),2);
+	init_mpgeg();
 	glutMainLoop();
 
 	return 0;
