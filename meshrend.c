@@ -52,29 +52,40 @@ void mesh_compile_list(const struct mesh *mesh, GLuint list)
 } Vec3;
 #define NUM_THREADS 5
 #include <stdbool.h>
- 
+ int nomoreindex = 1;
 extern int KvvVENTAL ;
-extern float *V;
+extern float *V[10];
 extern int KvvVENTALA[600000*2]; 
 
-struct state_vector *  springVector;
-struct state_vector   springharmony_status_link[ 133333][33][1]; 
-struct state_vector *** reall;
-struct state_vector    springharmony_status_link_[ 133333][33][1];  
+ extern int veclist[600000 ][2];
+extern struct state_vector   springharmony_status_link[  8333][32][1]; 
+extern struct state_vector *** reall;
+extern struct state_vector    springharmony_status_link_[  8333][32][1];  
 
-double changer = 1;
-int once = 1;
-void mesh_calc_bounds(const struct mesh *mesh, float *min, float *max)
+
+void mesh_calc_bounds(const struct mesh *mesh, float *min, float *max,int jj)
 {
+
+
+double changer1 = 1;
+double changer2 = 1;
+double changer3 = 1;
+double yup = 0;
+int once = 1;
+int counnn =0;
+double centroidx = 0;
+double centroidy = 0;
+double centroidz = 0;
+double cx= 0;
+double cy= 0;
+double cz= 0;
 	int i,j, nr;
 	const float *vbuf;
  
-	nr = mesh_vertex_buffer(mesh, &vbuf ) /100;
- 	KvvVENTAL = nr;
+	nr = mesh_vertex_buffer(mesh, &vbuf )  /1;
+ 	springharmony_status_link_[0][0][0].totnumpoints[jj] = nr;
+ 	
 
- if(once == 1)
-{
- springVector = malloc(nr*112);
  
 /*
 state_result_worm_ventral= (struct state_vector ***) malloc(sizeof(struct state_vector**) * nr*3); //FIX 1
@@ -103,36 +114,73 @@ for(i = 0; i < nr*2; i++){
  	int kk = 0; 
   Vec3 * v;
 	int ll;
-for(kk = 0; kk <  10  ; kk++)
+	
+ 
+for(kk = 0; kk < 4; kk++)
 	{
 	for(ll = 0; ll < nr  ; ll++)
 	{
   printf(" index %d \n",  nr);
-	  v= (Vec3 *)(V + 3*(KvvVENTALA[ll]-1));
-         	  springharmony_status_link_[ll][0][kk].pos_new_x = v->x/(changer)  ;
+	  v= (Vec3 *)(V[jj] + 3*(veclist[ll][jj]-1));
+//if(v->x != 0 && v->y != 0 && v->z != 0)
+{
+double vel1=  ((float)rand()/(float)(RAND_MAX))  ;
+double vel2=  ((float)rand()/(float)(RAND_MAX)) ;
+double vel3=  ((float)rand()/(float)(RAND_MAX)) ;
+
+double mass=  ((float)rand()/(float)(RAND_MAX)) ;
+if(yup == 0)
+{
+         	  springharmony_status_link_[ll][0][kk].pos_new_x[jj]  = v->x/(changer1) +yup ;
+ printf("vel1 =%f \n", vel1);
+ 	          springharmony_status_link_[ll][0][kk].pos_new_y[jj]  = v->y/(changer2)+yup ;
+ 		  springharmony_status_link_[ll][0][kk].pos_new_z[jj]  = v->z/(changer3) +yup ;
+ 		  
+ 		   centroidx +=v->x;
+		   centroidy +=v->y;
+		   centroidz +=v->z;
+ 		  }
+ 		  else if(yup == 1)
+ 		  {
+ 		 
+ 		 springharmony_status_link_[ll][0][kk].pos_new_x[jj]  = (    (v->x - cx) )/changer1 + cx ;
+ printf("vel1 =%f \n", vel1);
+ 	          springharmony_status_link_[ll][0][kk].pos_new_y[jj]  =   v->y/(changer1);
+ 		  springharmony_status_link_[ll][0][kk].pos_new_z[jj]  = ( (v->z - cz) )/changer3 + cz;
+ 		  
+ 		  
+ 		  }
+ 		  springharmony_status_link_[ll][0][kk].mass = 1.0;
  
- 	          springharmony_status_link_[ll][0][kk].pos_new_y = v->y/(changer) ;
- 		  springharmony_status_link_[ll][0][kk].pos_new_z = v->z/(changer)  ;
- 
- 	  	  springharmony_status_link_[ll][0][kk].vel_new_x = 1e-2*(kk+3) ;
- 		  springharmony_status_link_[ll][0][kk].vel_new_y = 1e-3*(kk+3) ;
- 		  springharmony_status_link_[ll][0][kk].vel_new_z =  6e-2*(kk+3)  ;
+ 	  	  springharmony_status_link_[ll][0][kk].vel_new_x[jj]  = 1*1e-11;
+ 		  springharmony_status_link_[ll][0][kk].vel_new_y[jj]  = 1*1e-11;
+ 		  springharmony_status_link_[ll][0][kk].vel_new_z[jj]  =1*1e-11;
+
+}
   printf("vector   %.10f  %.10f  %.10f  %d \n", v->x,v->y,v->z,ll);
 	}
  
- 
-	for(ll = 0; ll < nr     ; ll++)
-	{
- 		findnearestpoint(nr  ,NULL,ll,0,kk );
-	}
- changer = changer +0.2;
- 
-}
- 
-init_mpgeg();
-once  = 0;
-}
 
+printf("counnn =%d\n", ll);
+	 for(ll = 0; ll < nr     ; ll++)
+	{
+ 	 	 findnearestpoint(nr  ,NULL,ll,0,kk ,0.004,jj);
+	}
+
+  changer1 = changer1 +0.015;
+  changer2 = changer2 +0.025;
+  changer3 = changer3 +0.2;
+  cx = centroidx/nr;
+  cy = centroidy/nr;
+  cz = centroidz/nr;
+printf("pos {%f,%f,%f}\n", cx,cy,cz);
+
+ 
+  yup = 1;
+}
+ 
+  nomoreindex = 0;
+  KvvVENTAL = 0;
 	vec_set(min, INFINITY, INFINITY, INFINITY);
 	vec_neg(max, min);
 	for (i = 0; i < nr; i++) {
